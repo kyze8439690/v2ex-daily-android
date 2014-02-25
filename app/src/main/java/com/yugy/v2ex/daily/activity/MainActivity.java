@@ -14,11 +14,13 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.TextView;
 
+import com.umeng.update.UmengUpdateAgent;
 import com.yugy.v2ex.daily.fragment.AllNodeFragment;
 import com.yugy.v2ex.daily.fragment.CollectionFragment;
 import com.yugy.v2ex.daily.fragment.NavigationDrawerFragment;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.fragment.NewestNodeFragment;
+import com.yugy.v2ex.daily.fragment.SettingFragment;
 
 public class MainActivity extends BaseActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -37,6 +39,7 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        UmengUpdateAgent.update(this);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -63,9 +66,14 @@ public class MainActivity extends BaseActivity
                         .replace(R.id.container, new AllNodeFragment())
                         .commit();
                 break;
-            default:
+            case 2:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new CollectionFragment())
+                        .commit();
+                break;
+            case 3:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new SettingFragment())
                         .commit();
                 break;
         }
@@ -81,6 +89,9 @@ public class MainActivity extends BaseActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
                 break;
         }
     }

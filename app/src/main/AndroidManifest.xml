@@ -9,12 +9,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:debuggable="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:name=".Application"
         android:theme="@style/AppTheme" >
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="530cc7d456240bfac5056280" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="apk" />
 
         <service
             android:name="com.umeng.common.net.DownloadingService"

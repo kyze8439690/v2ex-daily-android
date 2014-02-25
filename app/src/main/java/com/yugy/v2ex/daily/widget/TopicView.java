@@ -70,7 +70,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
         mName.setText(model.member.username);
         mTime.setReferenceTime(model.created * 1000);
         mReplies.setText(model.replies + " 个回复");
-        mNode.setText(model.node.titleAlternative);
+        mNode.setText(model.node.name);
 
         mMember = model.member;
         mNodeId = model.node.id;
