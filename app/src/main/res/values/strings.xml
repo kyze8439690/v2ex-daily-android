@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">V2EX Daily</string>
+    <string name="title_section1">Newest</string>
+    <string name="title_section2">All Node</string>
+    <string name="title_section3">Collections</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Settings</string>
+    <string name="just_now">Just now</string>
+    <string name="action_search">Search</string>
+
+</resources>

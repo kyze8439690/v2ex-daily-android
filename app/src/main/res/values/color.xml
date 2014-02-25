@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="alert">#B4CC0000</color>
+    <color name="confirm">#B4FF8800</color>
+    <color name="info">#B4669900</color>
+
+    <color name="window_background">#e6e6e6</color>
+    <color name="holo_selector_pressed">#8033b5e5</color>
+</resources>

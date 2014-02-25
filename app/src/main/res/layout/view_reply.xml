@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/bg_reply"
+                android:padding="8dp">
+
+    <com.yugy.v2ex.daily.widget.SelectorImageView
+        android:id="@+id/img_view_reply_head"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_launcher"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_reply_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/img_view_reply_head"
+        android:layout_marginLeft="8dp"
+        android:text="name"
+        />
+
+    <com.yugy.v2ex.daily.widget.RelativeTimeTextView
+        android:id="@+id/txt_view_reply_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12 小时前"
+        android:textColor="#aaa"
+        android:textSize="12sp"
+        android:layout_toRightOf="@id/txt_view_reply_name"
+        android:layout_alignBottom="@id/txt_view_reply_name"
+        android:layout_marginLeft="8dp"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_reply_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="content"
+        android:layout_toRightOf="@id/img_view_reply_head"
+        android:layout_marginLeft="8dp"
+        android:layout_below="@id/txt_view_reply_name"
+        android:layout_marginTop="8dp"
+        />
+
+</RelativeLayout>

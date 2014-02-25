@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                                android:layout_width="match_parent"
+                                                                android:layout_height="match_parent">
+
+    <com.astuetz.PagerSlidingTabStrip
+        android:id="@+id/tab_fragment_collection"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_fragment_collection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="48dp"/>
+
+    <TextView
+        android:id="@+id/txt_fragment_collection_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="32dp"
+        android:textSize="16sp"
+        android:text="No Collection now.Please add some node in All Node module"/>
+
+</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

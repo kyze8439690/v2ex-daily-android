@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_bg_play"
+                android:paddingBottom="14dp"
+                android:layout_margin="8dp">
+
+    <TextView
+        android:id="@+id/txt_view_topic_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:text="领导突然安排我明天去相亲，对女方几乎没有了解，求建议或攻略！"
+        android:fontFamily="RobotoSlab-Regular.ttf"
+        android:layout_margin="10dp"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_topic_content"
+        android:layout_below="@id/txt_view_topic_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="我是一个懒人，平时喜欢做一些小工具帮自己分担一些工作。
+这是我一年前做的一个自动切图插件，当时甚至还没有UI，只有自己看得懂怎么用，
+一直用了很久，而最近 Photoshop 自带的 Generator 经过几次更新之后变得越来越好用，
+这个插件也慢慢不怎么用它了，所以最近给他做了个其他人起码能看得懂的UI，打算分享出去。
+但是到了命名的时候就卡住了，现在我是用自己名字暂时随便取的，所以求助V友们帮忙想一个名字，
+然后我会做一个主页。
+像 Slicy 这个名字就不错可惜被用了。"
+        android:maxLines="10"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        android:textColor="#737373"/>
+
+    <com.yugy.v2ex.daily.widget.SelectorImageView
+        android:id="@+id/img_view_topic_head"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_below="@id/txt_view_topic_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/ic_launcher"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_topic_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="name"
+        android:layout_alignTop="@id/img_view_topic_head"
+        android:layout_toRightOf="@id/img_view_topic_head"
+        android:layout_marginLeft="8dp"
+        />
+
+    <com.yugy.v2ex.daily.widget.RelativeTimeTextView
+        android:id="@+id/txt_view_topic_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12 小时前"
+        android:layout_alignBottom="@id/img_view_topic_head"
+        android:layout_alignLeft="@id/txt_view_topic_name"
+        android:textColor="#aaa"
+        android:textSize="12sp"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_topic_replies"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="14 条回复"
+        android:layout_alignBottom="@id/img_view_topic_head"
+        android:layout_toRightOf="@id/txt_view_topic_time"
+        android:layout_marginLeft="8dp"
+        android:textSize="12sp"
+        android:textColor="#aaa"/>
+
+    <TextView
+        android:id="@+id/txt_view_topic_node"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="node"
+        android:layout_alignTop="@id/img_view_topic_head"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/bg_node"
+        android:padding="8dp"
+        android:textColor="#aaa"
+        />
+
+</RelativeLayout>
