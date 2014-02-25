@@ -185,9 +185,10 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        NodeView item = (NodeView) view;
         Intent intent = new Intent(getActivity(), NodeActivity.class);
         Bundle argument = new Bundle();
-        argument.putInt("node_id", mModels.get(position).id);
+        argument.putInt("node_id", item.getNodeId());
         intent.putExtra("argument", argument);
         startActivity(intent);
     }

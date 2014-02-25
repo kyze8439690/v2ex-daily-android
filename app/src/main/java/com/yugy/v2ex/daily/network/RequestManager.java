@@ -62,13 +62,13 @@ public class RequestManager {
     }
 
     public void displayImage(String url, final ImageView imageView){
-        imageView.setImageResource(R.drawable.ic_image_loading);
+        imageView.setImageResource(R.drawable.ic_launcher);
         sImageLoader.get(url, new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer imageContainer, boolean isImmediate) {
                 if (!isImmediate){
                     TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
-                            Application.getContext().getResources().getDrawable(R.drawable.ic_image_loading),
+                            Application.getContext().getResources().getDrawable(R.drawable.ic_launcher),
                             new BitmapDrawable(Application.getContext().getResources(), imageContainer.getBitmap())
                     });
                     transitionDrawable.setCrossFadeEnabled(true);
@@ -81,7 +81,7 @@ public class RequestManager {
 
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                imageView.setImageResource(R.drawable.ic_image_fail);
+                volleyError.printStackTrace();
             }
         });
     }

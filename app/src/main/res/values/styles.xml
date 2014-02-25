@@ -3,7 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
-        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="ptrHeaderStyle">@style/Widget.Custom.PtrHeader</item>
         <item name="android:windowBackground">@color/window_background</item>
     </style>
@@ -28,10 +27,6 @@
 
     <style name="ActionBarStyle.Transparent.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
-        <item name="android:background">@drawable/ab_solid_bg</item>
     </style>
 
     <style name="Widget.Custom.PtrHeader" parent="android:Widget">

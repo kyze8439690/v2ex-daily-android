@@ -7,7 +7,8 @@
     <com.etsy.android.grid.StaggeredGridView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:item_margin="8dp"
-        app:column_count="2"
+        app:column_count_portrait="2"
+        app:column_count_landscape="3"
         android:id="@+id/grid_fragment_all_node"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

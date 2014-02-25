@@ -61,17 +61,7 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
 
         mMember = model.member;
 
-        RequestManager.getImageLoader().get(model.member.avatarLarge, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                mHead.setImageBitmap(imageContainer.getBitmap());
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
-            }
-        });
+        RequestManager.getInstance().displayImage(model.member.avatarLarge, mHead);
     }
 
     @Override

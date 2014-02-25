@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
@@ -112,17 +111,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         mSpannableString = new SpannableString(mMemberModel.username);
         mName.setText(mMemberModel.username);
         mDescription.setText("V2EX 第 " + mMemberModel.id + " 号会员");
-        RequestManager.getImageLoader().get(mMemberModel.avatarLarge, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                mHeaderLogo.setImageBitmap(imageContainer.getBitmap());
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
-            }
-        });
+        RequestManager.getInstance().displayImage(mMemberModel.avatarLarge, mHeaderLogo);
 
         setupActionBar();
         setupListView();

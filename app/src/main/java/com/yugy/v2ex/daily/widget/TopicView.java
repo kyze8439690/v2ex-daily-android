@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.yugy.v2ex.daily.R;
+import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
@@ -45,6 +46,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
     private TextView mReplies;
     private TextView mNode;
 
+    private int mNodeId;
     private MemberModel mMember;
 
     private void init(){
@@ -58,6 +60,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
         mNode = (TextView) findViewById(R.id.txt_view_topic_node);
 
         mHead.setOnClickListener(this);
+        mNode.setOnClickListener(this);
     }
 
     public void parse(TopicModel model){
@@ -70,18 +73,9 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
         mNode.setText(model.node.titleAlternative);
 
         mMember = model.member;
+        mNodeId = model.node.id;
 
-        RequestManager.getImageLoader().get(model.member.avatarLarge, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                mHead.setImageBitmap(imageContainer.getBitmap());
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
-            }
-        });
+        RequestManager.getInstance().displayImage(model.member.avatarLarge, mHead);
     }
 
     public void setViewDetail(){
@@ -91,10 +85,23 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(getContext(), UserActivity.class);
-        Bundle argument = new Bundle();
-        argument.putParcelable("model", mMember);
-        intent.putExtra("argument", argument);
-        getContext().startActivity(intent);
+        Intent intent;
+        Bundle argument;
+        switch (v.getId()){
+            case R.id.img_view_topic_head:
+                intent = new Intent(getContext(), UserActivity.class);
+                argument = new Bundle();
+                argument.putParcelable("model", mMember);
+                intent.putExtra("argument", argument);
+                getContext().startActivity(intent);
+                break;
+            case R.id.txt_view_topic_node:
+                intent = new Intent(getContext(), NodeActivity.class);
+                argument = new Bundle();
+                argument.putInt("node_id", mNodeId);
+                intent.putExtra("argument", argument);
+                getContext().startActivity(intent);
+                break;
+        }
     }
 }

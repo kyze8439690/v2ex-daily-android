@@ -68,6 +68,10 @@ public class NodeView extends RelativeLayout implements View.OnClickListener{
         mTopics.setText(model.topics + " topics");
     }
 
+    public int getNodeId(){
+        return mNodeId;
+    }
+
     public void setTypeAdded(boolean added){
         if(added){
             mType = TYPE_ADDED;
