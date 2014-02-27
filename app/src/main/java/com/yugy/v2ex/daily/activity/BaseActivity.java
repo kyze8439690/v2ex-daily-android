@@ -1,8 +1,8 @@
 package com.yugy.v2ex.daily.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.umeng.analytics.MobclickAgent;
@@ -13,7 +13,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 /**
  * Created by yugy on 14-1-29.
  */
-public class BaseActivity extends Activity{
+public class BaseActivity extends FragmentActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

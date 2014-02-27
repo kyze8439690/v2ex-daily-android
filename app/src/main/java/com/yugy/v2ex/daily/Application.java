@@ -1,5 +1,7 @@
 package com.yugy.v2ex.daily;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Environment;
 
@@ -16,13 +18,14 @@ import java.io.File;
  */
 public class Application extends android.app.Application{
 
-    private static Context mContext;
+    private static Application mContext;
+    private static int sMemoryClass;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mContext = getApplicationContext();
+        mContext = this;
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
@@ -46,6 +49,17 @@ public class Application extends android.app.Application{
         }
         ImageLoader.getInstance().init(configBuilder.build());
 
+        final ActivityManager mgr = (ActivityManager) getApplicationContext().
+                getSystemService(Activity.ACTIVITY_SERVICE);
+        sMemoryClass = mgr.getMemoryClass();
+    }
+
+    public static Application getInstance(){
+        return mContext;
+    }
+
+    public int getMemorySize(){
+        return sMemoryClass;
     }
 
     public static Context getContext(){
