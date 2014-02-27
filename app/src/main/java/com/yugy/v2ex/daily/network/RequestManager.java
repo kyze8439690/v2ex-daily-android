@@ -48,10 +48,7 @@ public class RequestManager {
     }
 
     public static ImageLoader getImageLoader() {
-        if(sInstance == null){
-            sInstance = new RequestManager();
-        }
-        return sInstance.sImageLoader;
+        return getInstance().sImageLoader;
     }
 
     public static RequestManager getInstance(){

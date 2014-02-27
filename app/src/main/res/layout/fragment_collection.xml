@@ -22,6 +22,7 @@
         android:gravity="center"
         android:padding="32dp"
         android:textSize="16sp"
+        android:visibility="gone"
         android:text="No Collection now.Please add some node in All Node module"/>
 
 </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

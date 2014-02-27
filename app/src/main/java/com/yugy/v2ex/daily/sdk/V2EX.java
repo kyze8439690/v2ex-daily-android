@@ -6,10 +6,12 @@ import android.preference.PreferenceManager;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.network.RequestManager;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by yugy on 14-2-22.
@@ -21,6 +23,7 @@ public class V2EX {
     private static final String API_ALL_NODE = "/nodes/all.json";
     private static final String API_REPLIES = "/replies/show.json";
     private static final String API_TOPIC = "/topics/show.json";
+    private static final String API_USER = "/members/show.json";
 
     public static void getLatestTopics(Context context, boolean forceRefresh,
                                        final Response.Listener<JSONArray> listener,
@@ -135,6 +138,14 @@ public class V2EX {
                 listener.onResponse(jsonArray);
             }
         }, errorListener));
+    }
+
+    public static void showUser(Context context, String username,
+                                Response.Listener<JSONObject> listener,
+                                Response.ErrorListener errorListener){
+        RequestManager.getInstance().addRequest(context, new JsonObjectRequest(
+                API_URL + API_USER + "?username=" + username, null, listener, errorListener)
+        );
     }
 
 }

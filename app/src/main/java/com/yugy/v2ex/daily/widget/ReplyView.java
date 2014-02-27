@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.ReplyModel;
+import com.yugy.v2ex.daily.network.AsyncImageGetter;
 import com.yugy.v2ex.daily.network.RequestManager;
 
 /**
@@ -57,7 +59,8 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     public void parse(ReplyModel model){
         mName.setText(model.member.username);
         mTime.setReferenceTime(model.created * 1000);
-        mContent.setText(Html.fromHtml(model.contentRendered));
+        mContent.setText(Html.fromHtml(model.contentRendered, new AsyncImageGetter(getContext(), mContent), null));
+        mContent.setMovementMethod(LinkMovementMethod.getInstance());
 
         mMember = model.member;
 

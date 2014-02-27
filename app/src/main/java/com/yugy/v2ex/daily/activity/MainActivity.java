@@ -6,6 +6,7 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,31 +53,36 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(final int position) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        switch (position){
-            case 0:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new NewestNodeFragment())
-                        .commit();
-                break;
-            case 1:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new AllNodeFragment())
-                        .commit();
-                break;
-            case 2:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new CollectionFragment())
-                        .commit();
-                break;
-            case 3:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new SettingFragment())
-                        .commit();
-                break;
-        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FragmentManager fragmentManager = getFragmentManager();
+                switch (position){
+                    case 0:
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.container, new NewestNodeFragment())
+                                .commit();
+                        break;
+                    case 1:
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.container, new AllNodeFragment())
+                                .commit();
+                        break;
+                    case 2:
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.container, new CollectionFragment())
+                                .commit();
+                        break;
+                    case 3:
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.container, new SettingFragment())
+                                .commit();
+                        break;
+                }
+            }
+        }, 300);
     }
 
     public void onSectionAttached(int number) {

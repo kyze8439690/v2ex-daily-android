@@ -24,6 +24,10 @@ public class UserActivity extends SwipeBackActivity {
             UserFragment userFragment = new UserFragment();
             if(getIntent().hasExtra("argument")){
                 userFragment.setArguments(getIntent().getBundleExtra("argument"));
+            }else{
+                Bundle argument = new Bundle();
+                argument.putString("username", getIntent().getData().getPath());
+                userFragment.setArguments(argument);
             }
             getFragmentManager().beginTransaction().add(R.id.container_activity_topic, userFragment).commit();
         }

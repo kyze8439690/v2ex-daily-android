@@ -3,6 +3,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:title="账户"
+        >
+
+        <Preference
+            android:key="pref_login"
+            android:title="登陆"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="更多"
         >
 

@@ -34,6 +34,7 @@ import com.yugy.v2ex.daily.widget.AppMsg;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         mName = (TextView) mPullToRefreshLayout.findViewById(R.id.txt_fragment_user_name);
         mDescription = (TextView) mPullToRefreshLayout.findViewById(R.id.txt_fragment_user_description);
         mPlaceHolderView = getActivity().getLayoutInflater().inflate(R.layout.view_header_placeholder, mListView, false);
-        mListView.addHeaderView(mPlaceHolderView);
+        mListView.addHeaderView(mPlaceHolderView, null, false);
         mListView.setOnItemClickListener(this);
         return mPullToRefreshLayout;
     }
@@ -107,13 +108,44 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                 .allChildrenArePullable()
                 .setup(mPullToRefreshLayout);
 
-        mMemberModel = getArguments().getParcelable("model");
+
+        setupActionBar();
+
+        if(getArguments().containsKey("model")){
+            mMemberModel = getArguments().getParcelable("model");
+            showData();
+        }else if(getArguments().containsKey("username")){
+            String username = getArguments().getString("username").substring(1);
+            mName.setText(username);
+            mDescription.setText("Loading...");
+            V2EX.showUser(getActivity(), username, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    mMemberModel = new MemberModel();
+                    try {
+                        mMemberModel.parse(jsonObject);
+                        showData();
+                    } catch (JSONException e) {
+                        AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                    volleyError.printStackTrace();
+                }
+            });
+        }
+    }
+
+    private void showData(){
         mSpannableString = new SpannableString(mMemberModel.username);
         mName.setText(mMemberModel.username);
         mDescription.setText("V2EX 第 " + mMemberModel.id + " 号会员");
         RequestManager.getInstance().displayImage(mMemberModel.avatarLarge, mHeaderLogo);
 
-        setupActionBar();
         setupListView();
     }
 
@@ -156,9 +188,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        if (volleyError.getCause() instanceof EOFException) {
-                            AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                        }
+                        AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
                         mPullToRefreshLayout.setRefreshComplete();
                         volleyError.printStackTrace();
                     }
@@ -246,7 +276,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         if(mDataLoaded){
             Intent intent = new Intent(getActivity(), TopicActivity.class);
             Bundle argument = new Bundle();
-            argument.putParcelable("model", mModels.get(position));
+            argument.putParcelable("model", mModels.get(position - 1));
             intent.putExtra("argument", argument);
             startActivity(intent);
         }

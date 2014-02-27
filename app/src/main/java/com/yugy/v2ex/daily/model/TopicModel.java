@@ -29,7 +29,9 @@ public class TopicModel implements Parcelable{
         title = jsonObject.getString("title");
         url = jsonObject.getString("url");
         content = jsonObject.getString("content");
-        contentRendered = jsonObject.getString("content_rendered");
+        contentRendered = jsonObject.getString("content_rendered")
+                .replace("href=\"/member/", "href=\"v2ex://member/")
+                .replace("href=\"/i/", "href=\"http://i.v2ex.co/");
         replies = jsonObject.getInt("replies");
         member = new MemberModel();
         member.parse(jsonObject.getJSONObject("member"));

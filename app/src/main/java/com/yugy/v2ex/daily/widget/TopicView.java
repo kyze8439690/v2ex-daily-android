@@ -4,20 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
+import com.yugy.v2ex.daily.network.AsyncImageGetter;
 import com.yugy.v2ex.daily.network.RequestManager;
+
 
 /**
  * Created by yugy on 14-2-23.
@@ -65,12 +65,13 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
 
     public void parse(TopicModel model){
         mTitle.setText(model.title);
-        mContent.setText(Html.fromHtml(model.contentRendered));
+        CharSequence sequence = Html.fromHtml(model.contentRendered, new AsyncImageGetter(getContext(), mContent), null);
+        mContent.setText(sequence);
 
         mName.setText(model.member.username);
         mTime.setReferenceTime(model.created * 1000);
         mReplies.setText(model.replies + " 个回复");
-        mNode.setText(model.node.name);
+        mNode.setText(model.node.title);
 
         mMember = model.member;
         mNodeId = model.node.id;
@@ -80,7 +81,9 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
 
     public void setViewDetail(){
         mContent.setMaxLines(Integer.MAX_VALUE);
-        mContent.setTextSize(14);
+        mContent.setTextSize(16);
+        mContent.setLineSpacing(3f, 1.2f);
+        mContent.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override

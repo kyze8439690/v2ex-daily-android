@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -140,16 +141,7 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
             @Override
             public void onResponse(JSONArray jsonArray) {
                 DebugUtils.log(jsonArray);
-                try {
-                    mModels = getModels(jsonArray);
-                    mGridView.setAdapter(new AllNodeAdapter(mModels));
-                } catch (JSONException e) {
-                    AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                    e.printStackTrace();
-                }
-                mPullToRefreshLayout.setRefreshComplete();
-                mPullToRefreshLayout.findViewById(R.id.progress_fragment_all_node).setVisibility(View.GONE);
-                mGridView.setEmptyView(null);
+                new ParseTask().execute(jsonArray);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -161,6 +153,30 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
                 volleyError.printStackTrace();
             }
         });
+    }
+
+    private class ParseTask extends AsyncTask<JSONArray, Void, ArrayList<NodeModel>>{
+
+        @Override
+        protected ArrayList<NodeModel> doInBackground(JSONArray... params) {
+            try {
+                mModels = getModels(params[0]);
+                return mModels;
+            } catch (JSONException e) {
+                AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<NodeModel> nodeModels) {
+            mGridView.setAdapter(new AllNodeAdapter(mModels));
+            mPullToRefreshLayout.setRefreshComplete();
+            mPullToRefreshLayout.findViewById(R.id.progress_fragment_all_node).setVisibility(View.GONE);
+            mGridView.setEmptyView(null);
+            super.onPostExecute(nodeModels);
+        }
     }
 
     private ArrayList<NodeModel> getModels(JSONArray jsonArray) throws JSONException {

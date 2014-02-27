@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -63,26 +64,7 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
                     @Override
                     public void onResponse(JSONArray jsonArray) {
                         DebugUtils.log(jsonArray);
-                        try {
-                            ArrayList<NodeModel> models = getModels(jsonArray);
-                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                            Set<String> collectionNodeId = sharedPreferences.getStringSet("node_collections", new HashSet<String>());
-                            if(collectionNodeId.size() != 0){
-                                for(NodeModel model : models){
-                                    for(String id : collectionNodeId){
-                                        if(String.valueOf(model.id).equals(id)){
-                                            mCollectionNode.add(model);
-                                        }
-                                    }
-                                }
-                                mEmptyText.setVisibility(View.GONE);
-                                mViewPager.setAdapter(new CollectionAdapter(getFragmentManager(), mCollectionNode));
-                                mPagerSlidingTabStrip.setViewPager(mViewPager);
-                            }
-                        } catch (JSONException e) {
-                            AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                            e.printStackTrace();
-                        }
+                        new ParseTask().execute(jsonArray);
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -94,6 +76,43 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
                     }
                 }
         );
+    }
+
+    private class ParseTask extends AsyncTask<JSONArray, Void, CollectionAdapter>{
+
+        @Override
+        protected CollectionAdapter doInBackground(JSONArray... params) {
+            try {
+                ArrayList<NodeModel> models = getModels(params[0]);
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                Set<String> collectionNodeId = sharedPreferences.getStringSet("node_collections", new HashSet<String>());
+                if(collectionNodeId.size() != 0){
+                    for(NodeModel model : models){
+                        for(String id : collectionNodeId){
+                            if(String.valueOf(model.id).equals(id)){
+                                mCollectionNode.add(model);
+                            }
+                        }
+                    }
+                    return new CollectionAdapter(getFragmentManager(), mCollectionNode);
+                }
+            } catch (JSONException e) {
+                AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(CollectionAdapter collectionAdapter) {
+            if(collectionAdapter != null){
+                mViewPager.setAdapter(collectionAdapter);
+                mPagerSlidingTabStrip.setViewPager(mViewPager);
+            }else{
+                mEmptyText.setVisibility(View.VISIBLE);
+            }
+            super.onPostExecute(collectionAdapter);
+        }
     }
 
     private class CollectionAdapter extends FragmentStatePagerAdapter{

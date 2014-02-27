@@ -20,7 +20,9 @@ public class ReplyModel {
         id = jsonObject.getInt("id");
         thanks = jsonObject.getInt("thanks");
         content = jsonObject.getString("content");
-        contentRendered = jsonObject.getString("content_rendered");
+        contentRendered = jsonObject.getString("content_rendered")
+                .replace("href=\"/member/", "href=\"v2ex://member/")
+                .replace("href=\"/i/", "href=\"http://i.v2ex.co/");
         member = new MemberModel();
         member.parse(jsonObject.getJSONObject("member"));
         created = jsonObject.getLong("created");

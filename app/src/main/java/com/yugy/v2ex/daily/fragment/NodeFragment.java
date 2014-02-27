@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.yugy.v2ex.daily.R;
+import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.TopicAdapter;
 import com.yugy.v2ex.daily.model.TopicModel;
@@ -69,6 +70,9 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                         DebugUtils.log(jsonArray);
                         try {
                             mModels = getModels(jsonArray);
+                            if(getActivity() instanceof NodeActivity){
+                                getActivity().getActionBar().setTitle(mModels.get(0).node.title);
+                            }
                             mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
                         } catch (JSONException e) {
                             AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
