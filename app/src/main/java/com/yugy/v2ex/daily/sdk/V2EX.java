@@ -7,8 +7,13 @@ import android.preference.PreferenceManager;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.network.RequestManager;
+import com.yugy.v2ex.daily.utils.DebugUtils;
+
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,127 +30,142 @@ public class V2EX {
     private static final String API_TOPIC = "/topics/show.json";
     private static final String API_USER = "/members/show.json";
 
-    public static void getLatestTopics(Context context, boolean forceRefresh,
-                                       final Response.Listener<JSONArray> listener,
-                                       Response.ErrorListener errorListener){
+    public static void getLatestTopics(Context context, boolean forceRefresh, final JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("getLatestTopics");
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if(!forceRefresh){
             if(sharedPreferences.contains("latest_topics_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("latest_topics_cache", null));
-                    listener.onResponse(jsonArray);
+                    responseHandler.onSuccess(jsonArray);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_LATEST, new Response.Listener<JSONArray>() {
+        new AsyncHttpClient().get(context, API_URL + API_LATEST, new JsonHttpResponseHandler() {
             @Override
-            public void onResponse(JSONArray jsonArray) {
-                sharedPreferences.edit().putString("latest_topics_cache", jsonArray.toString()).commit();
-                listener.onResponse(jsonArray);
+            public void onSuccess(JSONArray response) {
+                sharedPreferences.edit().putString("latest_topics_cache", response.toString()).commit();
+                responseHandler.onSuccess(response);
+                super.onSuccess(response);
             }
-        }, errorListener));
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                responseHandler.onFailure(statusCode, headers, responseBody, e);
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
-    public static void getAllNode(Context context,
-                                  boolean forceRefresh,
-                                  final Response.Listener<JSONArray> listener,
-                                  Response.ErrorListener errorListener){
+    public static void getAllNode(Context context, boolean forceRefresh, final JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("getAllNode");
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Application.getContext());
         if(!forceRefresh){
             if(sharedPreferences.contains("all_node")){
                 try {
                     JSONArray response = new JSONArray(sharedPreferences.getString("all_node", "/"));
-                    listener.onResponse(response);
+                    responseHandler.onSuccess(response);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_ALL_NODE, new Response.Listener<JSONArray>() {
+        new AsyncHttpClient().get(context, API_URL + API_ALL_NODE, new JsonHttpResponseHandler() {
+
             @Override
-            public void onResponse(JSONArray jsonArray) {
-                sharedPreferences.edit().putString("all_node", jsonArray.toString()).commit();
-                listener.onResponse(jsonArray);
+            public void onSuccess(JSONArray response) {
+                sharedPreferences.edit().putString("all_node", response.toString()).commit();
+                responseHandler.onSuccess(response);
+                super.onSuccess(response);
             }
-        }, errorListener));
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                responseHandler.onFailure(statusCode, headers, responseBody, e);
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
-    public static void showTopicByTopicId(Context context, int topicId,
-                                          Response.Listener<JSONArray> listener,
-                                          Response.ErrorListener errorListener){
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_TOPIC + "?id=" + topicId, listener, errorListener));
+    public static void showTopicByTopicId(Context context, int topicId, JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("showTopicByTopicId");
+        new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?id=" + topicId, responseHandler);
     }
 
-    public static void getReplies(Context context, int topicId,
-                                  Response.Listener<JSONArray> listener,
-                                  Response.ErrorListener errorListener){
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_REPLIES + "?topic_id=" + topicId, listener, errorListener));
+    public static void getReplies(Context context, int topicId, JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("getReplies");
+        new AsyncHttpClient().get(context, API_URL + API_REPLIES + "?topic_id=" + topicId, responseHandler);
     }
 
     public static void showTopicByNodeId(Context context, boolean forceRefresh, final int nodeId,
-                                         final Response.Listener<JSONArray> listener,
-                                         Response.ErrorListener errorListener){
+                                         final JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("showTopicByNodeId");
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if(!forceRefresh){
             if(sharedPreferences.contains("topics_" + nodeId + "_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("topics_" + nodeId + "_cache", null));
-                    listener.onResponse(jsonArray);
+                    responseHandler.onSuccess(jsonArray);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_TOPIC + "?node_id=" + nodeId, new Response.Listener<JSONArray>() {
+        new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?node_id=" + nodeId, new JsonHttpResponseHandler() {
             @Override
-            public void onResponse(JSONArray jsonArray) {
-                sharedPreferences.edit().putString("topics_" + nodeId + "_cache", jsonArray.toString()).commit();
-                listener.onResponse(jsonArray);
+            public void onSuccess(JSONArray response) {
+                sharedPreferences.edit().putString("topics_" + nodeId + "_cache", response.toString()).commit();
+                responseHandler.onSuccess(response);
+                super.onSuccess(response);
             }
-        }, errorListener));
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                responseHandler.onFailure(statusCode, headers, responseBody, e);
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
     public static void showTopicByUsername(Context context, boolean forceRefresh, final String username,
-                                         final Response.Listener<JSONArray> listener,
-                                         Response.ErrorListener errorListener){
+                                         final JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("showTopicByUsername");
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if(!forceRefresh){
             if(sharedPreferences.contains("topics_" + username + "_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("topics_" + username + "_cache", null));
-                    listener.onResponse(jsonArray);
+                    responseHandler.onSuccess(jsonArray);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
-        RequestManager.getInstance().addRequest(context, new JsonArrayRequest(
-                API_URL + API_TOPIC + "?username=" + username, new Response.Listener<JSONArray>() {
+        new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?username=" + username, new JsonHttpResponseHandler(){
             @Override
-            public void onResponse(JSONArray jsonArray) {
-                sharedPreferences.edit().putString("topics_" + username + "_cache", jsonArray.toString()).commit();
-                listener.onResponse(jsonArray);
+            public void onSuccess(JSONArray response) {
+                sharedPreferences.edit().putString("topics_" + username + "_cache", response.toString()).commit();
+                responseHandler.onSuccess(response);
+                super.onSuccess(response);
             }
-        }, errorListener));
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                responseHandler.onFailure(statusCode, headers, responseBody, e);
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
-    public static void showUser(Context context, String username,
-                                Response.Listener<JSONObject> listener,
-                                Response.ErrorListener errorListener){
-        RequestManager.getInstance().addRequest(context, new JsonObjectRequest(
-                API_URL + API_USER + "?username=" + username, null, listener, errorListener)
-        );
+    public static void showUser(Context context, String username, JsonHttpResponseHandler responseHandler){
+        DebugUtils.log("showUser");
+        new AsyncHttpClient().get(context, API_URL + API_USER + "?username=" + username, responseHandler);
     }
 
 }

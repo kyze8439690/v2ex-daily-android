@@ -10,5 +10,6 @@
     <string name="navigation_drawer_close">关闭抽屉</string>
     <string name="just_now">刚刚</string>
     <string name="action_search">搜索</string>
+    <string name="title_login">用户登陆</string>
 
 </resources>

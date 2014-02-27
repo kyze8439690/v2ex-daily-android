@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
@@ -32,6 +33,7 @@ import com.yugy.v2ex.daily.utils.ScreenUtils;
 import com.yugy.v2ex.daily.widget.AlphaForegroundColorSpan;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,23 +119,25 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
             String username = getArguments().getString("username").substring(1);
             mName.setText(username);
             mDescription.setText("Loading...");
-            V2EX.showUser(getActivity(), username, new Response.Listener<JSONObject>() {
+            V2EX.showUser(getActivity(), username, new JsonHttpResponseHandler(){
                 @Override
-                public void onResponse(JSONObject jsonObject) {
+                public void onSuccess(JSONObject response) {
                     mMemberModel = new MemberModel();
                     try {
-                        mMemberModel.parse(jsonObject);
+                        mMemberModel.parse(response);
                         showData();
                     } catch (JSONException e) {
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                         e.printStackTrace();
                     }
+                    super.onSuccess(response);
                 }
-            }, new Response.ErrorListener() {
+
                 @Override
-                public void onErrorResponse(VolleyError volleyError) {
+                public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
                     AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                    volleyError.printStackTrace();
+                    e.printStackTrace();
+                    super.onFailure(statusCode, headers, responseBody, e);
                 }
             });
         }
@@ -169,30 +173,30 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
 
     private void getData(boolean forceRefresh){
         V2EX.showTopicByUsername(getActivity(), forceRefresh, mMemberModel.username,
-                new Response.Listener<JSONArray>() {
-
-                    @Override
-                    public void onResponse(JSONArray jsonArray) {
-                        DebugUtils.log(jsonArray);
-                        try {
-                            mModels = getModels(jsonArray);
-                            mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
-                            mDataLoaded = true;
-                        } catch (JSONException e) {
-                            AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                            e.printStackTrace();
-                        }
-                        mPullToRefreshLayout.setRefreshComplete();
+            new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(JSONArray response) {
+                    DebugUtils.log(response);
+                    try {
+                        mModels = getModels(response);
+                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
+                        mDataLoaded = true;
+                    } catch (JSONException e) {
+                        AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                        mPullToRefreshLayout.setRefreshComplete();
-                        volleyError.printStackTrace();
-                    }
+                    mPullToRefreshLayout.setRefreshComplete();
+                    super.onSuccess(response);
                 }
-        );
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                    mPullToRefreshLayout.setRefreshComplete();
+                    e.printStackTrace();
+                    super.onFailure(statusCode, headers, responseBody, e);
+                }
+        });
     }
 
     private ArrayList<TopicModel> getModels(JSONArray response) throws JSONException {

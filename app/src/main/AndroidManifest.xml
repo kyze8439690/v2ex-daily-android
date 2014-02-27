@@ -57,6 +57,7 @@
         </activity>
         <activity android:name=".activity.LoginActivity"
                   android:theme="@style/AppTheme.SwipeBack"
+                  android:label="@string/title_login"
                   android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

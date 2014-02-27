@@ -88,12 +88,10 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
             return true;
         }
         if(preference.getKey().equals(PREF_LOGIN)){
-            if(getPreferenceManager().getSharedPreferences().contains("logined")){
-                if(getPreferenceManager().getSharedPreferences().getBoolean("logined", false)){
+            if(getPreferenceManager().getSharedPreferences().getBoolean("logined", false)){
 
-                }else{
-                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                }
+            }else{
+                startActivity(new Intent(getActivity(), LoginActivity.class));
             }
             return true;
         }

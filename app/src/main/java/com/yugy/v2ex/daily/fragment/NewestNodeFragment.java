@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
@@ -22,6 +23,7 @@ import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -63,28 +65,27 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, A
 
     private void getData(boolean forceRefresh){
         mPullToRefreshLayout.setRefreshing(true);
-        V2EX.getLatestTopics(getActivity(), forceRefresh, new Response.Listener<JSONArray>(){
-
+        V2EX.getLatestTopics(getActivity(), forceRefresh, new JsonHttpResponseHandler(){
             @Override
-            public void onResponse(JSONArray jsonArray) {
-                DebugUtils.log(jsonArray);
+            public void onSuccess(JSONArray response) {
+                DebugUtils.log(response);
                 try {
-                    mModels = getModels(jsonArray);
+                    mModels = getModels(response);
                     mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
                 } catch (JSONException e) {
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                     e.printStackTrace();
                 }
                 mPullToRefreshLayout.setRefreshComplete();
+                super.onSuccess(response);
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                if(volleyError.getCause() instanceof EOFException){
-                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                }
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                e.printStackTrace();
+                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
                 mPullToRefreshLayout.setRefreshComplete();
-                volleyError.printStackTrace();
+                super.onFailure(statusCode, headers, responseBody, e);
             }
         });
     }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
 import com.yugy.v2ex.daily.model.ReplyModel;
@@ -26,6 +27,7 @@ import com.yugy.v2ex.daily.widget.AppMsg;
 import com.yugy.v2ex.daily.widget.ReplyView;
 import com.yugy.v2ex.daily.widget.TopicView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -78,63 +80,58 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     private void getTopicData(){
-        V2EX.showTopicByTopicId(getActivity(), mTopicModel.id, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jsonArray) {
-                        DebugUtils.log(jsonArray);
-                        try {
-                            mTopicModel.parse(jsonArray.getJSONObject(0));
-                            getReplyData();
-                        } catch (JSONException e) {
-                            AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if (volleyError.getCause() instanceof EOFException) {
-                            AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                        } else if (volleyError.getCause() instanceof TimeoutError) {
-                            AppMsg.makeText(getActivity(), "Timeout error", AppMsg.STYLE_ALERT).show();
-                        }
-                        volleyError.printStackTrace();
-                    }
+        V2EX.showTopicByTopicId(getActivity(), mTopicModel.id, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONArray response) {
+                DebugUtils.log(response);
+                try {
+                    mTopicModel.parse(response.getJSONObject(0));
+                    getReplyData();
+                } catch (JSONException e) {
+                    AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                    e.printStackTrace();
                 }
-        );
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                e.printStackTrace();
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
     private void getReplyData(){
-        V2EX.getReplies(getActivity(), mTopicModel.id, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jsonArray) {
-                        DebugUtils.log(jsonArray);
-                        if(jsonArray.length() == 0){
-                            mListView.setAdapter(new NoReplyAdapter());
-                            mPullToRefreshLayout.setRefreshComplete();
-                            return;
-                        }
-                        try {
-                            ArrayList<ReplyModel> models = getModels(jsonArray);
-                            mListView.setAdapter(new TopicReplyAdapter(models));
-                            mType = TYPE_NORMAL;
-                            mPullToRefreshLayout.setRefreshComplete();
-                        } catch (JSONException e) {
-                            AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if(volleyError.getCause() instanceof EOFException){
-                            AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                        }else if(volleyError.getCause() instanceof TimeoutError){
-                            AppMsg.makeText(getActivity(), "Timeout error", AppMsg.STYLE_ALERT).show();
-                        }
-                        volleyError.printStackTrace();
-                    }
-                });
+        V2EX.getReplies(getActivity(), mTopicModel.id, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONArray response) {
+                DebugUtils.log(response);
+                if(response.length() == 0){
+                    mListView.setAdapter(new NoReplyAdapter());
+                    mPullToRefreshLayout.setRefreshComplete();
+                    return;
+                }
+                try {
+                    ArrayList<ReplyModel> models = getModels(response);
+                    mListView.setAdapter(new TopicReplyAdapter(models));
+                    mType = TYPE_NORMAL;
+                    mPullToRefreshLayout.setRefreshComplete();
+                } catch (JSONException e) {
+                    AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                    e.printStackTrace();
+                }
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                e.printStackTrace();
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
     private ArrayList<ReplyModel> getModels(JSONArray jsonArray) throws JSONException {

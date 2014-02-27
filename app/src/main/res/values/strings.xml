@@ -10,5 +10,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="just_now">Just now</string>
     <string name="action_search">Search</string>
+    <string name="title_login">User Login</string>
 
 </resources>

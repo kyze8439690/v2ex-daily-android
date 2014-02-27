@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.astuetz.PagerSlidingTabStrip;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.model.NodeModel;
@@ -25,6 +26,7 @@ import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -60,22 +62,21 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
         super.onActivityCreated(savedInstanceState);
 
         mCollectionNode = new ArrayList<NodeModel>();
-        V2EX.getAllNode(getActivity(), false, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jsonArray) {
-                        DebugUtils.log(jsonArray);
-                        new ParseTask().execute(jsonArray);
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if (volleyError.getCause() instanceof EOFException) {
-                            AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                        }
-                        volleyError.printStackTrace();
-                    }
-                }
-        );
+        V2EX.getAllNode(getActivity(), false, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONArray response) {
+                DebugUtils.log(response);
+                new ParseTask().execute(response);
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                e.printStackTrace();
+                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
     }
 
     private class ParseTask extends AsyncTask<JSONArray, Void, CollectionAdapter>{
