@@ -11,15 +11,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
 import com.yugy.v2ex.daily.model.ReplyModel;
 import com.yugy.v2ex.daily.model.TopicModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.ScreenUtils;
@@ -31,7 +27,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -216,11 +211,5 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
             textView.setText("No replies");
             return textView;
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
-        super.onDestroy();
     }
 }

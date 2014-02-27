@@ -7,18 +7,15 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.ReplyModel;
 import com.yugy.v2ex.daily.network.AsyncImageGetter;
-import com.yugy.v2ex.daily.network.RequestManager;
 
 /**
  * Created by yugy on 14-2-25.
@@ -64,7 +61,7 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
 
         mMember = model.member;
 
-        RequestManager.getInstance().displayImage(model.member.avatarLarge, mHead);
+        ImageLoader.getInstance().displayImage(model.member.avatarLarge, mHead);
     }
 
     @Override

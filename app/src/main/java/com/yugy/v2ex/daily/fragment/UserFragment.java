@@ -17,16 +17,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
 import com.yugy.v2ex.daily.adapter.TopicAdapter;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.ScreenUtils;
@@ -147,7 +145,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         mSpannableString = new SpannableString(mMemberModel.username);
         mName.setText(mMemberModel.username);
         mDescription.setText("V2EX 第 " + mMemberModel.id + " 号会员");
-        RequestManager.getInstance().displayImage(mMemberModel.avatarLarge, mHeaderLogo);
+        ImageLoader.getInstance().displayImage(mMemberModel.avatarLarge, mHeaderLogo);
 
         setupListView();
     }

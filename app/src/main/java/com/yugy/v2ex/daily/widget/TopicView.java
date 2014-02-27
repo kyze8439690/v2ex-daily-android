@@ -10,13 +10,13 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.network.AsyncImageGetter;
-import com.yugy.v2ex.daily.network.RequestManager;
 
 
 /**
@@ -76,7 +76,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
         mMember = model.member;
         mNodeId = model.node.id;
 
-        RequestManager.getInstance().displayImage(model.member.avatarLarge, mHead);
+        ImageLoader.getInstance().displayImage(model.member.avatarLarge, mHead);
     }
 
     public void setViewDetail(){

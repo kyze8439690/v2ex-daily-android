@@ -6,9 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
@@ -17,7 +14,6 @@ import com.umeng.update.UpdateStatus;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.LoginActivity;
 import com.yugy.v2ex.daily.activity.MainActivity;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
 /**
@@ -47,12 +43,6 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(4);
-    }
-
-    @Override
-    public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
-        super.onDestroy();
     }
 
     @Override

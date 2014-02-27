@@ -9,15 +9,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.TopicAdapter;
 import com.yugy.v2ex.daily.model.TopicModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
@@ -106,12 +103,6 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     @Override
     public void onRefreshStarted(View view) {
         getData(true);
-    }
-
-    @Override
-    public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
-        super.onDestroy();
     }
 
     @Override

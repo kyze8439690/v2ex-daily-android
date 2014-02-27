@@ -10,15 +10,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.TopicAdapter;
 import com.yugy.v2ex.daily.model.TopicModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
@@ -27,7 +24,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -120,9 +116,4 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, A
         ((MainActivity) activity).onSectionAttached(1);
     }
 
-    @Override
-    public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
-        super.onDestroy();
-    }
 }

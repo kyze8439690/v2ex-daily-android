@@ -17,15 +17,12 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.SearchView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.etsy.android.grid.StaggeredGridView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.model.NodeModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
@@ -35,7 +32,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -259,7 +255,6 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
 
     @Override
     public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
         mEditor.remove("node_collections").commit();
         mEditor.putStringSet("node_collections", mNodeIdCollection).commit();
         super.onDestroy();

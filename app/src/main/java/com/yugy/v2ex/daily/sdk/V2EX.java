@@ -4,19 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.Application;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by yugy on 14-2-22.
@@ -147,7 +142,7 @@ public class V2EX {
                 }
             }
         }
-        new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?username=" + username, new JsonHttpResponseHandler(){
+        new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?username=" + username, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
                 sharedPreferences.edit().putString("topics_" + username + "_cache", response.toString()).commit();

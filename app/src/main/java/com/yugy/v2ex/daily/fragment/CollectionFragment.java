@@ -14,14 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.astuetz.PagerSlidingTabStrip;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.model.NodeModel;
-import com.yugy.v2ex.daily.network.RequestManager;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
@@ -30,7 +27,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,6 +56,12 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Set<String> collectionNodeId = sharedPreferences.getStringSet("node_collections", new HashSet<String>());
+        if(collectionNodeId.size() == 0){
+            mEmptyText.setVisibility(View.VISIBLE);
+        }
 
         mCollectionNode = new ArrayList<NodeModel>();
         V2EX.getAllNode(getActivity(), false, new JsonHttpResponseHandler(){
@@ -109,8 +111,6 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
             if(collectionAdapter != null){
                 mViewPager.setAdapter(collectionAdapter);
                 mPagerSlidingTabStrip.setViewPager(mViewPager);
-            }else{
-                mEmptyText.setVisibility(View.VISIBLE);
             }
             super.onPostExecute(collectionAdapter);
         }
@@ -164,12 +164,6 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(3);
-    }
-
-    @Override
-    public void onDestroy() {
-        RequestManager.getInstance().cancelRequests(getActivity());
-        super.onDestroy();
     }
 
     @Override
