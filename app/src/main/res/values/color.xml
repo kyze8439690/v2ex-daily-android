@@ -6,4 +6,7 @@
 
     <color name="window_background">#e6e6e6</color>
     <color name="holo_selector_pressed">#8033b5e5</color>
+
+    <color name="photo_crop_dim_color">#cc000000</color>
+    <color name="photo_crop_highlight_color">#fff</color>
 </resources>

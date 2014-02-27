@@ -77,6 +77,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
         </activity>
+
+        <activity
+            android:name=".activity.PhotoViewActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            ></activity>
     </application>
 
 </manifest>
