@@ -115,7 +115,7 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
         }
     }
 
-    private class CollectionAdapter extends FragmentStatePagerAdapter{
+    private class CollectionAdapter extends FragmentStatePagerAdapter {
 
         private ArrayList<NodeModel> mModels;
         private ArrayList<String> mTitles;

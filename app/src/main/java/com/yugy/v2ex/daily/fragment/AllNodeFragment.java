@@ -90,6 +90,9 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
         final SearchView searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setQueryHint("Search for nodes");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            private boolean mShowingSearchResult = false;
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -98,6 +101,7 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (!newText.equals("")) {
+                    mShowingSearchResult = true;
                     ArrayList<NodeModel> result = new ArrayList<NodeModel>();
                     for (int i = 0; i < mModels.size(); i++) {
                         String title = mModels.get(i).title.toLowerCase();
@@ -106,10 +110,11 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
                         }
                     }
                     mGridView.setAdapter(new AllNodeAdapter(result));
-                } else {
+                } else if(mShowingSearchResult) {
                     if(mModels != null){
                         mGridView.setAdapter(new AllNodeAdapter(mModels));
                     }
+                    mShowingSearchResult = false;
                 }
                 return false;
             }

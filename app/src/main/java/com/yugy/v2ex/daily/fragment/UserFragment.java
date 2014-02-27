@@ -36,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;

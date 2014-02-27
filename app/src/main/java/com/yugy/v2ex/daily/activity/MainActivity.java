@@ -1,25 +1,17 @@
 package com.yugy.v2ex.daily.activity;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.TextView;
+import android.view.Menu;
 
 import com.umeng.update.UmengUpdateAgent;
+import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.fragment.AllNodeFragment;
 import com.yugy.v2ex.daily.fragment.CollectionFragment;
 import com.yugy.v2ex.daily.fragment.NavigationDrawerFragment;
-import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.fragment.NewestNodeFragment;
 import com.yugy.v2ex.daily.fragment.SettingFragment;
 
@@ -30,6 +22,9 @@ public class MainActivity extends BaseActivity
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    private NewestNodeFragment mNewestNodeFragment;
+    private AllNodeFragment mAllNodeFragment;
+    private SettingFragment mSettingFragment;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -55,34 +50,31 @@ public class MainActivity extends BaseActivity
     @Override
     public void onNavigationDrawerItemSelected(final int position) {
         // update the main content by replacing fragments
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                FragmentManager fragmentManager = getFragmentManager();
-                switch (position){
-                    case 0:
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.container, new NewestNodeFragment())
-                                .commit();
-                        break;
-                    case 1:
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.container, new AllNodeFragment())
-                                .commit();
-                        break;
-                    case 2:
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.container, new CollectionFragment())
-                                .commit();
-                        break;
-                    case 3:
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.container, new SettingFragment())
-                                .commit();
-                        break;
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        switch (position){
+            case 0:
+                if(mNewestNodeFragment == null){
+                    mNewestNodeFragment = new NewestNodeFragment();
                 }
-            }
-        }, 300);
+                fragmentTransaction.replace(R.id.container, mNewestNodeFragment);
+                break;
+            case 1:
+                if(mAllNodeFragment == null){
+                    mAllNodeFragment = new AllNodeFragment();
+                }
+                fragmentTransaction.replace(R.id.container, mAllNodeFragment);
+                break;
+            case 2:
+                fragmentTransaction.replace(R.id.container, new CollectionFragment());
+                break;
+            case 3:
+                if(mSettingFragment == null){
+                    mSettingFragment = new SettingFragment();
+                }
+                fragmentTransaction.replace(R.id.container, mSettingFragment);
+        }
+        fragmentTransaction.commit();
     }
 
     public void onSectionAttached(int number) {

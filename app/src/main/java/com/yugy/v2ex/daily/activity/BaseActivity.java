@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.common.Res;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
