@@ -22,7 +22,6 @@ import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.network.AsyncImageGetter;
-import com.yugy.v2ex.daily.utils.DebugUtils;
 
 import java.util.ArrayList;
 
@@ -92,17 +91,13 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
             imageUrls.add(imageUrl);
         }
 
-
         for(ImageSpan currentSpan : spans){
-            final String imageUrl = currentSpan.getSource();
             final int start = htmlSpannable.getSpanStart(currentSpan);
             final int end   = htmlSpannable.getSpanEnd(currentSpan);
 
             ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
-                    DebugUtils.log("Image Clicked " + imageUrl);
-                    DebugUtils.log("嘿嘿:" + imagePositions.indexOf(start + "," + end) + "imageUrls:" + imageUrls.toString());
                     PhotoViewActivity.launch(getContext(), imagePositions.indexOf(start + "," + end), imageUrls);
                 }
             };

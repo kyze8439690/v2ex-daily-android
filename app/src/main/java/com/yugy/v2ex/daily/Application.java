@@ -3,12 +3,15 @@ package com.yugy.v2ex.daily;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Environment;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.io.File;
@@ -27,8 +30,21 @@ public class Application extends android.app.Application{
 
         mContext = this;
 
+        initiImageLoader();
+
+        initAppConfig();
+    }
+
+    private void initAppConfig() {
+        final ActivityManager mgr = (ActivityManager) getApplicationContext().
+                getSystemService(Activity.ACTIVITY_SERVICE);
+        sMemoryClass = mgr.getMemoryClass();
+    }
+
+    private void initiImageLoader() {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.EXACTLY)
                 .cacheOnDisc(true)
                 .displayer(new FadeInBitmapDisplayer(200))
                 .showImageOnLoading(R.drawable.ic_launcher)
@@ -41,6 +57,8 @@ public class Application extends android.app.Application{
             cacheDir = getCacheDir();
         }
         ImageLoaderConfiguration.Builder configBuilder = new ImageLoaderConfiguration.Builder(mContext)
+                .threadPoolSize(2)
+                .memoryCache(new WeakMemoryCache())
                 .denyCacheImageMultipleSizesInMemory()
                 .discCache(new UnlimitedDiscCache(cacheDir))
                 .defaultDisplayImageOptions(options);
@@ -48,10 +66,6 @@ public class Application extends android.app.Application{
             configBuilder.writeDebugLogs();
         }
         ImageLoader.getInstance().init(configBuilder.build());
-
-        final ActivityManager mgr = (ActivityManager) getApplicationContext().
-                getSystemService(Activity.ACTIVITY_SERVICE);
-        sMemoryClass = mgr.getMemoryClass();
     }
 
     public static Application getInstance(){
