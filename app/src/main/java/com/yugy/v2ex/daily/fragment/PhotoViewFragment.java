@@ -18,7 +18,6 @@
 package com.yugy.v2ex.daily.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,13 +33,14 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.widget.photo.ImageUtils;
 import com.yugy.v2ex.daily.widget.photo.PhotoView;
+import com.yugy.v2ex.daily.widget.photo.PhotoViewCallbacks;
 
 
 /**
  * Displays a photo.
  */
 public class PhotoViewFragment extends Fragment implements
-        OnClickListener {
+        OnClickListener, PhotoViewCallbacks.OnScreenListener {
 
     /**
      * Interface for components that are internally scrollable left-to-right.
@@ -66,12 +66,7 @@ public class PhotoViewFragment extends Fragment implements
         public boolean interceptMoveRight(float origX, float origY);
     }
 
-    protected final static String STATE_INTENT_KEY =
-            "com.android.mail.photo.fragments.PhotoViewFragment.INTENT";
-
-    public final static String ARG_INTENT = "arg-intent";
     public final static String ARG_POSITION = "arg-position";
-    public final static String ARG_SHOW_SPINNER = "arg-show-spinner";
     public static final String ARG_PHOTO_DOWNLOAD_URL = "arg-photo-download-url";
 
     /**
@@ -79,27 +74,21 @@ public class PhotoViewFragment extends Fragment implements
      */
     public static Integer sPhotoSize;
 
-    /**
-     * The intent we were launched with
-     */
-    protected Intent mIntent;
-//    protected PhotoViewCallbacks mCallback;
-
     protected PhotoView mPhotoView;
     protected String mDownloadUrl;
-
     protected int mPosition;
 
+    protected PhotoViewCallbacks mCallback;
+
+
     /**
-     * Public no-arg constructor for allowing the framework to handle orientation changes
+     * Whether or not the progress bar is showing valid information about the progress stated
      */
-    public PhotoViewFragment() {
-        // Do nothing.
-    }
+    protected boolean mProgressBarNeeded = true;
 
-
-    public static Fragment newInstance(String imageUrl) {
+    public static Fragment newInstance(String imageUrl, int position) {
         final Bundle bundle = new Bundle();
+        bundle.putInt(ARG_POSITION, position);
         bundle.putString(ARG_PHOTO_DOWNLOAD_URL, imageUrl);
         final PhotoViewFragment fragment = new PhotoViewFragment();
         fragment.setArguments(bundle);
@@ -109,19 +98,12 @@ public class PhotoViewFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        ImageLoader.getInstance().loadImage(mDownloadUrl, new SimpleImageLoadingListener() {
-            @Override
-            public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-                bindPhoto(bitmap);
-            }
-        });
+        mCallback = (PhotoViewCallbacks) getActivity();
+        if (mCallback == null) {
+            throw new IllegalArgumentException("Activity must be a derived class of PhotoViewActivity");
+        }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -153,14 +135,7 @@ public class PhotoViewFragment extends Fragment implements
         }
 
         mDownloadUrl = bundle.getString(ARG_PHOTO_DOWNLOAD_URL);
-
-        if (savedInstanceState != null) {
-            final Bundle state = savedInstanceState.getBundle(STATE_INTENT_KEY);
-            if (state != null) {
-                mIntent = new Intent().putExtras(state);
-            }
-        }
-
+        mPosition = bundle.getInt(ARG_POSITION);
     }
 
     @Override
@@ -177,19 +152,22 @@ public class PhotoViewFragment extends Fragment implements
         mPhotoView.setOnClickListener(this);
         mPhotoView.setFullScreen(false, false);
         mPhotoView.enableImageTransforms(false);
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        mCallback.addScreenListener(mPosition, this);
+        mCallback.addScreenListener(mPosition, this);
+
+        if (!isPhotoBound()) {
+            mProgressBarNeeded = true;
+            startLoadBitmapTask();
+        }
     }
 
     @Override
     public void onPause() {
-//        mCallback.removeCursorListener(this);
-//        mCallback.removeScreenListener(mPosition);
+        mCallback.removeScreenListener(mPosition);
         resetPhotoView();
         super.onPause();
     }
@@ -204,15 +182,18 @@ public class PhotoViewFragment extends Fragment implements
         super.onDestroyView();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        if (mIntent != null) {
-            outState.putParcelable(STATE_INTENT_KEY, mIntent.getExtras());
-        }
+    private void startLoadBitmapTask() {
+        ImageLoader.getInstance().loadImage(mDownloadUrl, new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                displayPhoto(bitmap);
+            }
+        });
     }
 
+    private void displayPhoto(Bitmap data) {
+        bindPhoto(data);
+    }
 
     /**
      * Binds an image to the photo view.
@@ -246,6 +227,7 @@ public class PhotoViewFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
+        //Image Click
     }
 
     /**
@@ -264,5 +246,33 @@ public class PhotoViewFragment extends Fragment implements
         return (mPhotoView != null && mPhotoView.isPhotoBound());
     }
 
+    @Override
+    public void onViewActivated() {
+        if (!mCallback.isFragmentActive(this)) {
+            // we're not in the foreground; reset our view
+            resetViews();
+        } else {
+            if (!isPhotoBound()) {
+                startLoadBitmapTask();
+            }
+        }
+    }
 
+    @Override
+    public boolean onInterceptMoveLeft(float origX, float origY) {
+        if (!mCallback.isFragmentActive(this)) {
+            // we're not in the foreground; don't intercept any touches
+            return false;
+        }
+        return (mPhotoView != null && mPhotoView.interceptMoveLeft(origX, origY));
+    }
+
+    @Override
+    public boolean onInterceptMoveRight(float origX, float origY) {
+        if (!mCallback.isFragmentActive(this)) {
+            // we're not in the foreground; don't intercept any touches
+            return false;
+        }
+        return (mPhotoView != null && mPhotoView.interceptMoveRight(origX, origY));
+    }
 }

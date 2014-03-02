@@ -27,6 +27,7 @@ import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.util.AttributeSet;
@@ -87,7 +88,7 @@ public class PhotoView extends View implements OnGestureListener,
     private static Paint sCropPaint;
 
     /** The photo to display */
-    private BitmapDrawable mDrawable;
+    private Drawable mDrawable;
     /** The matrix used for drawing; this may be {@code null} */
     private Matrix mDrawMatrix;
     /** A matrix to apply the scaling of the photo */
@@ -446,15 +447,39 @@ public class PhotoView extends View implements OnGestureListener,
         mDoubleTapOccurred = false;
     }
 
+    public void bindDrawable(Drawable drawable) {
+        boolean changed = false;
+        if (drawable != null && drawable != mDrawable) {
+            // Clear previous state.
+            if (mDrawable != null) {
+                mDrawable.setCallback(null);
+            }
+
+            mDrawable = drawable;
+
+            // Reset mMinScale to ensure the bounds / matrix are recalculated
+            mMinScale = 0f;
+
+            // Set a callback?
+            mDrawable.setCallback(this);
+
+            changed = true;
+        }
+
+        configureBounds(changed);
+        invalidate();
+    }
+
     /**
      * Binds a bitmap to the view.
      *
      * @param photoBitmap the bitmap to bind.
      */
     public void bindPhoto(Bitmap photoBitmap) {
-        boolean changed = false;
-        if (mDrawable != null) {
-            final Bitmap drawableBitmap = mDrawable.getBitmap();
+        boolean currentDrawableIsBitmapDrawable = mDrawable instanceof BitmapDrawable;
+        boolean changed = !(currentDrawableIsBitmapDrawable);
+        if (mDrawable != null && currentDrawableIsBitmapDrawable) {
+            final Bitmap drawableBitmap = ((BitmapDrawable) mDrawable).getBitmap();
             if (photoBitmap == drawableBitmap) {
                 // setting the same bitmap; do nothing
                 return;
@@ -462,7 +487,7 @@ public class PhotoView extends View implements OnGestureListener,
 
             changed = photoBitmap != null &&
                     (mDrawable.getIntrinsicWidth() != photoBitmap.getWidth() ||
-                    mDrawable.getIntrinsicHeight() != photoBitmap.getHeight());
+                            mDrawable.getIntrinsicHeight() != photoBitmap.getHeight());
 
             // Reset mMinScale to ensure the bounds / matrix are recalculated
             mMinScale = 0f;
@@ -481,10 +506,17 @@ public class PhotoView extends View implements OnGestureListener,
      * Returns the bound photo data if set. Otherwise, {@code null}.
      */
     public Bitmap getPhoto() {
-        if (mDrawable != null) {
-            return mDrawable.getBitmap();
+        if (mDrawable != null && mDrawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) mDrawable).getBitmap();
         }
         return null;
+    }
+
+    /**
+     * Returns the bound drawable. May be {@code null} if no drawable is bound.
+     */
+    public Drawable getDrawable() {
+        return mDrawable;
     }
 
     /**
@@ -659,7 +691,7 @@ public class PhotoView extends View implements OnGestureListener,
             final int cropLeft = (layoutWidth - mCropSize) / 2;
             final int cropTop = (layoutHeight - mCropSize) / 2;
             final int cropRight = cropLeft + mCropSize;
-            final int cropBottom =  cropTop + mCropSize;
+            final int cropBottom = cropTop + mCropSize;
 
             // Create a crop region overlay. We need a separate canvas to be able to "punch
             // a hole" through to the underlying image.
@@ -676,6 +708,25 @@ public class PhotoView extends View implements OnGestureListener,
             setMeasuredDimension(getMeasuredWidth(), mFixedHeight);
         } else {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+    @Override
+    public boolean verifyDrawable(Drawable drawable) {
+        return mDrawable == drawable || super.verifyDrawable(drawable);
+    }
+
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public void invalidateDrawable(Drawable drawable) {
+        // Only invalidate this view if the passed in drawable is displayed within this view. If
+        // another drawable is passed in, have the parent view handle invalidation.
+        if (mDrawable == drawable) {
+            invalidate();
+        } else {
+            super.invalidateDrawable(drawable);
         }
     }
 
@@ -767,7 +818,7 @@ public class PhotoView extends View implements OnGestureListener,
                     (vheight / 2) - (dheight * mMaxInitialScaleFactor / 2),
                     (vwidth / 2) + (dwidth * mMaxInitialScaleFactor / 2),
                     (vheight / 2) + (dheight * mMaxInitialScaleFactor / 2));
-            if(mTempDst.contains(scaledDestination)) {
+            if (mTempDst.contains(scaledDestination)) {
                 mMatrix.setRectToRect(mTempSrc, scaledDestination, Matrix.ScaleToFit.CENTER);
             } else {
                 mMatrix.setRectToRect(mTempSrc, mTempDst, Matrix.ScaleToFit.CENTER);
@@ -800,7 +851,7 @@ public class PhotoView extends View implements OnGestureListener,
 
     /**
      * Returns the currently applied scale factor for the image.
-     * <p>
+     * <p/>
      * NOTE: This method overwrites any values stored in {@link #mValues}.
      */
     private float getScale() {
@@ -810,16 +861,16 @@ public class PhotoView extends View implements OnGestureListener,
 
     /**
      * Scales the image while keeping the aspect ratio.
-     *
+     * <p/>
      * The given scale is capped so that the resulting scale of the image always remains
      * between {@link #mMinScale} and {@link #mMaxScale}.
-     *
+     * <p/>
      * The scaled image is never allowed to be outside of the viewable area. If the image
      * is smaller than the viewable area, it will be centered.
      *
      * @param newScale the new scale
-     * @param centerX the center horizontal point around which to scale
-     * @param centerY the center vertical point around which to scale
+     * @param centerX  the center horizontal point around which to scale
+     * @param centerY  the center vertical point around which to scale
      */
     private void scale(float newScale, float centerX, float centerY) {
         // rotate back to the original orientation
@@ -846,13 +897,13 @@ public class PhotoView extends View implements OnGestureListener,
 
     /**
      * Translates the image.
-     *
+     * <p/>
      * This method will not allow the image to be translated outside of the visible area.
      *
      * @param tx how many pixels to translate horizontally
      * @param ty how many pixels to translate vertically
      * @return {@code true} if the translation was applied as specified. Otherwise, {@code false}
-     *      if the translation was modified.
+     * if the translation was modified.
      */
     private boolean translate(float tx, float ty) {
         mTranslateRect.set(mTempSrc);
@@ -877,7 +928,7 @@ public class PhotoView extends View implements OnGestureListener,
             }
         }
 
-        float maxTop = mAllowCrop ? mCropRect.top: 0.0f;
+        float maxTop = mAllowCrop ? mCropRect.top : 0.0f;
         float maxBottom = mAllowCrop ? mCropRect.bottom : getHeight();
         float t = mTranslateRect.top;
         float b = mTranslateRect.bottom;
