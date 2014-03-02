@@ -91,9 +91,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
             imageUrls.add(imageUrl);
         }
 
-
         for(ImageSpan currentSpan : spans){
-            final String imageUrl = currentSpan.getSource();
             final int start = htmlSpannable.getSpanStart(currentSpan);
             final int end   = htmlSpannable.getSpanEnd(currentSpan);
 

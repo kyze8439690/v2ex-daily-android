@@ -28,9 +28,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.yugy.v2ex.daily.R;
+import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.photo.ImageUtils;
 import com.yugy.v2ex.daily.widget.photo.PhotoView;
 import com.yugy.v2ex.daily.widget.photo.PhotoViewCallbacks;
@@ -41,6 +47,14 @@ import com.yugy.v2ex.daily.widget.photo.PhotoViewCallbacks;
  */
 public class PhotoViewFragment extends Fragment implements
         OnClickListener, PhotoViewCallbacks.OnScreenListener {
+
+    protected static ImageSize sTargetSize = new ImageSize(1024, 1024);
+    protected static DisplayImageOptions sOptions = new DisplayImageOptions.Builder()
+            .bitmapConfig(Bitmap.Config.RGB_565)
+            .imageScaleType(ImageScaleType.EXACTLY)
+            .cacheOnDisc(true)
+            .displayer(new FadeInBitmapDisplayer(300))
+            .build();
 
     /**
      * Interface for components that are internally scrollable left-to-right.
@@ -183,12 +197,18 @@ public class PhotoViewFragment extends Fragment implements
     }
 
     private void startLoadBitmapTask() {
-        ImageLoader.getInstance().loadImage(mDownloadUrl, new SimpleImageLoadingListener() {
+
+        ImageLoader.getInstance().loadImage(mDownloadUrl, sTargetSize, sOptions, new SimpleImageLoadingListener() {
             @Override
             public void onLoadingComplete(String s, View view, Bitmap bitmap) {
                 displayPhoto(bitmap);
             }
-        });
+        }, new ImageLoadingProgressListener() {
+                    @Override
+                    public void onProgressUpdate(String imageUri, View view, int current, int total) {
+                        DebugUtils.log("update : " + current + "/" + total);
+                    }
+                });
     }
 
     private void displayPhoto(Bitmap data) {
@@ -212,7 +232,9 @@ public class PhotoViewFragment extends Fragment implements
      * consumes all touch events.
      */
     public void enableImageTransforms(boolean enable) {
-        mPhotoView.enableImageTransforms(enable);
+        if (mPhotoView != null) {
+            mPhotoView.enableImageTransforms(enable);
+        }
     }
 
     /**
