@@ -36,7 +36,7 @@ public class PhotoViewActivity extends BaseActivity{
         mPhohoUrls = (ArrayList<String>) getIntent().getSerializableExtra(PhotoViewFragment.ARG_PHOTO_DOWNLOAD_URL);
         mCurrentPosition = getIntent().getIntExtra(PhotoViewFragment.ARG_POSITION, 0);
 
-        mAdapter = new PhotoViewerPagerAdapter(getSupportFragmentManager());
+        mAdapter = new PhotoViewerPagerAdapter(getFragmentManager());
         mAdapter.setData(mPhohoUrls);
 
         mViewPager = (ViewPager) findViewById(R.id.photo_view_pager);

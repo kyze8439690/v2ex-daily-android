@@ -1,9 +1,8 @@
 package com.yugy.v2ex.daily.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentStatePagerAdapter;
 
 import com.yugy.v2ex.daily.fragment.PhotoViewFragment;
 
@@ -28,7 +27,7 @@ public class PhotoViewerPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        return PagerAdapter.POSITION_NONE;
+        return FragmentStatePagerAdapter.POSITION_NONE;
     }
 
     @Override
