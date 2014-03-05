@@ -19,9 +19,9 @@
     android:id="@+id/photo_activity_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:background="@android:color/transparent">
 
-    <android.support.v4.view.ViewPager
+    <com.yugy.v2ex.daily.widget.photo.PhotoViewPager
         android:id="@+id/photo_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
