@@ -11,7 +11,4 @@ To know more infomation, please visit [**http://yanghui.name/v2ex-daily-android/
 <img src="https://raw.github.com/kyze8439690/v2ex-daily-android/master/screenshot/4.jpg" width="400" height="640"/>
 
 ### To do:  
-- View picture
-- Login and logout
-- send reply
 - send topic
