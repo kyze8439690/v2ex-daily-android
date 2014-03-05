@@ -2,8 +2,12 @@ package com.yugy.v2ex.daily.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +22,7 @@ import com.yugy.v2ex.daily.model.ReplyModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
+import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.utils.ScreenUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 import com.yugy.v2ex.daily.widget.ReplyView;
@@ -26,6 +31,7 @@ import com.yugy.v2ex.daily.widget.TopicView;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -39,6 +45,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public class TopicFragment extends Fragment implements AdapterView.OnItemClickListener, OnRefreshListener{
 
     private PullToRefreshLayout mPullToRefreshLayout;
+    private TopicView mHeaderView;
     private ListView mListView;
 
     private TopicModel mTopicModel;
@@ -47,6 +54,16 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
     private static final int TYPE_NORMAL = 1;
 
     private int mType = TYPE_EMPTY;
+    private boolean mLogined = false;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mLogined = PreferenceManager.getDefaultSharedPreferences(getActivity()).contains("username");
+        if(mLogined){
+            setHasOptionsMenu(true);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,10 +83,10 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 .setup(mPullToRefreshLayout);
 
         mTopicModel = getArguments().getParcelable("model");
-        TopicView topicView = new TopicView(getActivity());
-        topicView.setViewDetail();
-        topicView.parse(mTopicModel);
-        mListView.addHeaderView(topicView, mTopicModel, false);
+        mHeaderView = new TopicView(getActivity());
+        mHeaderView.setViewDetail();
+        mHeaderView.parse(mTopicModel);
+        mListView.addHeaderView(mHeaderView, mTopicModel, false);
         mListView.setAdapter(new LoadingAdapter(getActivity()));
         getReplyData();
     }
@@ -81,6 +98,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 DebugUtils.log(response);
                 try {
                     mTopicModel.parse(response.getJSONObject(0));
+                    mHeaderView.parse(mTopicModel);
                     getReplyData();
                 } catch (JSONException e) {
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
@@ -98,7 +116,21 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
         });
     }
 
+    public void onCommentFinish(JSONObject result){
+        try {
+            if(result.getString("result").equals("ok")){
+                MessageUtils.toast(getActivity(), "Comment success");
+                getReplyData();
+            }else if(result.getString("result").equals("fail")){
+                MessageUtils.toast(getActivity(), "Comment failed");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getReplyData(){
+        mPullToRefreshLayout.setRefreshing(true);
         V2EX.getReplies(getActivity(), mTopicModel.id, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
@@ -137,6 +169,26 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
             models.add(model);
         }
         return models;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.topic, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_topic_comment:
+                CommentDialogFragment commentDialogFragment = new CommentDialogFragment();
+                Bundle argument = new Bundle();
+                argument.putInt("topic_id", mTopicModel.id);
+                commentDialogFragment.setArguments(argument);
+                commentDialogFragment.show(getFragmentManager(), "comment");
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -181,6 +233,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 item = new ReplyView(getActivity());
             }
             item.parse(getItem(position));
+            item.setFloorNum(position + 1);
             return item;
         }
     }

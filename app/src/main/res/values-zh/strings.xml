@@ -11,5 +11,11 @@
     <string name="just_now">刚刚</string>
     <string name="action_search">搜索</string>
     <string name="title_login">用户登陆</string>
+    <string name="title_comment">回复</string>
+    <string name="title_comment_hint">在这里输入回复内容</string>
+    <string name="title_cancel">取消</string>
+    <string name="comment_content_empty">评论内容不能为空</string>
+    <string name="title_commenting">评论中...</string>
+    <string name="fail_get_once">获取once码失败</string>
 
 </resources>

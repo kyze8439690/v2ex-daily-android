@@ -44,6 +44,7 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     }
 
     private SelectorImageView mHead;
+    private TextView mFloor;
     private TextView mName;
     private RelativeTimeTextView mTime;
     private TextView mContent;
@@ -53,6 +54,7 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     private void init(){
         inflate(getContext(), R.layout.view_reply, this);
         mHead = (SelectorImageView) findViewById(R.id.img_view_reply_head);
+        mFloor = (TextView) findViewById(R.id.txt_view_reply_floor);
         mName = (TextView) findViewById(R.id.txt_view_reply_name);
         mTime = (RelativeTimeTextView) findViewById(R.id.txt_view_reply_time);
         mContent = (TextView) findViewById(R.id.txt_view_reply_content);
@@ -111,6 +113,10 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
         mMember = model.member;
 
         ImageLoader.getInstance().displayImage(model.member.avatarLarge, mHead);
+    }
+
+    public void setFloorNum(int floorNum){
+        mFloor.setText(String.valueOf(floorNum));
     }
 
     @Override

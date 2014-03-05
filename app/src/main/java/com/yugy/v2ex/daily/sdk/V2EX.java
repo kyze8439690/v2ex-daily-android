@@ -5,13 +5,23 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.utils.DebugUtils;
+import com.yugy.v2ex.daily.utils.MessageUtils;
 
 import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by yugy on 14-2-22.
@@ -161,6 +171,190 @@ public class V2EX {
     public static void showUser(Context context, String username, JsonHttpResponseHandler responseHandler){
         DebugUtils.log("showUser");
         new AsyncHttpClient().get(context, API_URL + API_USER + "?username=" + username, responseHandler);
+    }
+
+    private static AsyncHttpClient sClient = null;
+
+    private static AsyncHttpClient getClient(Context context){
+        if(sClient == null){
+            sClient = new AsyncHttpClient();
+            sClient.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.2.1; en-us; M040 Build/JOP40D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+            sClient.addHeader("Cache-Control", "max-age=0");
+            sClient.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+            sClient.addHeader("Accept-Charset", "utf-8, iso-8859-1, utf-16, *;q=0.7");
+            sClient.addHeader("Accept-Language", "zh-CN, en-US");
+            sClient.addHeader("X-Requested-With", "com.android.browser");
+        }
+        sClient.setCookieStore(new PersistentCookieStore(context));
+        return sClient;
+    }
+
+    /**
+     * return example:
+     * {
+     *      result:ok/fail,
+     *      content:{
+     *          once: 12345,
+     *          cookie_referer: asdce
+     *      }
+     * }
+     */
+    public static void getOnceCode(final Context context, int topicId, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = getClient(context);
+        client.addHeader("Referer", "http://www.v2ex.com");
+        client.get("http://www.v2ex.com/t/" + topicId, new AsyncHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String content = new String(responseBody);
+                JSONObject result = new JSONObject();
+                Pattern pattern = Pattern.compile("<input type=\"hidden\" value=\"([0-9]+)\" name=\"once\" />");
+                final Matcher matcher = pattern.matcher(content);
+                try {
+                    if(matcher.find()){
+                        result.put("result", "ok");
+
+                        JSONObject jsonContent = new JSONObject();
+                        jsonContent.put("once", Integer.parseInt(matcher.group(1)));
+
+                        for(Header header : headers){
+                            if(header.getName().equals("Set-Cookie")){
+                                DebugUtils.log(header.getName() + ": " + header.getValue());
+                                Pattern cookiePattern = Pattern.compile("V2EX_REFERRER=\"[^\"]+\"");
+                                Matcher cookieMatcher = cookiePattern.matcher(header.getValue());
+                                if(cookieMatcher.find()){
+                                    jsonContent.put("cookie_referer", cookieMatcher.group());
+                                }
+                            }
+                        }
+
+                        result.put("content", jsonContent);
+                    }else{
+                        result.put("result", "fail");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                responseHandler.onSuccess(result);
+                super.onSuccess(statusCode, headers, responseBody);
+            }
+        });
+    }
+
+    public static void getOnceCode(Context context, String url, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = getClient(context);
+        client.get(url, new TextHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+//                DebugUtils.log(responseBody);
+                JSONObject result = new JSONObject();
+                Pattern pattern = Pattern.compile("<input type=\"hidden\" value=\"([0-9]+)\" name=\"once\" />");
+                final Matcher matcher = pattern.matcher(responseBody);
+                try {
+                    if(matcher.find()){
+                        result.put("result", "ok");
+
+                        JSONObject jsonContent = new JSONObject();
+                        jsonContent.put("once", Integer.parseInt(matcher.group(1)));
+
+                        result.put("content", jsonContent);
+                    }else{
+                        result.put("result", "fail");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                DebugUtils.log(result);
+                responseHandler.onSuccess(result);
+                super.onSuccess(statusCode, headers, responseBody);
+            }
+        });
+    }
+
+
+    /**
+     * return example:
+     * {
+     *      result:ok/fail,
+     *      content:{
+     *          username: kyze8439690
+     *      }
+     * }
+     */
+    public static void login(final Context context, String username, String password, int onceCode, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = getClient(context);
+        client.addHeader("Origin", "http://www.v2ex.com");
+        client.addHeader("Referer", "http://www.v2ex.com/signin");
+        client.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        RequestParams params = new RequestParams();
+        params.put("next", "/");
+        params.put("u", username);
+        params.put("once", String.valueOf(onceCode));
+        params.put("p", password);
+        client.post("http://www.v2ex.com/signin", params, new TextHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+//                DebugUtils.log(responseBody);
+                Pattern userNamePattern = Pattern.compile("<a href=\"/member/([^\"]+)\" class=\"top\">");
+                final Matcher matcher = userNamePattern.matcher(responseBody);
+                JSONObject result = new JSONObject();
+                try {
+                    if (matcher.find()) {
+                        result.put("result", "ok");
+                        result.put("content", new JSONObject() {{
+                            put("username", matcher.group(1));
+                        }});
+                    } else {
+                        result.put("result", "fail");
+                    }
+                    DebugUtils.log(result);
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        });
+    }
+
+    public static void postComment(final Context context, int onceCode, int topicId, final String commentContent, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setEnableRedirects(false);
+        client.setCookieStore(new PersistentCookieStore(context));
+        client.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.2.1; en-us; M040 Build/JOP40D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        client.addHeader("Cache-Control", "max-age=0");
+        client.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        client.addHeader("Accept-Charset", "utf-8, iso-8859-1, utf-16, *;q=0.7");
+        client.addHeader("Accept-Language", "zh-CN, en-US");
+        client.addHeader("X-Requested-With", "com.android.browser");
+        client.addHeader("Origin", "http://www.v2ex.com");
+        client.addHeader("Referer", "http://www.v2ex.com/t/" + topicId);
+        client.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        RequestParams params = new RequestParams();
+        params.put("content", commentContent);
+        params.put("once", String.valueOf(onceCode));
+        client.post("http://www.v2ex.com/t/" + topicId, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                DebugUtils.log(statusCode);
+                JSONObject result = new JSONObject();
+                try {
+                    if(statusCode == 302){
+                        result.put("result", "ok");
+                        result.put("content", commentContent);
+                    }else{
+                        result.put("result", "fail");
+                    }
+                    DebugUtils.log(result);
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                super.onFailure(statusCode, headers, responseBody, error);
+            }
+        });
     }
 
 }

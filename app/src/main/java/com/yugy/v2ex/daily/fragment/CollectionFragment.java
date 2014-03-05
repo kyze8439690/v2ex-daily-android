@@ -68,7 +68,9 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
-                new ParseTask().execute(response);
+                if(getActivity() != null){
+                    new ParseTask().execute(response);
+                }
                 super.onSuccess(response);
             }
 

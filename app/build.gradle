@@ -25,5 +25,6 @@ dependencies {
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.etsy.android.grid:library:+'
     compile 'com.astuetz:pagerslidingtabstrip:+'
+    compile 'com.loopj.android:android-async-http:+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

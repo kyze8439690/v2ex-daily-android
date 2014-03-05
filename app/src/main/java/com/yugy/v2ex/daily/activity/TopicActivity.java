@@ -9,12 +9,19 @@ import android.view.MenuItem;
 
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.swipeback.SwipeBackActivity;
+import com.yugy.v2ex.daily.fragment.PostCommentDialogFragment;
 import com.yugy.v2ex.daily.fragment.TopicFragment;
+
+import org.json.JSONObject;
+
+import static com.yugy.v2ex.daily.fragment.PostCommentDialogFragment.OnCommentFinishListener;
 
 /**
  * Created by yugy on 14-2-24.
  */
-public class TopicActivity extends SwipeBackActivity{
+public class TopicActivity extends SwipeBackActivity implements OnCommentFinishListener {
+
+    private TopicFragment mTopicFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,11 +29,11 @@ public class TopicActivity extends SwipeBackActivity{
         setContentView(R.layout.activity_topic);
 
         if(savedInstanceState == null){
-            TopicFragment topicFragment = new TopicFragment();
+            mTopicFragment = new TopicFragment();
             if(getIntent().hasExtra("argument")){
-                topicFragment.setArguments(getIntent().getBundleExtra("argument"));
+                mTopicFragment.setArguments(getIntent().getBundleExtra("argument"));
             }
-            getFragmentManager().beginTransaction().add(R.id.container_activity_topic, topicFragment).commit();
+            getFragmentManager().beginTransaction().add(R.id.container_activity_topic, mTopicFragment).commit();
         }
     }
 
@@ -44,6 +51,13 @@ public class TopicActivity extends SwipeBackActivity{
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onCommentFinished(JSONObject result) {
+        if(mTopicFragment != null){
+            mTopicFragment.onCommentFinish(result);
         }
     }
 }

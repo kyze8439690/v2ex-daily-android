@@ -1,6 +1,8 @@
 package com.yugy.v2ex.daily.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +16,8 @@ import com.umeng.update.UpdateStatus;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.LoginActivity;
 import com.yugy.v2ex.daily.activity.MainActivity;
+import com.yugy.v2ex.daily.utils.DebugUtils;
+import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
 /**
@@ -31,12 +35,24 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
     private static final String PREF_CONTACT = "pref_contact";
     private static final String PREF_UPDATE = "pref_check_update";
 
+    private static final int REQUEST_CODE_LOGIN = 10086;
+
+    private boolean logined = false;
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getPreferenceManager().findPreference(PREF_LOGIN).setOnPreferenceClickListener(this);
-        getPreferenceManager().findPreference(PREF_CONTACT).setOnPreferenceClickListener(this);
-        getPreferenceManager().findPreference(PREF_UPDATE).setOnPreferenceClickListener(this);
+
+        if(logined = getPreferenceManager().getSharedPreferences().contains("username")){
+            String username = getPreferenceManager().getSharedPreferences().getString("username", null);
+            if(username != null){
+                findPreference(PREF_LOGIN).setTitle(username);
+            }
+        }
+
+        findPreference(PREF_LOGIN).setOnPreferenceClickListener(this);
+        findPreference(PREF_CONTACT).setOnPreferenceClickListener(this);
+        findPreference(PREF_UPDATE).setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -78,13 +94,38 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
             return true;
         }
         if(preference.getKey().equals(PREF_LOGIN)){
-            if(getPreferenceManager().getSharedPreferences().getBoolean("logined", false)){
-
+            if(logined){
+                new AlertDialog.Builder(getActivity())
+                        .setCancelable(true)
+                        .setMessage("你确定要退出登录吗？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getPreferenceManager().getSharedPreferences().edit()
+                                        .remove("username")
+                                        .commit();
+                                logined = false;
+                                getPreferenceManager().findPreference(PREF_LOGIN).setTitle("登陆");
+                            }
+                        }).setNegativeButton("取消", null)
+                        .show();
             }else{
-                startActivity(new Intent(getActivity(), LoginActivity.class));
+                startActivityForResult(new Intent(getActivity(), LoginActivity.class), REQUEST_CODE_LOGIN);
             }
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_CODE_LOGIN && resultCode == Activity.RESULT_OK){
+            String username = data.getStringExtra("username");
+            logined = username != null;
+            if(logined){
+                findPreference(PREF_LOGIN).setTitle(username);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

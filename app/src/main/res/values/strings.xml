@@ -11,5 +11,11 @@
     <string name="just_now">Just now</string>
     <string name="action_search">Search</string>
     <string name="title_login">User Login</string>
+    <string name="title_comment">Comment</string>
+    <string name="title_comment_hint">Type your comment here</string>
+    <string name="title_cancel">Cancel</string>
+    <string name="comment_content_empty">Comment content can\'t be empty.</string>
+    <string name="title_commenting">Commenting...</string>
+    <string name="fail_get_once">Fail to get once code</string>
 
 </resources>

@@ -16,8 +16,8 @@
     <RelativeLayout
         android:id="@+id/header_fragment_user"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:background="@drawable/gradient">
+        android:background="@drawable/gradient"
+        android:layout_height="250dp">
 
         <ImageView
             android:id="@+id/header_logo_fragment_user"
