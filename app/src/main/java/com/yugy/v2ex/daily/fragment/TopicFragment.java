@@ -49,6 +49,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
     private ListView mListView;
 
     private TopicModel mTopicModel;
+    private ArrayList<ReplyModel> mReplyModels;
 
     private static final int TYPE_EMPTY = 0;
     private static final int TYPE_NORMAL = 1;
@@ -142,8 +143,8 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                     return;
                 }
                 try {
-                    ArrayList<ReplyModel> models = getModels(response);
-                    mListView.setAdapter(new TopicReplyAdapter(models));
+                    mReplyModels = getModels(response);
+                    mListView.setAdapter(new TopicReplyAdapter(mReplyModels));
                     mType = TYPE_NORMAL;
                     mPullToRefreshLayout.setRefreshComplete();
                 } catch (JSONException e) {
@@ -194,8 +195,8 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if(mType == TYPE_NORMAL){
-//            MessageUtils.toast(getActivity(), position + "");
+        if(mType == TYPE_NORMAL && mLogined){
+
         }
     }
 
@@ -233,8 +234,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
             if(item == null){
                 item = new ReplyView(getActivity());
             }
-            item.parse(getItem(position));
-            item.setFloorNum(position + 1);
+            item.parse(mLogined, mTopicModel.id, getItem(position));
             return item;
         }
     }

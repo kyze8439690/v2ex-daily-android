@@ -63,6 +63,7 @@
                 android:value=".activity.MainActivity" />
         </activity>
         <activity android:name=".activity.UserActivity"
+                  android:label=""
                   android:theme="@style/AppTheme.OverlayActionBar"
                   android:parentActivityName=".activity.MainActivity">
             <intent-filter>

@@ -20,7 +20,8 @@ public class CommentDialogFragment extends DialogFragment implements DialogInter
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         mEditText = (EditText) getActivity().getLayoutInflater().inflate(R.layout.fragment_comment_dialog, null);
         if(getArguments().containsKey("comment_content")){
-             mEditText.setText(getArguments().getString("comment_content"));
+            mEditText.setText(getArguments().getString("comment_content"));
+            mEditText.setSelection(mEditText.getText().length());
         }
         return new AlertDialog.Builder(getActivity())
                 .setView(mEditText)

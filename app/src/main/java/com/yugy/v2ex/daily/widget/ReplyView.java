@@ -1,5 +1,6 @@
 package com.yugy.v2ex.daily.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,8 +10,10 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,8 +21,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.PhotoViewActivity;
 import com.yugy.v2ex.daily.activity.UserActivity;
+import com.yugy.v2ex.daily.fragment.CommentDialogFragment;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.ReplyModel;
+import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.network.AsyncImageGetter;
 
 import java.util.ArrayList;
@@ -44,30 +49,41 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     }
 
     private SelectorImageView mHead;
-    private TextView mFloor;
     private TextView mName;
+    private ImageButton mReply;
     private RelativeTimeTextView mTime;
     private TextView mContent;
 
     private MemberModel mMember;
 
+    private int mTopicId;
+    private boolean mLogined;
+
     private void init(){
         inflate(getContext(), R.layout.view_reply, this);
         mHead = (SelectorImageView) findViewById(R.id.img_view_reply_head);
-        mFloor = (TextView) findViewById(R.id.txt_view_reply_floor);
+        mReply = (ImageButton) findViewById(R.id.btn_view_reply_reply);
         mName = (TextView) findViewById(R.id.txt_view_reply_name);
         mTime = (RelativeTimeTextView) findViewById(R.id.txt_view_reply_time);
         mContent = (TextView) findViewById(R.id.txt_view_reply_content);
 
         mHead.setOnClickListener(this);
+        mReply.setOnClickListener(this);
     }
 
-    public void parse(ReplyModel model){
-        mName.setText(model.member.username);
-        mTime.setReferenceTime(model.created * 1000);
+    public void parse(boolean logined, int topicId, ReplyModel replyModel){
+        mLogined = logined;
+        if(mLogined){
+            mReply.setVisibility(INVISIBLE);
+        }else{
+            mReply.setVisibility(VISIBLE);
+        }
+        mTopicId = topicId;
+        mName.setText(replyModel.member.username);
+        mTime.setReferenceTime(replyModel.created * 1000);
 
-        Spanned spanned = Html.fromHtml(model.contentRendered, new AsyncImageGetter(getContext(), mContent), null);
-        SpannableStringBuilder htmlSpannable = null;
+        Spanned spanned = Html.fromHtml(replyModel.contentRendered, new AsyncImageGetter(getContext(), mContent), null);
+        SpannableStringBuilder htmlSpannable;
         if(spanned instanceof SpannableStringBuilder){
             htmlSpannable = (SpannableStringBuilder) spanned;
         } else {
@@ -110,21 +126,31 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
         mContent.setText(spanned);
         mContent.setMovementMethod(LinkMovementMethod.getInstance());
 
-        mMember = model.member;
+        mMember = replyModel.member;
 
-        ImageLoader.getInstance().displayImage(model.member.avatarLarge, mHead);
-    }
-
-    public void setFloorNum(int floorNum){
-        mFloor.setText(String.valueOf(floorNum));
+        ImageLoader.getInstance().displayImage(replyModel.member.avatarLarge, mHead);
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(getContext(), UserActivity.class);
-        Bundle argument = new Bundle();
-        argument.putParcelable("model", mMember);
-        intent.putExtra("argument", argument);
-        getContext().startActivity(intent);
+        Bundle argument;
+        switch (v.getId()){
+            case R.id.img_view_reply_head:
+                Intent intent = new Intent(getContext(), UserActivity.class);
+                argument = new Bundle();
+                argument.putParcelable("model", mMember);
+                intent.putExtra("argument", argument);
+                getContext().startActivity(intent);
+                break;
+            case R.id.btn_view_reply_reply:
+                CommentDialogFragment commentDialogFragment = new CommentDialogFragment();
+                argument = new Bundle();
+                argument.putInt("topic_id", mTopicId);
+                argument.putString("comment_content", "@" + mMember.username + " ");
+                commentDialogFragment.setArguments(argument);
+                commentDialogFragment.show(((Activity)getContext()).getFragmentManager(), "comment");
+                break;
+        }
+
     }
 }

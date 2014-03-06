@@ -8,14 +8,13 @@
                 android:background="@drawable/bg_reply"
                 android:padding="8dp">
 
-    <TextView
-        android:id="@+id/txt_view_reply_floor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/btn_view_reply_reply"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        style="?android:borderlessButtonStyle"
         android:layout_alignParentRight="true"
-        android:text="1"
-        android:textColor="#aaa"
-        android:textSize="12sp"
+        android:src="@drawable/ic_action_reply"
         />
 
     <com.yugy.v2ex.daily.widget.SelectorImageView
