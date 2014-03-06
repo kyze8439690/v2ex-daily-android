@@ -16,6 +16,7 @@ import com.umeng.update.UpdateStatus;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.LoginActivity;
 import com.yugy.v2ex.daily.activity.MainActivity;
+import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
@@ -104,6 +105,7 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
                                 getPreferenceManager().getSharedPreferences().edit()
                                         .remove("username")
                                         .commit();
+                                V2EX.logout(getActivity());
                                 logined = false;
                                 getPreferenceManager().findPreference(PREF_LOGIN).setTitle("登陆");
                             }

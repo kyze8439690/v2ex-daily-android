@@ -72,39 +72,44 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
             V2EX.getOnceCode(this, "http://www.v2ex.com/signin", new JsonHttpResponseHandler(){
                 @Override
                 public void onSuccess(JSONObject response) {
-                    try {
-                        if(response.getString("result").equals("ok")){
-                            int onceCode = response.getJSONObject("content").getInt("once");
-                            V2EX.login(LoginActivity.this, mUsername.getText().toString(), mPassword.getText().toString(), onceCode, new JsonHttpResponseHandler(){
-                                @Override
-                                public void onSuccess(JSONObject response) {
-                                    try {
-                                        if(response.getString("result").equals("ok")){
-                                            String username = response.getJSONObject("content").getString("username");
-                                            MessageUtils.toast(LoginActivity.this, "Hello, " + username);
-                                            PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit().putString("username", username).commit();
-                                            progressDialog.dismiss();
-                                            Intent intent = new Intent();
-                                            intent.putExtra("username", username);
-                                            setResult(RESULT_OK, intent);
-                                            finish();
-                                        }else if(response.getString("result").equals("fail")){
-                                            MessageUtils.toast(LoginActivity.this, "Login fail");
-                                            progressDialog.dismiss();
+                    if(LoginActivity.this != null){
+                        try {
+                            if(response.getString("result").equals("ok")){
+                                int onceCode = response.getJSONObject("content").getInt("once");
+                                V2EX.login(LoginActivity.this, mUsername.getText().toString(), mPassword.getText().toString(), onceCode, new JsonHttpResponseHandler(){
+                                    @Override
+                                    public void onSuccess(JSONObject response) {
+                                        if(LoginActivity.this != null){
+                                            try {
+                                                if(response.getString("result").equals("ok")){
+                                                    String username = response.getJSONObject("content").getString("username");
+                                                    MessageUtils.toast(LoginActivity.this, "Hello, " + username);
+                                                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit().putString("username", username).commit();
+                                                    progressDialog.dismiss();
+                                                    Intent intent = new Intent();
+                                                    intent.putExtra("username", username);
+                                                    setResult(RESULT_OK, intent);
+                                                    finish();
+                                                }else if(response.getString("result").equals("fail")){
+                                                    String errorContent = response.getJSONObject("content").getString("error_msg");
+                                                    MessageUtils.toast(LoginActivity.this, errorContent);
+                                                    progressDialog.dismiss();
+                                                }
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            super.onSuccess(response);
                                         }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
                                     }
-                                    super.onSuccess(response);
-                                }
-                            });
-                        }else{
-                            MessageUtils.toast(LoginActivity.this, "get oncecode fail");
+                                });
+                            }else{
+                                MessageUtils.toast(LoginActivity.this, "get oncecode fail");
+                            }
+                            super.onSuccess(response);
+                        } catch (JSONException e) {
+                            MessageUtils.toast(LoginActivity.this, "json error");
+                            e.printStackTrace();
                         }
-                        super.onSuccess(response);
-                    } catch (JSONException e) {
-                        MessageUtils.toast(LoginActivity.this, "json error");
-                        e.printStackTrace();
                     }
                 }
             });

@@ -306,6 +306,17 @@ public class V2EX {
                         }});
                     } else {
                         result.put("result", "fail");
+                        Pattern errorPattern = Pattern.compile("<div class=\"problem\">(.*)</div>");
+                        Matcher errorMatcher = errorPattern.matcher(responseBody);
+                        final String errorContent;
+                        if(errorMatcher.find()){
+                            errorContent = errorMatcher.group(1).replaceAll("<[^>]+>", "");
+                        }else{
+                            errorContent = "Unknown error";
+                        }
+                        result.put("content", new JSONObject() {{
+                            put("error_msg", errorContent);
+                        }});
                     }
                     DebugUtils.log(result);
                     responseHandler.onSuccess(result);
@@ -337,6 +348,29 @@ public class V2EX {
         client.post("http://www.v2ex.com/t/" + topicId, params, new AsyncHttpResponseHandler() {
 
             @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject result = new JSONObject();
+                    result.put("result", "fail");
+                    Pattern errorPattern = Pattern.compile("<div class=\"problem\">(.*)</div>");
+                    Matcher errorMatcher = errorPattern.matcher(new String(responseBody));
+                    final String errorContent;
+                    if(errorMatcher.find()){
+                        errorContent = errorMatcher.group(1).replaceAll("<[^>]+>", "");
+                    }else{
+                        errorContent = "Unknown error";
+                    }
+                    result.put("content", new JSONObject(){{
+                        put("error_msg", errorContent);
+                    }});
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                super.onSuccess(statusCode, headers, responseBody);
+            }
+
+            @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 DebugUtils.log(statusCode);
                 JSONObject result = new JSONObject();
@@ -357,4 +391,8 @@ public class V2EX {
         });
     }
 
+    public static void logout(Context context){
+        PersistentCookieStore cookieStore = new PersistentCookieStore(context);
+        cookieStore.clear();
+    }
 }

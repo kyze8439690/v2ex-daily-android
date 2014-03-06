@@ -122,7 +122,8 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 MessageUtils.toast(getActivity(), "Comment success");
                 getReplyData();
             }else if(result.getString("result").equals("fail")){
-                MessageUtils.toast(getActivity(), "Comment failed");
+                String errorContent = result.getJSONObject("content").getString("error_msg");
+                MessageUtils.toast(getActivity(), errorContent);
             }
         } catch (JSONException e) {
             e.printStackTrace();
