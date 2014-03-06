@@ -37,6 +37,8 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
         UmengUpdateAgent.update(this);
 
+        getActionBar().setIcon(R.drawable.ic_logo);
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();

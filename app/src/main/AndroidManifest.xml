@@ -42,6 +42,7 @@
         </activity>
         <activity android:name=".activity.TopicActivity"
                   android:theme="@style/AppTheme.SwipeBack"
+                  android:icon="@drawable/ic_logo"
                   android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -49,6 +50,7 @@
         </activity>
         <activity android:name=".activity.NodeActivity"
                   android:theme="@style/AppTheme.SwipeBack"
+                  android:icon="@drawable/ic_logo"
                   android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -56,6 +58,7 @@
         </activity>
         <activity android:name=".activity.LoginActivity"
                   android:theme="@style/AppTheme.SwipeBack"
+                  android:icon="@drawable/ic_logo"
                   android:label="@string/title_login"
                   android:parentActivityName=".activity.MainActivity">
             <meta-data
