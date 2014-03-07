@@ -104,6 +104,15 @@ public class AllNodesDataHelper extends BaseDataHelper{
         return nodes;
     }
 
+    public NodeModel select(int nodeId){
+        Cursor cursor = query(null, BaseNodesDBInfo.NODE_ID + "=" + nodeId, null, null);
+        if(cursor.moveToFirst()){
+            return NodeModel.fromCursor(cursor);
+        }else{
+            return null;
+        }
+    }
+
     public NodeModel[] search(String keyword){
         NodeModel[] nodes;
         Cursor cursor = query(null, BaseNodesDBInfo.NAME + " like '%" + keyword + "%'", null, null);

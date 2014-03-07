@@ -17,5 +17,6 @@
     <string name="comment_content_empty">评论内容不能为空</string>
     <string name="title_commenting">评论中...</string>
     <string name="fail_get_once">获取once码失败</string>
+    <string name="title_add_collection">添加到收藏节点</string>
 
 </resources>

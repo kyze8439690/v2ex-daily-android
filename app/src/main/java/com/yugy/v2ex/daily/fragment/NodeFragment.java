@@ -4,6 +4,9 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,6 +17,8 @@ import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.NodeActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.TopicAdapter;
+import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
+import com.yugy.v2ex.daily.model.NodeModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
@@ -38,6 +43,13 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     private ListView mListView;
     private int mNodeId;
     private ArrayList<TopicModel> mModels;
+    private AllNodesDataHelper mAllNodesDataHelper;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAllNodesDataHelper = new AllNodesDataHelper(getActivity());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,6 +71,32 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
 
         if((mNodeId = getArguments().getInt("node_id", 0)) != 0){
             getData(false);
+        }else{
+            getActivity().finish();
+        }
+
+        NodeModel nodeModel = mAllNodesDataHelper.select(mNodeId);
+
+        if(getActivity() instanceof NodeActivity && !nodeModel.isCollected){
+            setHasOptionsMenu(true);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.node, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_node_add:
+                new AllNodesDataHelper(getActivity()).setCollected(true, mNodeId);
+                item.setVisible(false);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

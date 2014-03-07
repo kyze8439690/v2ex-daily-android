@@ -17,5 +17,6 @@
     <string name="comment_content_empty">Comment content can\'t be empty.</string>
     <string name="title_commenting">Commenting...</string>
     <string name="fail_get_once">Fail to get once code</string>
+    <string name="title_add_collection">Add to collection</string>
 
 </resources>
