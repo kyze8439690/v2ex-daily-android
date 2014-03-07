@@ -57,7 +57,6 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     private MemberModel mMember;
 
     private int mTopicId;
-    private boolean mLogined;
 
     private void init(){
         inflate(getContext(), R.layout.view_reply, this);
@@ -72,11 +71,10 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
     }
 
     public void parse(boolean logined, int topicId, ReplyModel replyModel){
-        mLogined = logined;
-        if(mLogined){
-            mReply.setVisibility(INVISIBLE);
-        }else{
+        if(logined){
             mReply.setVisibility(VISIBLE);
+        }else{
+            mReply.setVisibility(INVISIBLE);
         }
         mTopicId = topicId;
         mName.setText(replyModel.member.username);
