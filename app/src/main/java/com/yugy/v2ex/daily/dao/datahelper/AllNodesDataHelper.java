@@ -87,6 +87,23 @@ public class AllNodesDataHelper extends BaseDataHelper{
         return nodes;
     }
 
+    public NodeModel[] getCollections(){
+        NodeModel[] nodes;
+        Cursor cursor = query(null, BaseNodesDBInfo.IS_COLLECTED + "=" + 1, null, null);
+        if(cursor.moveToFirst()){
+            ArrayList<NodeModel> nodeModelArrayList = new ArrayList<NodeModel>();
+            nodeModelArrayList.add(NodeModel.fromCursor(cursor));
+            while (cursor.moveToNext()){
+                nodeModelArrayList.add(NodeModel.fromCursor(cursor));
+            }
+            nodes = nodeModelArrayList.toArray(new NodeModel[nodeModelArrayList.size()]);
+        }else{
+            nodes = new NodeModel[0];
+        }
+        cursor.close();
+        return nodes;
+    }
+
     public NodeModel[] search(String keyword){
         NodeModel[] nodes;
         Cursor cursor = query(null, BaseNodesDBInfo.NAME + " like '%" + keyword + "%'", null, null);
