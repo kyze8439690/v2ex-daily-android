@@ -65,6 +65,7 @@ public class NodeView extends RelativeLayout implements View.OnClickListener{
         }else{
             mHeader.setVisibility(GONE);
         }
+        setTypeAdded(model.isCollected);
         mTopics.setText(model.topics + " topics");
     }
 
@@ -72,7 +73,7 @@ public class NodeView extends RelativeLayout implements View.OnClickListener{
         return mNodeId;
     }
 
-    public void setTypeAdded(boolean added){
+    private void setTypeAdded(boolean added){
         if(added){
             mType = TYPE_ADDED;
             mAdd.setImageResource(R.drawable.btn_add_on_card_after);

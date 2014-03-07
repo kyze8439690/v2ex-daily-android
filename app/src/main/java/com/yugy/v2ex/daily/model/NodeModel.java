@@ -1,7 +1,11 @@
 package com.yugy.v2ex.daily.model;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.yugy.v2ex.daily.dao.dbinfo.AllNodesDBInfo;
+import com.yugy.v2ex.daily.dao.dbinfo.BaseNodesDBInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +24,8 @@ public class NodeModel implements Parcelable{
 
     public String header;
     public String footer;
+
+    public boolean isCollected = false;
 
     public void parse(JSONObject jsonObject) throws JSONException {
         id = jsonObject.getInt("id");
@@ -59,6 +65,10 @@ public class NodeModel implements Parcelable{
         if((footer = strings[5]).equals("")){
             footer = null;
         }
+
+        boolean[] booleans = new boolean[1];
+        in.readBooleanArray(booleans);
+        isCollected = booleans[0];
     }
 
     @Override
@@ -86,6 +96,7 @@ public class NodeModel implements Parcelable{
             strings[5] = "";
         }
         dest.writeStringArray(strings);
+        dest.writeBooleanArray(new boolean[]{ isCollected });
     }
 
     public static final Creator<NodeModel> CREATOR = new Creator<NodeModel>() {
@@ -99,4 +110,35 @@ public class NodeModel implements Parcelable{
             return new NodeModel[size];
         }
     };
+
+    public static NodeModel fromCursor(Cursor cursor){
+        NodeModel nodeModel = new NodeModel();
+        nodeModel.id = cursor.getInt(cursor.getColumnIndex(BaseNodesDBInfo.NODE_ID));
+        nodeModel.name = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.NAME));
+        nodeModel.title = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.TITLE));
+        String titleAlternative = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.TITLE_ALTERNATIVE));
+        if(titleAlternative.equals("")){
+            nodeModel.titleAlternative = null;
+        }else{
+            nodeModel.titleAlternative = titleAlternative;
+        }
+        nodeModel.url = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.URL));
+        nodeModel.topics = cursor.getInt(cursor.getColumnIndex(BaseNodesDBInfo.TOPICS));
+        String header = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.HEADER));
+        if(header.equals("")){
+            nodeModel.header = null;
+        }else{
+            nodeModel.header = header;
+        }
+        String footer = cursor.getString(cursor.getColumnIndex(BaseNodesDBInfo.FOOTER));
+        if(footer.equals("")){
+            nodeModel.footer = null;
+        }else{
+            nodeModel.footer = footer;
+        }
+        if(cursor.getInt(cursor.getColumnIndex(BaseNodesDBInfo.IS_COLLECTED)) == 1){
+            nodeModel.isCollected = true;
+        }
+        return nodeModel;
+    }
 }

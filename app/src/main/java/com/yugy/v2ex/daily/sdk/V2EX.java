@@ -65,25 +65,12 @@ public class V2EX {
         });
     }
 
-    public static void getAllNode(Context context, boolean forceRefresh, final JsonHttpResponseHandler responseHandler){
+    public static void getAllNode(Context context, final JsonHttpResponseHandler responseHandler){
         DebugUtils.log("getAllNode");
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Application.getContext());
-        if(!forceRefresh){
-            if(sharedPreferences.contains("all_node")){
-                try {
-                    JSONArray response = new JSONArray(sharedPreferences.getString("all_node", "/"));
-                    responseHandler.onSuccess(response);
-                    return;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         new AsyncHttpClient().get(context, API_URL + API_ALL_NODE, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(JSONArray response) {
-                sharedPreferences.edit().putString("all_node", response.toString()).commit();
                 responseHandler.onSuccess(response);
                 super.onSuccess(response);
             }

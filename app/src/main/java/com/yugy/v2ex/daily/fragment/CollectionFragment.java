@@ -36,7 +36,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 /**
  * Created by yugy on 14-2-25.
  */
-public class CollectionFragment extends Fragment implements OnRefreshListener{
+public class CollectionFragment extends Fragment{
 
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private ViewPager mViewPager;
@@ -64,7 +64,7 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
         }
 
         mCollectionNode = new ArrayList<NodeModel>();
-        V2EX.getAllNode(getActivity(), false, new JsonHttpResponseHandler(){
+        V2EX.getAllNode(getActivity(), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
@@ -166,11 +166,6 @@ public class CollectionFragment extends Fragment implements OnRefreshListener{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(3);
-    }
-
-    @Override
-    public void onRefreshStarted(View view) {
-
     }
 }
 

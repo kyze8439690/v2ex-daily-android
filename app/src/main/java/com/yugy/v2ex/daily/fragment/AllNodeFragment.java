@@ -2,8 +2,11 @@ package com.yugy.v2ex.daily.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,9 +25,13 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.activity.NodeActivity;
+import com.yugy.v2ex.daily.adapter.AllNodesAdapter;
+import com.yugy.v2ex.daily.adapter.SearchAllNodeAdapter;
+import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
 import com.yugy.v2ex.daily.model.NodeModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
+import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 import com.yugy.v2ex.daily.widget.NodeView;
 
@@ -43,41 +50,41 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 /**
  * Created by yugy on 14-2-23.
  */
-public class AllNodeFragment extends Fragment implements OnRefreshListener, NodeView.OnAddButtonClickListener, AdapterView.OnItemClickListener{
+public class AllNodeFragment extends Fragment implements
+        AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>{
 
-    private PullToRefreshLayout mPullToRefreshLayout;
     private StaggeredGridView mGridView;
-
-    private SharedPreferences.Editor mEditor;
-    private ArrayList<NodeModel> mModels;
-    private Set<String> mNodeIdCollection;
+    private AllNodesDataHelper mAllNodesDataHelper;
+    private AllNodesAdapter mAllNodesAdapter;
+    private SearchAllNodeAdapter mSearchAllNodeAdapter = null;
+    private View mEmptyView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mEditor = sharedPreferences.edit();
-        mNodeIdCollection = sharedPreferences.getStringSet("node_collections", new HashSet<String>());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mPullToRefreshLayout = (PullToRefreshLayout) inflater.inflate(R.layout.fragment_all_node, container, false);
-        mGridView = (StaggeredGridView) mPullToRefreshLayout.findViewById(R.id.grid_fragment_all_node);
-        mGridView.setEmptyView(mPullToRefreshLayout.findViewById(R.id.progress_fragment_all_node));
+        View rootView = inflater.inflate(R.layout.fragment_all_node, container, false);
+        mGridView = (StaggeredGridView) rootView.findViewById(R.id.grid_fragment_all_node);
+        mEmptyView = rootView.findViewById(R.id.progress_fragment_all_node);
+        mGridView.setEmptyView(mEmptyView);
         mGridView.setOnItemClickListener(this);
-        return mPullToRefreshLayout;
+        mAllNodesDataHelper = new AllNodesDataHelper(getActivity());
+        mAllNodesAdapter = new AllNodesAdapter(getActivity());
+        mGridView.setAdapter(mAllNodesAdapter);
+        getLoaderManager().initLoader(0, null, this);
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ActionBarPullToRefresh.from(getActivity())
-                .allChildrenArePullable()
-                .listener(this)
-                .setup(mPullToRefreshLayout);
-        getData(false);
+        if(mAllNodesDataHelper.query().length == 0){
+            getData();
+        }
     }
 
     @Override
@@ -89,53 +96,53 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
         searchView.setQueryHint("Search for nodes");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
-            private boolean mShowingSearchResult = false;
-
             @Override
             public boolean onQueryTextSubmit(String query) {
+                DebugUtils.log("onQueryTextSubmit: " + query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!newText.equals("")) {
-                    mShowingSearchResult = true;
-                    ArrayList<NodeModel> result = new ArrayList<NodeModel>();
-                    for (int i = 0; i < mModels.size(); i++) {
-                        String title = mModels.get(i).title.toLowerCase();
-                        if (title.contains(newText.toLowerCase())) {
-                            result.add(mModels.get(i));
-                        }
+                DebugUtils.log("onQueryTextChange: " + newText);
+                if(newText.equals("")){     //删除关键字到空或者初始状态
+                    if(mGridView.getAdapter() instanceof AllNodesAdapter){      //初始状态, do nothing
+
+                    }else if(mGridView.getAdapter() instanceof SearchAllNodeAdapter){       //删除关键字到空，用回AllNodesAdapter
+                        mGridView.setAdapter(mAllNodesAdapter);
+                        mSearchAllNodeAdapter = null;
                     }
-                    mGridView.setAdapter(new AllNodeAdapter(result));
-                } else if(mShowingSearchResult) {
-                    if(mModels != null){
-                        mGridView.setAdapter(new AllNodeAdapter(mModels));
+                }else{      //有关键字啦
+                    if(mSearchAllNodeAdapter == null){      //SearchAllNodesAdapter 初始化
+                        mSearchAllNodeAdapter = new SearchAllNodeAdapter(getActivity(), newText);
+                        mGridView.setAdapter(mSearchAllNodeAdapter);
+                    }else{
+                        mSearchAllNodeAdapter.setKeyword(newText);
                     }
-                    mShowingSearchResult = false;
                 }
-                return false;
+                return true;
             }
         });
         searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                DebugUtils.log("onMenuItemActionExpand");
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchView.setQuery("", false);
-                mGridView.setAdapter(new AllNodeAdapter(mModels));
+                DebugUtils.log("onMenuItemActionCollapse");
+                mGridView.setAdapter(mAllNodesAdapter);
+                mSearchAllNodeAdapter = null;
                 return true;
             }
         });
 
     }
 
-    private void getData(boolean forceRefresh){
-        mPullToRefreshLayout.setRefreshing(true);
-        V2EX.getAllNode(getActivity(), forceRefresh, new JsonHttpResponseHandler(){
+    private void getData(){
+        V2EX.getAllNode(getActivity(), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
@@ -147,10 +154,24 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
                 e.printStackTrace();
                 AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                mPullToRefreshLayout.setRefreshComplete();
                 super.onFailure(statusCode, headers, responseBody, e);
             }
         });
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mAllNodesDataHelper.getCursorLoader();
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAllNodesAdapter.changeCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAllNodesAdapter.changeCursor(null);
     }
 
     private class ParseTask extends AsyncTask<JSONArray, Void, ArrayList<NodeModel>>{
@@ -158,8 +179,7 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
         @Override
         protected ArrayList<NodeModel> doInBackground(JSONArray... params) {
             try {
-                mModels = getModels(params[0]);
-                return mModels;
+                return getModels(params[0]);
             } catch (JSONException e) {
                 AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                 e.printStackTrace();
@@ -169,9 +189,8 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
 
         @Override
         protected void onPostExecute(ArrayList<NodeModel> nodeModels) {
-            mGridView.setAdapter(new AllNodeAdapter(mModels));
-            mPullToRefreshLayout.setRefreshComplete();
-            mPullToRefreshLayout.findViewById(R.id.progress_fragment_all_node).setVisibility(View.GONE);
+            mAllNodesDataHelper.bulkInsert(nodeModels);
+            mEmptyView.setVisibility(View.GONE);
             mGridView.setEmptyView(null);
             super.onPostExecute(nodeModels);
         }
@@ -188,16 +207,6 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
     }
 
     @Override
-    public void onClick(int nodeId, boolean added) {
-        String nodeIdString = String.valueOf(nodeId);
-        if(added){
-            mNodeIdCollection.add(nodeIdString);
-        }else{
-            mNodeIdCollection.remove(nodeIdString);
-        }
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         NodeView item = (NodeView) view;
         Intent intent = new Intent(getActivity(), NodeActivity.class);
@@ -207,61 +216,9 @@ public class AllNodeFragment extends Fragment implements OnRefreshListener, Node
         startActivity(intent);
     }
 
-    private class AllNodeAdapter extends BaseAdapter{
-
-        private ArrayList<NodeModel> mModels;
-
-        private AllNodeAdapter(ArrayList<NodeModel> models) {
-            mModels = models;
-        }
-
-        @Override
-        public int getCount() {
-            return mModels.size();
-        }
-
-        @Override
-        public NodeModel getItem(int position) {
-            return mModels.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            NodeView item = (NodeView) convertView;
-            if(item == null){
-                item = new NodeView(getActivity());
-                item.setOnAddButtonClickListener(AllNodeFragment.this);
-            }
-            item.parse(getItem(position));
-            if(mNodeIdCollection.contains(String.valueOf(getItem(position).id))){
-                item.setTypeAdded(true);
-            }else{
-                item.setTypeAdded(false);
-            }
-            return item;
-        }
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(2);
-    }
-
-    @Override
-    public void onDestroy() {
-        mEditor.remove("node_collections").commit();
-        mEditor.putStringSet("node_collections", mNodeIdCollection).commit();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onRefreshStarted(View view) {
-        getData(true);
     }
 }

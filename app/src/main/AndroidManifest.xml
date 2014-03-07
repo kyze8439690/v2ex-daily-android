@@ -31,6 +31,13 @@
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" >
         </activity>
 
+        <provider
+            android:authorities="com.yugy.v2ex.daily"
+            android:name=".dao.DataProvider"
+            android:exported="false" >
+            <grant-uri-permission android:pathPattern=".*"/>
+        </provider>
+
         <activity
             android:name=".activity.MainActivity"
             android:theme="@style/AppTheme" >
