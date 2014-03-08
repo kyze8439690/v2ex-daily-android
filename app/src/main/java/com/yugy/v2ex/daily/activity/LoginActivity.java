@@ -124,10 +124,15 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
                     mAllNodesDataHelper.removeCollections();
                     mAllNodesDataHelper.importCollections(collections);
                     MessageUtils.toast(LoginActivity.this, "Hello, " + username);
-                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit().putString("username", username).commit();
+                    long currentTimeMillis = System.currentTimeMillis();
+                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit()
+                            .putString("username", username)
+                            .putLong("sync_time", currentTimeMillis)
+                            .commit();
                     mProgressDialog.dismiss();
                     Intent intent = new Intent();
                     intent.putExtra("username", username);
+                    intent.putExtra("sync_time", currentTimeMillis);
                     setResult(RESULT_OK, intent);
                     finish();
                 } catch (JSONException e) {

@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-import com.yugy.v2ex.daily.R;
+import com.yugy.v2ex.daily.utils.TextUtils;
 
 
 /**
@@ -76,19 +76,7 @@ public class RelativeTimeTextView extends TextView {
         */
         if (this.mReferenceTime == -1L)
             return;
-        setText(getRelativeTimeDisplayString());
-    }
-
-    private CharSequence getRelativeTimeDisplayString() {
-        long now = System.currentTimeMillis();
-        long difference = now - mReferenceTime;
-        return (difference >= 0 &&  difference<=DateUtils.MINUTE_IN_MILLIS) ?
-                getResources().getString(R.string.just_now):
-                DateUtils.getRelativeTimeSpanString(
-                        mReferenceTime,
-                        now,
-                        DateUtils.MINUTE_IN_MILLIS,
-                        DateUtils.FORMAT_ABBREV_RELATIVE);
+        setText(TextUtils.getRelativeTimeDisplayString(getContext(), mReferenceTime));
     }
 
     @Override

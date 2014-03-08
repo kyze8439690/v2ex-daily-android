@@ -18,5 +18,12 @@
     <string name="title_commenting">评论中...</string>
     <string name="fail_get_once">获取once码失败</string>
     <string name="title_add_collection">添加到收藏节点</string>
+    <string name="title_user">账户</string>
+    <string name="title_sync">同步用户数据</string>
+    <string name="title_more">更多</string>
+    <string name="title_about">关于每日V2EX</string>
+    <string name="title_contact">联系作者</string>
+    <string name="title_contact_summary">我正在求一份工作...</string>
+    <string name="title_update">检查更新</string>
 
 </resources>
