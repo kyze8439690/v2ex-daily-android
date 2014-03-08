@@ -10,12 +10,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
-import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.utils.DebugUtils;
-import com.yugy.v2ex.daily.utils.MessageUtils;
 
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -340,35 +337,34 @@ public class V2EX {
      * }
      */
     public static void getUserInfo(final Context context, final JsonHttpResponseHandler responseHandler){
-        AsyncHttpClient client = getClient(context);
-        client.get("http://www.v2ex.com/my/nodes", new TextHttpResponseHandler(){
+        getClient(context).get("http://www.v2ex.com/my/nodes", new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                 super.onSuccess(statusCode, headers, responseBody);
                 JSONObject result = new JSONObject();
-                try{
+                try {
                     Pattern userPattern = Pattern.compile("<a href=\"/member/([^\"]+)\" class=\"top\">");
                     Matcher userMatcher = userPattern.matcher(responseBody);
-                    if(userMatcher.find()){
+                    if (userMatcher.find()) {
                         JSONObject content = new JSONObject();
                         content.put("username", userMatcher.group(1));
                         Pattern collectionPattern = Pattern.compile("</a>&nbsp; <a href=\"/go/([^\"]+)\">");
                         Matcher collectionMatcher = collectionPattern.matcher(responseBody);
-                        if(collectionMatcher.find()){
+                        if (collectionMatcher.find()) {
                             JSONArray collections = new JSONArray();
                             collections.put(collectionMatcher.group(1));
-                            while(collectionMatcher.find()){
+                            while (collectionMatcher.find()) {
                                 collections.put(collectionMatcher.group(1));
                             }
                             content.put("collections", collections);
                             result.put("content", content);
                             result.put("result", "ok");
                             responseHandler.onSuccess(result);
-                        }else{
+                        } else {
                             result.put("result", "fail");
                             responseHandler.onSuccess(result);
                         }
-                    }else{
+                    } else {
                         result.put("result", "fail");
                         responseHandler.onSuccess(result);
                     }
@@ -429,6 +425,76 @@ public class V2EX {
                     e.printStackTrace();
                 }
                 super.onFailure(statusCode, headers, responseBody, error);
+            }
+        });
+    }
+
+    /**
+     * result example:
+     * {
+     *     result:ok/fail,
+     *     reg_time:13123213213
+     * }
+     */
+    public static void getRegTime(final Context context, final JsonHttpResponseHandler responseHandler){
+        getClient(context).get("http://www.v2ex.com/go/nds", new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                super.onSuccess(statusCode, headers, responseBody);
+                try {
+                    JSONObject result = new JSONObject();
+                    Pattern regTimePattern = Pattern.compile("favorite/node/32\\?t=([^\"]+)\">");
+                    Matcher regTimeMatcher = regTimePattern.matcher(responseBody);
+                    if (regTimeMatcher.find()) {
+                        result.put("result", "ok");
+                        result.put("reg_time", regTimeMatcher.group(1));
+                    } else {
+                        result.put("result", "fail");
+                    }
+                    DebugUtils.log(result);
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public static void syncCollection(final Context context, int nodeId, String regTime, boolean add, final JsonHttpResponseHandler responseHandler){
+        String url;
+        if(add){
+            url = "http://www.v2ex.com/favorite/node/" + nodeId + "?t=" + regTime;
+        }else{
+            url = "http://www.v2ex.com/unfavorite/node/" + nodeId + "?t=" + regTime;
+        }
+        getClient(context).get(url, new TextHttpResponseHandler(){
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                super.onSuccess(statusCode, headers, responseBody);
+                try {
+                    JSONObject result = new JSONObject();
+                    result.put("result", "fail");
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                super.onFailure(statusCode, headers, responseBody, error);
+                JSONObject result = new JSONObject();
+                try {
+                    if(statusCode == 302){
+                        result.put("result", "ok");
+                    }else{
+                        result.put("result", "fail");
+                    }
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

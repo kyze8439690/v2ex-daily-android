@@ -134,7 +134,7 @@ public class AllNodesDataHelper extends BaseDataHelper{
 
     public NodeModel[] search(String keyword){
         NodeModel[] nodes;
-        Cursor cursor = query(null, BaseNodesDBInfo.NAME + " like '%" + keyword + "%'", null, null);
+        Cursor cursor = query(null, BaseNodesDBInfo.TITLE + " like '%" + keyword + "%'", null, null);
         if(cursor.moveToFirst()){
             ArrayList<NodeModel> nodeModelArrayList = new ArrayList<NodeModel>();
             nodeModelArrayList.add(NodeModel.fromCursor(cursor));

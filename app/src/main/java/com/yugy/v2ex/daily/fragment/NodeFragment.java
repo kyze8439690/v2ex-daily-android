@@ -1,8 +1,11 @@
 package com.yugy.v2ex.daily.fragment;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,11 +25,13 @@ import com.yugy.v2ex.daily.model.NodeModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
+import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -44,11 +49,18 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     private int mNodeId;
     private ArrayList<TopicModel> mModels;
     private AllNodesDataHelper mAllNodesDataHelper;
+    private SharedPreferences mSharedPreferences;
+    private ProgressDialog mProgressDialog;
+    private boolean mIsLogined;
+    private String mRegTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAllNodesDataHelper = new AllNodesDataHelper(getActivity());
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mIsLogined = mSharedPreferences.contains("username");
+        mRegTime = mSharedPreferences.getString("reg_time", null);
     }
 
     @Override
@@ -92,7 +104,33 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_node_add:
-                new AllNodesDataHelper(getActivity()).setCollected(true, mNodeId);
+                if(mIsLogined){
+                    mProgressDialog = ProgressDialog.show(getActivity(), null, "Add to collections...", true, false);
+                    if(mRegTime == null){
+                        V2EX.getRegTime(getActivity(), new JsonHttpResponseHandler(){
+                            @Override
+                            public void onSuccess(JSONObject response) {
+                                super.onSuccess(response);
+                                try {
+                                    if(response.getString("result").equals("ok")){
+                                        mRegTime = response.getString("reg_time");
+                                        mSharedPreferences.edit().putString("reg_time", mRegTime).commit();
+                                        syncCollection(mNodeId, true, mRegTime);
+                                    }else if(response.getString("result").equals("fail")){
+                                        MessageUtils.toast(getActivity(), "Get reg time fail");
+                                        mProgressDialog.dismiss();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }else{
+                        syncCollection(mNodeId, true, mRegTime);
+                    }
+                }else{
+                    mAllNodesDataHelper.setCollected(true, mNodeId);
+                }
                 item.setVisible(false);
                 return true;
             default:
@@ -150,5 +188,26 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
         argument.putParcelable("model", mModels.get(position));
         intent.putExtra("argument", argument);
         startActivity(intent);
+    }
+
+    private void syncCollection(final int nodeId, final boolean added, String regTime){
+        V2EX.syncCollection(getActivity(), nodeId, regTime, added, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONObject response) {
+                super.onSuccess(response);
+                try {
+                    if(response.getString("result").equals("ok")){
+                        mProgressDialog.setMessage("OK");
+                        mAllNodesDataHelper.setCollected(added, nodeId);
+                    }else if(response.getString("result").equals("fail")){
+                        mProgressDialog.setMessage("Fail");
+                        MessageUtils.toast(getActivity(), "Sync collections failed.");
+                    }
+                    mProgressDialog.dismiss();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

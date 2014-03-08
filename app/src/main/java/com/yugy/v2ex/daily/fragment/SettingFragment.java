@@ -17,8 +17,6 @@ import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.LoginActivity;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.sdk.V2EX;
-import com.yugy.v2ex.daily.utils.DebugUtils;
-import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
 /**
@@ -102,12 +100,7 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                getPreferenceManager().getSharedPreferences().edit()
-                                        .remove("username")
-                                        .commit();
-                                V2EX.logout(getActivity());
-                                logined = false;
-                                getPreferenceManager().findPreference(PREF_LOGIN).setTitle("登陆");
+                                logout();
                             }
                         }).setNegativeButton("取消", null)
                         .show();
@@ -117,6 +110,16 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
             return true;
         }
         return false;
+    }
+
+    private void logout(){
+        getPreferenceManager().getSharedPreferences().edit()
+                .remove("username")
+                .remove("reg_time")
+                .commit();
+        V2EX.logout(getActivity());
+        logined = false;
+        getPreferenceManager().findPreference(PREF_LOGIN).setTitle("登陆");
     }
 
     @Override
