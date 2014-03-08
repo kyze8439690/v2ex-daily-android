@@ -165,6 +165,8 @@ public class V2EX {
     private static AsyncHttpClient getClient(Context context){
         if(sClient == null){
             sClient = new AsyncHttpClient();
+            sClient.setEnableRedirects(false);
+            sClient.setCookieStore(new PersistentCookieStore(context));
             sClient.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.2.1; en-us; M040 Build/JOP40D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
             sClient.addHeader("Cache-Control", "max-age=0");
             sClient.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -172,7 +174,6 @@ public class V2EX {
             sClient.addHeader("Accept-Language", "zh-CN, en-US");
             sClient.addHeader("X-Requested-With", "com.android.browser");
         }
-        sClient.setCookieStore(new PersistentCookieStore(context));
         return sClient;
     }
 
@@ -263,7 +264,7 @@ public class V2EX {
      * {
      *      result:ok/fail,
      *      content:{
-     *          username: kyze8439690
+     *          error_msg: 123
      *      }
      * }
      */
@@ -282,29 +283,20 @@ public class V2EX {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
 //                DebugUtils.log(responseBody);
-                Pattern userNamePattern = Pattern.compile("<a href=\"/member/([^\"]+)\" class=\"top\">");
-                final Matcher matcher = userNamePattern.matcher(responseBody);
                 JSONObject result = new JSONObject();
                 try {
-                    if (matcher.find()) {
-                        result.put("result", "ok");
-                        result.put("content", new JSONObject() {{
-                            put("username", matcher.group(1));
-                        }});
-                    } else {
-                        result.put("result", "fail");
-                        Pattern errorPattern = Pattern.compile("<div class=\"problem\">(.*)</div>");
-                        Matcher errorMatcher = errorPattern.matcher(responseBody);
-                        final String errorContent;
-                        if(errorMatcher.find()){
-                            errorContent = errorMatcher.group(1).replaceAll("<[^>]+>", "");
-                        }else{
-                            errorContent = "Unknown error";
-                        }
-                        result.put("content", new JSONObject() {{
-                            put("error_msg", errorContent);
-                        }});
+                    result.put("result", "fail");
+                    Pattern errorPattern = Pattern.compile("<div class=\"problem\">(.*)</div>");
+                    Matcher errorMatcher = errorPattern.matcher(responseBody);
+                    final String errorContent;
+                    if(errorMatcher.find()){
+                        errorContent = errorMatcher.group(1).replaceAll("<[^>]+>", "");
+                    }else{
+                        errorContent = "Unknown error";
                     }
+                    result.put("content", new JSONObject() {{
+                        put("error_msg", errorContent);
+                    }});
                     DebugUtils.log(result);
                     responseHandler.onSuccess(result);
                 } catch (JSONException e) {
@@ -313,19 +305,82 @@ public class V2EX {
 
             }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                DebugUtils.log(statusCode);
+                JSONObject result = new JSONObject();
+                try {
+                    if(statusCode == 302){
+                        result.put("result", "ok");
+                    }else{
+                        result.put("result", "fail");
+                    }
+                    DebugUtils.log(result);
+                    responseHandler.onSuccess(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                super.onFailure(statusCode, headers, responseBody, error);
+            }
+        });
+    }
+
+    /**
+     * result example:
+     * {
+     *     result:ok/fail,
+     *     content:{
+     *         username:kyze8439690,
+     *         collections:[
+     *              all4all,
+     *              android,
+     *              ...
+     *         ]
+     *     }
+     * }
+     */
+    public static void getUserInfo(final Context context, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = getClient(context);
+        client.get("http://www.v2ex.com/my/nodes", new TextHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                super.onSuccess(statusCode, headers, responseBody);
+                JSONObject result = new JSONObject();
+                try{
+                    Pattern userPattern = Pattern.compile("<a href=\"/member/([^\"]+)\" class=\"top\">");
+                    Matcher userMatcher = userPattern.matcher(responseBody);
+                    if(userMatcher.find()){
+                        JSONObject content = new JSONObject();
+                        content.put("username", userMatcher.group(1));
+                        Pattern collectionPattern = Pattern.compile("</a>&nbsp; <a href=\"/go/([^\"]+)\">");
+                        Matcher collectionMatcher = collectionPattern.matcher(responseBody);
+                        if(collectionMatcher.find()){
+                            JSONArray collections = new JSONArray();
+                            collections.put(collectionMatcher.group(1));
+                            while(collectionMatcher.find()){
+                                collections.put(collectionMatcher.group(1));
+                            }
+                            content.put("collections", collections);
+                            result.put("content", content);
+                            result.put("result", "ok");
+                            responseHandler.onSuccess(result);
+                        }else{
+                            result.put("result", "fail");
+                            responseHandler.onSuccess(result);
+                        }
+                    }else{
+                        result.put("result", "fail");
+                        responseHandler.onSuccess(result);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         });
     }
 
     public static void postComment(final Context context, int onceCode, int topicId, final String commentContent, final JsonHttpResponseHandler responseHandler){
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setEnableRedirects(false);
-        client.setCookieStore(new PersistentCookieStore(context));
-        client.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.2.1; en-us; M040 Build/JOP40D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        client.addHeader("Cache-Control", "max-age=0");
-        client.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        client.addHeader("Accept-Charset", "utf-8, iso-8859-1, utf-16, *;q=0.7");
-        client.addHeader("Accept-Language", "zh-CN, en-US");
-        client.addHeader("X-Requested-With", "com.android.browser");
+        AsyncHttpClient client = getClient(context);
         client.addHeader("Origin", "http://www.v2ex.com");
         client.addHeader("Referer", "http://www.v2ex.com/t/" + topicId);
         client.addHeader("Content-Type", "application/x-www-form-urlencoded");

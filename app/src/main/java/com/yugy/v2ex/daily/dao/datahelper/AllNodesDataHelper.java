@@ -104,6 +104,25 @@ public class AllNodesDataHelper extends BaseDataHelper{
         return nodes;
     }
 
+    public void removeCollections(){
+        NodeModel[] nodes = getCollections();
+        for(NodeModel node : nodes){
+            node.isCollected = false;
+            update(node);
+        }
+    }
+
+    public void importCollections(String[] collections){
+        for(String collectionName : collections){
+            Cursor cursor = query(null, BaseNodesDBInfo.URL + "=\"http://www.v2ex.com/go/" + collectionName + "\"", null, null);
+            if(cursor.moveToFirst()){
+                NodeModel node = NodeModel.fromCursor(cursor);
+                node.isCollected = true;
+                update(node);
+            }
+        }
+    }
+
     public NodeModel select(int nodeId){
         Cursor cursor = query(null, BaseNodesDBInfo.NODE_ID + "=" + nodeId, null, null);
         if(cursor.moveToFirst()){
