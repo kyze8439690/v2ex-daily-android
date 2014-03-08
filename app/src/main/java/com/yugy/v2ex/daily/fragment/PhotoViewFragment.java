@@ -162,7 +162,7 @@ public class PhotoViewFragment extends Fragment implements
 
     protected void initializeView(View view) {
         mPhotoView = (PhotoView) view.findViewById(R.id.photo_view);
-        mPhotoView.setMaxInitialScale(1);
+        mPhotoView.setMaxInitialScale(5);
         mPhotoView.setOnClickListener(this);
         mPhotoView.setFullScreen(false, false);
         mPhotoView.enableImageTransforms(false);

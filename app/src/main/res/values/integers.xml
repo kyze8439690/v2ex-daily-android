@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="activity_anim_duration">300</integer>
+    <integer name="activity_anim_open_exit_duration">600</integer>
+    <integer name="activity_anim_close_enter_duration">600</integer>
+</resources>

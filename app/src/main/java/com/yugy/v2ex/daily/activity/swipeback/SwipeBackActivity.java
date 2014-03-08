@@ -1,6 +1,5 @@
 package com.yugy.v2ex.daily.activity.swipeback;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,6 +53,7 @@ public class SwipeBackActivity extends BaseActivity implements SwipeBackActivity
 
     @Override
     public void scrollToFinishActivity() {
-        getSwipeBackLayout().scrollToFinishActivity();
+        finish();
+        overridePendingTransition(R.anim.activity_close_enter, R.anim.activity_close_exit);
     }
 }

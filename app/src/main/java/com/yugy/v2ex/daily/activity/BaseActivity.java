@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.umeng.analytics.MobclickAgent;
+import com.yugy.v2ex.daily.R;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -19,6 +20,7 @@ public class BaseActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault("");
+        overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
     }
 
     @Override
