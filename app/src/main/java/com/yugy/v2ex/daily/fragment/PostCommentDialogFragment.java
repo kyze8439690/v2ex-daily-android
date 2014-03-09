@@ -1,12 +1,10 @@
 package com.yugy.v2ex.daily.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
@@ -67,7 +65,7 @@ public class PostCommentDialogFragment extends DialogFragment{
                 @Override
                 public void onSuccess(JSONObject response) {
                     DebugUtils.log(response);
-                    if(getDialog().isShowing()){
+                    if(getDialog() != null){
                         try {
                             if(response.getString("result").equals("ok")){
                                 int onceCode = response.getJSONObject("content").getInt("once");

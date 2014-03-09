@@ -111,17 +111,19 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                             @Override
                             public void onSuccess(JSONObject response) {
                                 super.onSuccess(response);
-                                try {
-                                    if(response.getString("result").equals("ok")){
-                                        mRegTime = response.getString("reg_time");
-                                        mSharedPreferences.edit().putString("reg_time", mRegTime).commit();
-                                        syncCollection(mNodeId, true, mRegTime);
-                                    }else if(response.getString("result").equals("fail")){
-                                        MessageUtils.toast(getActivity(), "Get reg time fail");
-                                        mProgressDialog.dismiss();
+                                if(getActivity() != null){
+                                    try {
+                                        if(response.getString("result").equals("ok")){
+                                            mRegTime = response.getString("reg_time");
+                                            mSharedPreferences.edit().putString("reg_time", mRegTime).commit();
+                                            syncCollection(mNodeId, true, mRegTime);
+                                        }else if(response.getString("result").equals("fail")){
+                                            MessageUtils.toast(getActivity(), "Get reg time fail");
+                                            mProgressDialog.dismiss();
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
                             }
                         });
@@ -143,17 +145,19 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
-                try {
-                    mModels = getModels(response);
-                    if(getActivity() instanceof NodeActivity){
-                        getActivity().getActionBar().setTitle(mModels.get(0).node.title);
+                if(getActivity() != null){
+                    try {
+                        mModels = getModels(response);
+                        if(getActivity() instanceof NodeActivity){
+                            getActivity().getActionBar().setTitle(mModels.get(0).node.title);
+                        }
+                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
+                    } catch (JSONException e) {
+                        AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
+                        e.printStackTrace();
                     }
-                    mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
-                } catch (JSONException e) {
-                    AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                    e.printStackTrace();
+                    mPullToRefreshLayout.setRefreshComplete();
                 }
-                mPullToRefreshLayout.setRefreshComplete();
                 super.onSuccess(response);
             }
 
@@ -195,17 +199,19 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
             @Override
             public void onSuccess(JSONObject response) {
                 super.onSuccess(response);
-                try {
-                    if(response.getString("result").equals("ok")){
-                        mProgressDialog.setMessage("OK");
-                        mAllNodesDataHelper.setCollected(added, nodeId);
-                    }else if(response.getString("result").equals("fail")){
-                        mProgressDialog.setMessage("Fail");
-                        MessageUtils.toast(getActivity(), "Sync collections failed.");
+                if(getActivity() != null){
+                    try {
+                        if(response.getString("result").equals("ok")){
+                            mProgressDialog.setMessage("OK");
+                            mAllNodesDataHelper.setCollected(added, nodeId);
+                        }else if(response.getString("result").equals("fail")){
+                            mProgressDialog.setMessage("Fail");
+                            MessageUtils.toast(getActivity(), "Sync collections failed.");
+                        }
+                        mProgressDialog.dismiss();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    mProgressDialog.dismiss();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         });
