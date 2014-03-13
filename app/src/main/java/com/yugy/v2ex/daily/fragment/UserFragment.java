@@ -3,14 +3,8 @@ package com.yugy.v2ex.daily.fragment;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
@@ -25,7 +19,6 @@ import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
@@ -184,7 +177,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                     DebugUtils.log(response);
                     try {
                         mModels = getModels(response);
-                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
+                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels, null));
                         mDataLoaded = true;
                     } catch (JSONException e) {
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();

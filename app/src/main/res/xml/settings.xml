@@ -18,6 +18,13 @@
             android:enabled="false"
             />
 
+        <SwitchPreference
+            android:key="pref_notification"
+            android:title="@string/title_notification"
+            android:dependency="pref_sync"
+            android:defaultValue="false"
+            />
+
     </PreferenceCategory>
 
     <PreferenceCategory

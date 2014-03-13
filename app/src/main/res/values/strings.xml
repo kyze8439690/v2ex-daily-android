@@ -25,6 +25,8 @@
     <string name="title_contact">Contact me</string>
     <string name="title_contact_summary">I am looking for a job...</string>
     <string name="title_update">Check update</string>
+    <string name="title_notification">Notification Service</string>
+    <string name="title_notification_action">Notification</string>
 
 
 </resources>

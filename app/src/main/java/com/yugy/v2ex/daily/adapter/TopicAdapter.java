@@ -17,10 +17,18 @@ public class TopicAdapter extends BaseAdapter {
 
     private Context mContext;
     private ArrayList<TopicModel> mModels;
+    private OnScrollToBottomListener mListener;
 
-    public TopicAdapter(Context context, ArrayList<TopicModel> models) {
+    /**
+     *
+     * @param context
+     * @param models
+     * @param listener pass null if there is no need.
+     */
+    public TopicAdapter(Context context, ArrayList<TopicModel> models, OnScrollToBottomListener listener) {
         mContext = context;
         mModels = models;
+        mListener = listener;
     }
 
     @Override
@@ -45,6 +53,19 @@ public class TopicAdapter extends BaseAdapter {
             item = new TopicView(mContext);
         }
         item.parse(getItem(position));
+        if(position == getCount() - 1){
+            if(mListener != null) {
+                mListener.onScrollToBottom();
+            }
+        }
         return item;
+    }
+
+    public void setModels(ArrayList<TopicModel> models){
+        mModels = models;
+    }
+
+    public static interface OnScrollToBottomListener{
+        public void onScrollToBottom();
     }
 }

@@ -3,7 +3,6 @@ package com.yugy.v2ex.daily.activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 

@@ -30,15 +30,21 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import static android.widget.AdapterView.*;
+import static com.yugy.v2ex.daily.adapter.TopicAdapter.*;
+
 /**
  * Created by yugy on 14-2-23.
  */
-public class NewestNodeFragment extends Fragment implements OnRefreshListener, AdapterView.OnItemClickListener{
+public class NewestNodeFragment extends Fragment implements OnRefreshListener, OnItemClickListener, OnScrollToBottomListener{
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private ListView mListView;
+    private TopicAdapter mAdapter;
 
     private ArrayList<TopicModel> mModels;
+
+    private int mPage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,18 +62,30 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, A
                 .allChildrenArePullable()
                 .listener(this)
                 .setup(mPullToRefreshLayout);
-        getData(false);
+        mPage = 1;
+        getData(true);
     }
 
     private void getData(boolean forceRefresh){
         mPullToRefreshLayout.setRefreshing(true);
-        V2EX.getLatestTopics(getActivity(), forceRefresh, new JsonHttpResponseHandler(){
+        V2EX.getLatestTopics(getActivity(), forceRefresh, mPage, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
                 try {
-                    mModels = getModels(response);
-                    mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
+                    if(mModels == null){
+                        mModels = new ArrayList<TopicModel>();
+                    }
+                    mModels.addAll(getModels(response));
+
+                    if(mAdapter == null){
+                        mAdapter = new TopicAdapter(getActivity(), mModels, NewestNodeFragment.this);
+                        mListView.setAdapter(mAdapter);
+                    }else{
+                        mAdapter.setModels(mModels);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                    mPage++;
                 } catch (JSONException e) {
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                     e.printStackTrace();
@@ -88,6 +106,7 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, A
 
     @Override
     public void onRefreshStarted(View view) {
+        mPage = 1;
         getData(true);
     }
 
@@ -116,4 +135,9 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, A
         ((MainActivity) activity).onSectionAttached(1);
     }
 
+    @Override
+    public void onScrollToBottom() {
+        mPullToRefreshLayout.setRefreshing(true);
+        getData(true);
+    }
 }

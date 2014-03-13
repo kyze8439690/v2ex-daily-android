@@ -32,10 +32,10 @@ public class V2EX {
     private static final String API_TOPIC = "/topics/show.json";
     private static final String API_USER = "/members/show.json";
 
-    public static void getLatestTopics(Context context, boolean forceRefresh, final JsonHttpResponseHandler responseHandler){
+    public static void getLatestTopics(Context context, boolean forceRefresh, int page, final JsonHttpResponseHandler responseHandler){
         DebugUtils.log("getLatestTopics");
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if(!forceRefresh){
+        if(!forceRefresh && page == 1){
             if(sharedPreferences.contains("latest_topics_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("latest_topics_cache", null));
@@ -46,7 +46,9 @@ public class V2EX {
                 }
             }
         }
-        new AsyncHttpClient().get(context, API_URL + API_LATEST, new JsonHttpResponseHandler() {
+        RequestParams params = new RequestParams();
+        params.put("p", String.valueOf(page));
+        new AsyncHttpClient().get(context, API_URL + API_LATEST, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
                 sharedPreferences.edit().putString("latest_topics_cache", response.toString()).commit();
@@ -493,6 +495,38 @@ public class V2EX {
                     }
                     responseHandler.onSuccess(result);
                 } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * result example:
+     * {
+     *     result:ok/fail,
+     *     token:123
+     * }
+     */
+    public static void getNotificationToken(final Context context, final JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = getClient(context);
+        client.setUserAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.146 Safari/537.36");
+        client.get("http://www.v2ex.com/notifications", new TextHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                super.onSuccess(statusCode, headers, responseBody);
+                Pattern tokenPattern = Pattern.compile("<input type=\"text\" value=\"http://www\\.v2ex\\.com/n/([^\\.]+)\\.xml\" class=\"sll\" onclick=\"this\\.select\\(\\);\" readonly=\"readonly\" />");
+                Matcher tokenMatcher = tokenPattern.matcher(responseBody);
+                try {
+                    JSONObject result = new JSONObject();
+                    if(tokenMatcher.find()){
+                        result.put("result", "ok");
+                        result.put("token", tokenMatcher.group(1));
+                    }else{
+                        result.put("result", "fail");
+                    }
+                    responseHandler.onSuccess(result);
+                }catch (JSONException e){
                     e.printStackTrace();
                 }
             }
