@@ -149,7 +149,9 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                     try {
                         mModels = getModels(response);
                         if(getActivity() instanceof NodeActivity){
-                            getActivity().getActionBar().setTitle(mModels.get(0).node.title);
+                            if(mModels.size() != 0){
+                                getActivity().getActionBar().setTitle(mModels.get(0).node.title);
+                            }
                         }
                         mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
                     } catch (JSONException e) {
