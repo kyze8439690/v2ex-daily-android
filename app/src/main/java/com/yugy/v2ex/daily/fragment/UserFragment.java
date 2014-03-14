@@ -145,7 +145,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         mSpannableString = new SpannableString(mMemberModel.username);
         mName.setText(mMemberModel.username);
         mDescription.setText("V2EX 第 " + mMemberModel.id + " 号会员");
-        ImageLoader.getInstance().displayImage(mMemberModel.avatarLarge, mHeaderLogo);
+        ImageLoader.getInstance().displayImage(mMemberModel.avatar, mHeaderLogo);
 
         setupListView();
     }
@@ -177,7 +177,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                     DebugUtils.log(response);
                     try {
                         mModels = getModels(response);
-                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels, null));
+                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
                         mDataLoaded = true;
                     } catch (JSONException e) {
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();

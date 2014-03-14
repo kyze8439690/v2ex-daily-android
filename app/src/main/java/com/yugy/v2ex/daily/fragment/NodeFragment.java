@@ -151,7 +151,7 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                         if(getActivity() instanceof NodeActivity){
                             getActivity().getActionBar().setTitle(mModels.get(0).node.title);
                         }
-                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels, null));
+                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
                     } catch (JSONException e) {
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                         e.printStackTrace();

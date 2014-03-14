@@ -5,7 +5,8 @@
     <string name="title_section1">最新主题</string>
     <string name="title_section2">所有节点</string>
     <string name="title_section3">节点收藏</string>
-    <string name="title_section4">设置</string>
+    <string name="title_section4">通知</string>
+    <string name="title_section5">设置</string>
     <string name="navigation_drawer_open">打开抽屉</string>
     <string name="navigation_drawer_close">关闭抽屉</string>
     <string name="just_now">刚刚</string>

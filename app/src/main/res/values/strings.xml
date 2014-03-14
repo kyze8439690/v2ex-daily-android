@@ -5,7 +5,8 @@
     <string name="title_section1">Newest</string>
     <string name="title_section2">All Node</string>
     <string name="title_section3">Collections</string>
-    <string name="title_section4">Settings</string>
+    <string name="title_section4">Notifications</string>
+    <string name="title_section5">Settings</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="just_now">Just now</string>

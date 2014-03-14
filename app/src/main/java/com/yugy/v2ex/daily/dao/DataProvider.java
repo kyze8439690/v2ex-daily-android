@@ -15,7 +15,9 @@ import android.provider.BaseColumns;
 
 import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
+import com.yugy.v2ex.daily.dao.datahelper.NewestNodeDataHelper;
 import com.yugy.v2ex.daily.dao.dbinfo.AllNodesDBInfo;
+import com.yugy.v2ex.daily.dao.dbinfo.NewestNodeDBInfo;
 
 /**
  * Created by yugy on 14-3-6.
@@ -27,15 +29,20 @@ public class DataProvider extends ContentProvider{
     public static final String SCHEME = "content://";
 
     public static final String PATH_ALL_NODES = "/allNodes";
+    public static final String PATH_NEWEST_NODE = "/newestNode";
 
     public static final Uri ALL_NODES_CONTENT_URI = Uri.parse(SCHEME + AUTHORITY + PATH_ALL_NODES);
+    public static final Uri NEWEST_NODE_CONTENT_URI = Uri.parse(SCHEME + AUTHORITY + PATH_NEWEST_NODE);
 
     private static final int ALL_NODES = 0;
+    private static final int NEWEST_NODE = 1;
 
     public static final String ALL_NODES_CONTENT_TYPE = "vnd.android.cursor.dir/vnd.yugy.all.nodes";
+    public static final String NEWEST_NODE_CONTENT_TYPE = "vnd.android.cursor.dir/vnd.yugy.newest.node";
 
     private static final UriMatcher sUriMATCHER = new UriMatcher(UriMatcher.NO_MATCH){{
         addURI(AUTHORITY, "allNodes", ALL_NODES);
+        addURI(AUTHORITY, "newestNode", NEWEST_NODE);
     }};
 
     private static DBHelper mDBHelper;
@@ -77,6 +84,9 @@ public class DataProvider extends ContentProvider{
             case ALL_NODES:
                 table = AllNodesDataHelper.TABLE_NAME;
                 break;
+            case NEWEST_NODE:
+                table = NewestNodeDataHelper.TABLE_NAME;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Uri" + uri);
         }
@@ -88,6 +98,8 @@ public class DataProvider extends ContentProvider{
         switch (sUriMATCHER.match(uri)){
             case ALL_NODES:
                 return ALL_NODES_CONTENT_TYPE;
+            case NEWEST_NODE:
+                return NEWEST_NODE_CONTENT_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown Uri" + uri);
         }
@@ -184,6 +196,7 @@ public class DataProvider extends ContentProvider{
         @Override
         public void onCreate(SQLiteDatabase db) {
             AllNodesDBInfo.TABLE.create(db);
+            NewestNodeDBInfo.TABLE.create(db);
         }
 
         @Override

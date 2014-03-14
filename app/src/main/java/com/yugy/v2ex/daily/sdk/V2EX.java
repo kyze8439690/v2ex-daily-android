@@ -32,26 +32,13 @@ public class V2EX {
     private static final String API_TOPIC = "/topics/show.json";
     private static final String API_USER = "/members/show.json";
 
-    public static void getLatestTopics(Context context, boolean forceRefresh, int page, final JsonHttpResponseHandler responseHandler){
+    public static void getLatestTopics(Context context, int page, final JsonHttpResponseHandler responseHandler){
         DebugUtils.log("getLatestTopics");
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if(!forceRefresh && page == 1){
-            if(sharedPreferences.contains("latest_topics_cache")){
-                try {
-                    JSONArray jsonArray = new JSONArray(sharedPreferences.getString("latest_topics_cache", null));
-                    responseHandler.onSuccess(jsonArray);
-                    return;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         RequestParams params = new RequestParams();
         params.put("p", String.valueOf(page));
         new AsyncHttpClient().get(context, API_URL + API_LATEST, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
-                sharedPreferences.edit().putString("latest_topics_cache", response.toString()).commit();
                 responseHandler.onSuccess(response);
                 super.onSuccess(response);
             }

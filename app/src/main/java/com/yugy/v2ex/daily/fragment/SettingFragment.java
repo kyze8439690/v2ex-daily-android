@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.umeng.update.UmengUpdateAgent;
@@ -23,7 +22,6 @@ import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
 import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
-import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.utils.TextUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
@@ -36,7 +34,7 @@ import static android.preference.Preference.OnPreferenceClickListener;
 /**
  * Created by yugy on 14-2-26.
  */
-public class SettingFragment extends PreferenceFragment implements OnPreferenceClickListener, Preference.OnPreferenceChangeListener{
+public class SettingFragment extends PreferenceFragment implements OnPreferenceClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +46,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     public static final String PREF_CONTACT = "pref_contact";
     public static final String PREF_UPDATE = "pref_check_update";
     public static final String PREF_SYNC = "pref_sync";
-    public static final String PREF_NOTIFICATION = "pref_notification";
 
     private static final int REQUEST_CODE_LOGIN = 10086;
 
@@ -78,13 +75,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         findPreference(PREF_CONTACT).setOnPreferenceClickListener(this);
         findPreference(PREF_UPDATE).setOnPreferenceClickListener(this);
         findPreference(PREF_SYNC).setOnPreferenceClickListener(this);
-        findPreference(PREF_NOTIFICATION).setOnPreferenceChangeListener(this);
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(4);
+        ((MainActivity) activity).onSectionAttached(5);
     }
 
     @Override
@@ -173,13 +169,11 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 .remove("reg_time")
                 .remove("sync_time")
                 .remove("token")
-                .remove(PREF_NOTIFICATION)
                 .commit();
         V2EX.logout(getActivity());
         logined = false;
         findPreference(PREF_LOGIN).setTitle(getString(R.string.title_login));
         findPreference(PREF_SYNC).setEnabled(false);
-        ((SwitchPreference)findPreference(PREF_NOTIFICATION)).setChecked(false);
         findPreference(PREF_SYNC).setSummary(null);
     }
 
@@ -200,47 +194,4 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if(preference.getKey().equals(PREF_NOTIFICATION)){
-            boolean isChecked = ((SwitchPreference)preference).isChecked();
-            final ProgressDialog progressDialog;
-            if(!isChecked){
-                progressDialog = ProgressDialog.show(getActivity(), null, "Getting notification token...", true, false);
-                V2EX.getNotificationToken(getActivity(), new JsonHttpResponseHandler(){
-                    @Override
-                    public void onSuccess(JSONObject response) {
-                        super.onSuccess(response);
-                        DebugUtils.log(response);
-                        if(getActivity() != null){
-                            try {
-                                if(response.getString("result").equals("ok")){
-                                    progressDialog.setMessage("Enable notification service");
-                                    getPreferenceManager().getSharedPreferences().edit()
-                                            .putString("token", response.getString("token"))
-                                            .apply();
-                                    progressDialog.dismiss();
-                                }else if(response.getString("result").equals("fail")){
-                                    progressDialog.setMessage("Get token fail");
-                                    MessageUtils.toast(getActivity(), "Get token fail");
-                                    progressDialog.dismiss();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
-            }else{
-                progressDialog = ProgressDialog.show(getActivity(), null, "Close notification service");
-                getPreferenceManager().getSharedPreferences().edit()
-                        .remove("token")
-                        .apply();
-                progressDialog.dismiss();
-            }
-            return true;
-        }else{
-            return false;
-        }
-    }
 }

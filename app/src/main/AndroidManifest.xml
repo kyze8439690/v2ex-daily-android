@@ -92,8 +92,6 @@
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Holo.NoActionBar"
             />
-        <service android:name=".service.NotificationService"
-                 />
     </application>
 
 </manifest>

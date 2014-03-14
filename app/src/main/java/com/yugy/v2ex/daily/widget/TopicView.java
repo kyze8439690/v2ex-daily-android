@@ -54,6 +54,7 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
     private TextView mNode;
 
     private int mNodeId;
+    private int mTopicId;
     private MemberModel mMember;
 
     private void init(){
@@ -71,9 +72,10 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
     }
 
     public void parse(TopicModel model){
+        mTopicId = model.id;
         mTitle.setText(model.title);
         Spanned spanned = Html.fromHtml(model.contentRendered, new AsyncImageGetter(getContext(), mContent), null);
-        SpannableStringBuilder htmlSpannable = null;
+        SpannableStringBuilder htmlSpannable;
         if(spanned instanceof SpannableStringBuilder){
             htmlSpannable = (SpannableStringBuilder) spanned;
         } else {
@@ -122,7 +124,11 @@ public class TopicView extends RelativeLayout implements View.OnClickListener{
         mMember = model.member;
         mNodeId = model.node.id;
 
-        ImageLoader.getInstance().displayImage(model.member.avatarLarge, mHead);
+        ImageLoader.getInstance().displayImage(model.member.avatar, mHead);
+    }
+
+    public int getTopicId() {
+        return mTopicId;
     }
 
     public void setViewDetail(){

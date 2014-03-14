@@ -1,8 +1,12 @@
 package com.yugy.v2ex.daily.model;
 
-import android.os.Bundle;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
+import com.yugy.v2ex.daily.dao.dbinfo.BaseTopicsDBInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,4 +105,30 @@ public class TopicModel implements Parcelable{
             return new TopicModel[size];
         }
     };
+
+    public static TopicModel fromCursor(Cursor cursor, Context context) {
+        TopicModel topicModel = new TopicModel();
+        topicModel.id = cursor.getInt(cursor.getColumnIndex(BaseTopicsDBInfo.TOPIC_ID));
+        topicModel.title = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.TITLE));
+        topicModel.url = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.URL));
+        topicModel.content = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.CONTENT));
+        topicModel.contentRendered = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.CONTENT_RENDERED));
+        topicModel.replies = cursor.getInt(cursor.getColumnIndex(BaseTopicsDBInfo.REPLIES));
+
+        MemberModel memberModel = new MemberModel();
+        memberModel.id = cursor.getInt(cursor.getColumnIndex(BaseTopicsDBInfo.MEMBER_ID));
+        memberModel.username = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.MEMBER_USERNAME));
+        memberModel.tagline = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.MEMBER_TAGLINE));
+        memberModel.avatar = cursor.getString(cursor.getColumnIndex(BaseTopicsDBInfo.MEMBER_AVATAR));
+        topicModel.member = memberModel;
+
+        AllNodesDataHelper allNodesDataHelper = new AllNodesDataHelper(context);
+        int nodeId = cursor.getInt(cursor.getColumnIndex(BaseTopicsDBInfo.NODE_ID));
+        topicModel.node = allNodesDataHelper.select(nodeId);
+
+        topicModel.created = cursor.getLong(cursor.getColumnIndex(BaseTopicsDBInfo.CREATED));
+        topicModel.lastModified = cursor.getLong(cursor.getColumnIndex(BaseTopicsDBInfo.LAST_MODIFIED));
+        topicModel.lastTouched = cursor.getLong(cursor.getColumnIndex(BaseTopicsDBInfo.LAST_TOUCHED));
+        return topicModel;
+    }
 }

@@ -12,6 +12,7 @@ import com.yugy.v2ex.daily.fragment.AllNodeFragment;
 import com.yugy.v2ex.daily.fragment.CollectionFragment;
 import com.yugy.v2ex.daily.fragment.NavigationDrawerFragment;
 import com.yugy.v2ex.daily.fragment.NewestNodeFragment;
+import com.yugy.v2ex.daily.fragment.NotificationFragment;
 import com.yugy.v2ex.daily.fragment.SettingFragment;
 
 public class MainActivity extends BaseActivity
@@ -23,6 +24,7 @@ public class MainActivity extends BaseActivity
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private NewestNodeFragment mNewestNodeFragment;
     private AllNodeFragment mAllNodeFragment;
+    private NotificationFragment mNotificationFragment;
     private SettingFragment mSettingFragment;
 
     /**
@@ -70,10 +72,17 @@ public class MainActivity extends BaseActivity
                 fragmentTransaction.replace(R.id.container, new CollectionFragment());
                 break;
             case 3:
+                if(mNotificationFragment == null){
+                    mNotificationFragment = new NotificationFragment();
+                }
+                fragmentTransaction.replace(R.id.container, mNotificationFragment);
+                break;
+            case 4:
                 if(mSettingFragment == null){
                     mSettingFragment = new SettingFragment();
                 }
                 fragmentTransaction.replace(R.id.container, mSettingFragment);
+                break;
         }
         fragmentTransaction.commit();
     }
@@ -91,6 +100,9 @@ public class MainActivity extends BaseActivity
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
                 break;
         }
     }

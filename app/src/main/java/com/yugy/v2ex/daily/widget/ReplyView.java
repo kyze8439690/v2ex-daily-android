@@ -10,7 +10,6 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
@@ -24,7 +23,6 @@ import com.yugy.v2ex.daily.activity.UserActivity;
 import com.yugy.v2ex.daily.fragment.CommentDialogFragment;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.ReplyModel;
-import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.network.AsyncImageGetter;
 
 import java.util.ArrayList;
@@ -126,7 +124,7 @@ public class ReplyView extends RelativeLayout implements View.OnClickListener{
 
         mMember = replyModel.member;
 
-        ImageLoader.getInstance().displayImage(replyModel.member.avatarLarge, mHead);
+        ImageLoader.getInstance().displayImage(replyModel.member.avatar, mHead);
     }
 
     @Override

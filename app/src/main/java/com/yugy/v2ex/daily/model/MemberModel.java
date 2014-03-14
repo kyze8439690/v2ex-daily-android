@@ -13,9 +13,7 @@ public class MemberModel implements Parcelable{
     public int id;
     public String username;
     public String tagline;
-    public String avatarMini;       //24*24
-    public String avatarNormal;     //48*48
-    public String avatarLarge;      //73*73
+    public String avatar;      //73*73
 
     public MemberModel(){}
 
@@ -23,29 +21,19 @@ public class MemberModel implements Parcelable{
         id = jsonObject.getInt("id");
         username = jsonObject.getString("username");
         tagline = jsonObject.getString("tagline");
-        avatarMini = jsonObject.getString("avatar_mini");
-        avatarNormal = jsonObject.getString("avatar_normal");
-        avatarLarge = jsonObject.getString("avatar_large");
-        if(avatarMini.startsWith("//")){
-            avatarMini = "http:" + avatarMini;
-        }
-        if(avatarNormal.startsWith("//")){
-            avatarNormal = "http:" + avatarNormal;
-        }
-        if(avatarLarge.startsWith("//")){
-            avatarLarge = "http:" + avatarLarge;
+        avatar = jsonObject.getString("avatar_large");
+        if(avatar.startsWith("//")){
+            avatar = "http:" + avatar;
         }
     }
 
     private MemberModel(Parcel in){
         id = in.readInt();
-        String[] strings = new String[5];
+        String[] strings = new String[3];
         in.readStringArray(strings);
         username = strings[0];
         tagline = strings[1];
-        avatarMini = strings[2];
-        avatarNormal = strings[3];
-        avatarLarge = strings[4];
+        avatar = strings[2];
     }
 
     @Override
@@ -59,9 +47,7 @@ public class MemberModel implements Parcelable{
         dest.writeStringArray(new String[]{
                 username,
                 tagline,
-                avatarMini,
-                avatarNormal,
-                avatarLarge
+                avatar
         });
     }
 

@@ -2,11 +2,15 @@ package com.yugy.v2ex.daily.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -14,11 +18,16 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.MainActivity;
 import com.yugy.v2ex.daily.activity.TopicActivity;
-import com.yugy.v2ex.daily.adapter.TopicAdapter;
+import com.yugy.v2ex.daily.adapter.NewestNodeAdapter;
+import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
+import com.yugy.v2ex.daily.dao.datahelper.NewestNodeDataHelper;
+import com.yugy.v2ex.daily.model.NodeModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
+import com.yugy.v2ex.daily.tasker.AllNodesParseTask;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
+import com.yugy.v2ex.daily.widget.TopicView;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -30,21 +39,22 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-import static android.widget.AdapterView.*;
-import static com.yugy.v2ex.daily.adapter.TopicAdapter.*;
+import static android.widget.AdapterView.OnItemClickListener;
 
 /**
  * Created by yugy on 14-2-23.
  */
-public class NewestNodeFragment extends Fragment implements OnRefreshListener, OnItemClickListener, OnScrollToBottomListener{
+public class NewestNodeFragment extends Fragment implements OnRefreshListener, OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener{
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private ListView mListView;
-    private TopicAdapter mAdapter;
-
-    private ArrayList<TopicModel> mModels;
+    private AllNodesDataHelper mAllNodesDataHelper;
+    private NewestNodeDataHelper mNewestNodeDataHelper;
+    private NewestNodeAdapter mNewestNodeAdapter;
 
     private int mPage;
+    private boolean mLoading;
+    private boolean mLoadFromCache;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +62,14 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
         mListView = (ListView) mPullToRefreshLayout.findViewById(R.id.list_fragment_node);
         mListView.setEmptyView(mPullToRefreshLayout.findViewById(R.id.progress_fragment_node));
         mListView.setOnItemClickListener(this);
+        mAllNodesDataHelper = new AllNodesDataHelper(getActivity());
+        mNewestNodeDataHelper = new NewestNodeDataHelper(getActivity());
+        mNewestNodeAdapter = new NewestNodeAdapter(getActivity());
+        mLoading = true;
+        mListView.setOnScrollListener(this);
+        mListView.setAdapter(mNewestNodeAdapter);
+        mLoading = false;
+        getLoaderManager().initLoader(0, null, this);
         return mPullToRefreshLayout;
     }
 
@@ -62,35 +80,69 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
                 .allChildrenArePullable()
                 .listener(this)
                 .setup(mPullToRefreshLayout);
-        mPage = 1;
-        getData(true);
+        if(mAllNodesDataHelper.query().length == 0){
+            getAllNodesData();
+        }else{
+            getNewestNodeData();
+        }
     }
 
-    private void getData(boolean forceRefresh){
+    private void getAllNodesData(){
+        V2EX.getAllNode(getActivity(), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONArray response) {
+                DebugUtils.log(response);
+                new AllNodesParseTask(getActivity()){
+                    @Override
+                    protected void onPostExecute(ArrayList<NodeModel> nodeModels) {
+                        mAllNodesDataHelper.bulkInsert(nodeModels);
+                        getNewestNodeData();
+                    }
+                }.execute(response);
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                e.printStackTrace();
+                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                super.onFailure(statusCode, headers, responseBody, e);
+            }
+        });
+    }
+
+    private void getNewestNodeData(){
+        if(mNewestNodeDataHelper.query().length == 0){
+            mPage = 1;
+            getData();
+            mLoadFromCache = false;
+        }else{
+            mLoadFromCache = true;
+        }
+    }
+
+    private void getData(){
+        mLoading = true;
+        if(mPage == 1){
+            mLoadFromCache = false;
+        }
         mPullToRefreshLayout.setRefreshing(true);
-        V2EX.getLatestTopics(getActivity(), forceRefresh, mPage, new JsonHttpResponseHandler(){
+        V2EX.getLatestTopics(getActivity(), mPage, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
                 try {
-                    if(mModels == null){
-                        mModels = new ArrayList<TopicModel>();
+                    if(mPage == 1){
+                        mNewestNodeDataHelper.clear();
                     }
-                    mModels.addAll(getModels(response));
-
-                    if(mAdapter == null){
-                        mAdapter = new TopicAdapter(getActivity(), mModels, NewestNodeFragment.this);
-                        mListView.setAdapter(mAdapter);
-                    }else{
-                        mAdapter.setModels(mModels);
-                        mAdapter.notifyDataSetChanged();
-                    }
+                    mNewestNodeDataHelper.bulkInsert(getModels(response));
                     mPage++;
                 } catch (JSONException e) {
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                     e.printStackTrace();
                 }
                 mPullToRefreshLayout.setRefreshComplete();
+                mLoading = false;
                 super.onSuccess(response);
             }
 
@@ -107,14 +159,17 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     @Override
     public void onRefreshStarted(View view) {
         mPage = 1;
-        getData(true);
+        getData();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        TopicView topicView = (TopicView) view;
+        int topicId = topicView.getTopicId();
+        TopicModel topicModel = mNewestNodeDataHelper.select(topicId);
         Intent intent = new Intent(getActivity(), TopicActivity.class);
         Bundle argument = new Bundle();
-        argument.putParcelable("model", mModels.get(position));
+        argument.putParcelable("model", topicModel);
         intent.putExtra("argument", argument);
         startActivity(intent);
     }
@@ -136,8 +191,29 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     }
 
     @Override
-    public void onScrollToBottom() {
-        mPullToRefreshLayout.setRefreshing(true);
-        getData(true);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return mNewestNodeDataHelper.getCursorLoader();
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mNewestNodeAdapter.changeCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mNewestNodeAdapter.changeCursor(null);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if(!mLoadFromCache && !mLoading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleItemCount)){
+            getData();
+        }
     }
 }

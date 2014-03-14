@@ -5,11 +5,8 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.SearchView;
 
 import com.etsy.android.grid.StaggeredGridView;
@@ -30,22 +26,15 @@ import com.yugy.v2ex.daily.adapter.SearchAllNodeAdapter;
 import com.yugy.v2ex.daily.dao.datahelper.AllNodesDataHelper;
 import com.yugy.v2ex.daily.model.NodeModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
+import com.yugy.v2ex.daily.tasker.AllNodesParseTask;
 import com.yugy.v2ex.daily.utils.DebugUtils;
-import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 import com.yugy.v2ex.daily.widget.NodeView;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * Created by yugy on 14-2-23.
@@ -146,7 +135,14 @@ public class AllNodeFragment extends Fragment implements
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
-                new ParseTask().execute(response);
+                new AllNodesParseTask(getActivity()) {
+                    @Override
+                    protected void onPostExecute(ArrayList<NodeModel> nodeModels) {
+                        mAllNodesDataHelper.bulkInsert(nodeModels);
+                        mEmptyView.setVisibility(View.GONE);
+                        mGridView.setEmptyView(null);
+                    }
+                }.execute(response);
                 super.onSuccess(response);
             }
 
@@ -172,38 +168,6 @@ public class AllNodeFragment extends Fragment implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAllNodesAdapter.changeCursor(null);
-    }
-
-    private class ParseTask extends AsyncTask<JSONArray, Void, ArrayList<NodeModel>>{
-
-        @Override
-        protected ArrayList<NodeModel> doInBackground(JSONArray... params) {
-            try {
-                return getModels(params[0]);
-            } catch (JSONException e) {
-                AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<NodeModel> nodeModels) {
-            mAllNodesDataHelper.bulkInsert(nodeModels);
-            mEmptyView.setVisibility(View.GONE);
-            mGridView.setEmptyView(null);
-            super.onPostExecute(nodeModels);
-        }
-    }
-
-    private ArrayList<NodeModel> getModels(JSONArray jsonArray) throws JSONException {
-        ArrayList<NodeModel> models = new ArrayList<NodeModel>();
-        for(int i = 0; i < jsonArray.length(); i++){
-            NodeModel model = new NodeModel();
-            model.parse(jsonArray.getJSONObject(i));
-            models.add(model);
-        }
-        return models;
     }
 
     @Override
