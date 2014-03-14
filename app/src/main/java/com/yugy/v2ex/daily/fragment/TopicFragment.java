@@ -10,7 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,7 +41,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 /**
  * Created by yugy on 14-2-24.
  */
-public class TopicFragment extends Fragment implements AdapterView.OnItemClickListener, OnRefreshListener{
+public class TopicFragment extends Fragment implements OnRefreshListener{
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private TopicView mHeaderView;
@@ -50,11 +49,8 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
 
     private TopicModel mTopicModel;
     private ArrayList<ReplyModel> mReplyModels;
+    private int mTopicId;
 
-    private static final int TYPE_EMPTY = 0;
-    private static final int TYPE_NORMAL = 1;
-
-    private int mType = TYPE_EMPTY;
     private boolean mLogined = false;
 
     @Override
@@ -70,7 +66,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mPullToRefreshLayout = (PullToRefreshLayout) inflater.inflate(R.layout.fragment_topic, container, false);
         mListView = (ListView) mPullToRefreshLayout.findViewById(R.id.list_fragment_topic);
-        mListView.setOnItemClickListener(this);
+        mListView.setEmptyView(mPullToRefreshLayout.findViewById(R.id.progress_fragment_topic));
         return mPullToRefreshLayout;
     }
 
@@ -83,22 +79,36 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 .listener(this)
                 .setup(mPullToRefreshLayout);
 
-        mTopicModel = getArguments().getParcelable("model");
-        mHeaderView = new TopicView(getActivity());
-        mHeaderView.setViewDetail();
-        mHeaderView.parse(mTopicModel);
-        mListView.addHeaderView(mHeaderView, mTopicModel, false);
-        mListView.setAdapter(new LoadingAdapter(getActivity()));
-        getReplyData();
+        if(getArguments().containsKey("model")){
+            mTopicModel = getArguments().getParcelable("model");
+            mTopicId = mTopicModel.id;
+            mHeaderView = new TopicView(getActivity());
+            mHeaderView.setViewDetail();
+            mHeaderView.parse(mTopicModel);
+            mListView.addHeaderView(mHeaderView, mTopicModel, false);
+            mListView.setAdapter(new LoadingAdapter(getActivity()));
+            getReplyData();
+        }else if(getArguments().containsKey("topic_id")){
+            mTopicId = getArguments().getInt("topic_id");
+            getTopicData();
+        }
     }
 
     private void getTopicData(){
-        V2EX.showTopicByTopicId(getActivity(), mTopicModel.id, new JsonHttpResponseHandler(){
+        V2EX.showTopicByTopicId(getActivity(), mTopicId, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
                 DebugUtils.log(response);
                 try {
+                    if(mTopicModel == null){
+                        mTopicModel = new TopicModel();
+                    }
                     mTopicModel.parse(response.getJSONObject(0));
+                    if(mHeaderView == null){
+                        mHeaderView = new TopicView(getActivity());
+                        mHeaderView.setViewDetail();
+                        mListView.addHeaderView(mHeaderView, mTopicModel, false);
+                    }
                     mHeaderView.parse(mTopicModel);
                     getReplyData();
                 } catch (JSONException e) {
@@ -145,7 +155,6 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
                 try {
                     mReplyModels = getModels(response);
                     mListView.setAdapter(new TopicReplyAdapter(mReplyModels));
-                    mType = TYPE_NORMAL;
                     mPullToRefreshLayout.setRefreshComplete();
                 } catch (JSONException e) {
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
@@ -187,19 +196,12 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
             case R.id.menu_topic_comment:
                 CommentDialogFragment commentDialogFragment = new CommentDialogFragment();
                 Bundle argument = new Bundle();
-                argument.putInt("topic_id", mTopicModel.id);
+                argument.putInt("topic_id", mTopicId);
                 commentDialogFragment.setArguments(argument);
                 commentDialogFragment.show(getFragmentManager(), "comment");
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if(mType == TYPE_NORMAL && mLogined){
-
-        }
     }
 
     @Override
@@ -236,7 +238,7 @@ public class TopicFragment extends Fragment implements AdapterView.OnItemClickLi
             if(item == null){
                 item = new ReplyView(getActivity());
             }
-            item.parse(mLogined, mTopicModel.id, getItem(position));
+            item.parse(mLogined, mTopicId, getItem(position));
             return item;
         }
     }

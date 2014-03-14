@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_bg_play"
+                android:layout_margin="8dp"
+                android:padding="12dp"
+                >
+
+    <com.yugy.v2ex.daily.widget.RelativeTimeTextView
+        android:id="@+id/txt_view_notification_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:textSize="12sp"
+        android:textColor="#aaa"
+        android:text="1 day ago"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_notification_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/txt_view_notification_time"
+        android:layout_marginRight="8dp"
+        android:text="title"
+        android:textSize="14sp"
+        />
+
+    <TextView
+        android:id="@+id/txt_view_notification_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_view_notification_title"
+        android:layout_marginTop="8dp"
+        android:text="content"
+        android:background="#EEE"
+        android:padding="8dp"
+        />
+
+</RelativeLayout>

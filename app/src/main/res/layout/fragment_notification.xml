@@ -7,7 +7,11 @@
     <ListView
         android:id="@+id/list_fragment_notification"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:dividerHeight="0px"
+        android:scrollbars="none"
+        android:divider="@android:color/transparent"
+        android:listSelector="@android:color/transparent" />
 
     <TextView
         android:id="@+id/txt_fragment_notification_empty"

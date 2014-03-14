@@ -520,6 +520,10 @@ public class V2EX {
         });
     }
 
+    public static void getNotification(final Context context, String token, TextHttpResponseHandler responseHandler){
+        getClient(context).get("http://www.v2ex.com/n/" + token + ".xml", responseHandler);
+    }
+
     public static void logout(Context context){
         PersistentCookieStore cookieStore = new PersistentCookieStore(context);
         cookieStore.clear();
