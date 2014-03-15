@@ -339,20 +339,17 @@ public class V2EX {
                         content.put("username", userMatcher.group(1));
                         Pattern collectionPattern = Pattern.compile("</a>&nbsp; <a href=\"/go/([^\"]+)\">");
                         Matcher collectionMatcher = collectionPattern.matcher(responseBody);
+                        JSONArray collections = new JSONArray();
                         if (collectionMatcher.find()) {
-                            JSONArray collections = new JSONArray();
                             collections.put(collectionMatcher.group(1));
                             while (collectionMatcher.find()) {
                                 collections.put(collectionMatcher.group(1));
                             }
-                            content.put("collections", collections);
-                            result.put("content", content);
-                            result.put("result", "ok");
-                            responseHandler.onSuccess(result);
-                        } else {
-                            result.put("result", "fail");
-                            responseHandler.onSuccess(result);
                         }
+                        content.put("collections", collections);
+                        result.put("content", content);
+                        result.put("result", "ok");
+                        responseHandler.onSuccess(result);
                     } else {
                         result.put("result", "fail");
                         responseHandler.onSuccess(result);
