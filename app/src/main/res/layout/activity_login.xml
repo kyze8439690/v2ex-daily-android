@@ -4,13 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp"
+    android:padding="16dp"
     >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="V2EX"
+        android:padding="16dp"
+        android:fontFamily="RobotoSlab-Regular.ttf"
+        android:gravity="center"
+        android:textSize="40sp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="V2EX is a community of start-ups, designers, developers and creative people. "
+        android:gravity="center"
+        android:padding="8dp"
+        />
 
     <EditText
         android:id="@+id/edit_activity_login_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableLeft="@drawable/ic_person"
+        android:drawablePadding="8dp"
         android:hint="username"/>
 
     <EditText
@@ -19,6 +40,8 @@
         android:layout_height="wrap_content"
         android:hint="password"
         android:inputType="textPassword"
+        android:drawableLeft="@drawable/ic_lock"
+        android:drawablePadding="8dp"
         android:layout_marginTop="8dp"/>
 
     <Button
@@ -28,6 +51,17 @@
         android:layout_marginTop="8dp"
         android:text="login"/>
 
+    <TextView
+        android:id="@+id/txt_activity_login_sign_up"
+        style="?android:borderlessButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Don't have an account? Sign Up!"
+        android:textSize="14sp"
+        android:textColor="#555"
+        android:onClick="onClick"
+        />
 
 
 </LinearLayout>

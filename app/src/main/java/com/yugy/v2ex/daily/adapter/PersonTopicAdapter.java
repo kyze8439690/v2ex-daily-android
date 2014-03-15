@@ -1,20 +1,19 @@
 package com.yugy.v2ex.daily.adapter;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.yugy.v2ex.daily.model.TopicModel;
-import com.yugy.v2ex.daily.widget.TopicView;
+import com.yugy.v2ex.daily.widget.PersonTopicView;
 
 import java.util.ArrayList;
 
 /**
  * Created by yugy on 14-2-25.
  */
-public class TopicAdapter extends BaseAdapter {
+public class PersonTopicAdapter extends BaseAdapter {
 
     private Context mContext;
     private ArrayList<TopicModel> mModels;
@@ -24,7 +23,7 @@ public class TopicAdapter extends BaseAdapter {
      * @param context
      * @param models
      */
-    public TopicAdapter(Context context, ArrayList<TopicModel> models) {
+    public PersonTopicAdapter(Context context, ArrayList<TopicModel> models) {
         mContext = context;
         mModels = models;
     }
@@ -44,22 +43,13 @@ public class TopicAdapter extends BaseAdapter {
         return position;
     }
 
-    private int mLastPosition = -1;
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TopicView item = (TopicView) convertView;
+        PersonTopicView item = (PersonTopicView) convertView;
         if(item == null){
-            item = new TopicView(mContext);
+            item = new PersonTopicView(mContext);
         }
         item.parse(getItem(position));
-        if((position > mLastPosition)){
-            ObjectAnimator.ofFloat(item, View.TRANSLATION_Y, 150, 0)
-                    .ofFloat(item, View.ROTATION_X, 8, 0)
-                    .setDuration(400)
-                    .start();
-        }
-        mLastPosition = position;
         return item;
     }
 }

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light">
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="ptrHeaderStyle">@style/Widget.Custom.PtrHeader</item>
         <item name="android:windowBackground">@color/window_background</item>
@@ -31,7 +31,7 @@
 
     <style name="Widget.Custom.PtrHeader" parent="android:Widget">
         <!-- Color to tint the progress bar -->
-        <item name="ptrProgressBarColor">#ff555555</item>
+        <item name="ptrProgressBarColor">#777777</item>
     </style>
 
 </resources>

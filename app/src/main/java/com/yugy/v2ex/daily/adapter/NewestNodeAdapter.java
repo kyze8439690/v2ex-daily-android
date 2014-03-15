@@ -1,5 +1,6 @@
 package com.yugy.v2ex.daily.adapter;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
@@ -41,6 +42,8 @@ public class NewestNodeAdapter extends CursorAdapter{
         topicView.parse(topicModel);
     }
 
+    private int mLastPosition = -1;
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(position == getCount() - 1){
@@ -48,7 +51,15 @@ public class NewestNodeAdapter extends CursorAdapter{
                 mListener.onScrollToBottom();
             }
         }
-        return super.getView(position, convertView, parent);
+        View view = super.getView(position, convertView, parent);
+        if((position > mLastPosition)){
+            ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 150, 0)
+                    .ofFloat(view, View.ROTATION_X, 8, 0)
+                    .setDuration(400)
+                    .start();
+        }
+        mLastPosition = position;
+        return view;
     }
 
     public static interface OnScrollToBottomListener{

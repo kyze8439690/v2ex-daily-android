@@ -22,7 +22,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.activity.TopicActivity;
 import com.yugy.v2ex.daily.adapter.LoadingAdapter;
-import com.yugy.v2ex.daily.adapter.TopicAdapter;
+import com.yugy.v2ex.daily.adapter.PersonTopicAdapter;
 import com.yugy.v2ex.daily.model.MemberModel;
 import com.yugy.v2ex.daily.model.TopicModel;
 import com.yugy.v2ex.daily.sdk.V2EX;
@@ -177,7 +177,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                     DebugUtils.log(response);
                     try {
                         mModels = getModels(response);
-                        mListView.setAdapter(new TopicAdapter(getActivity(), mModels));
+                        mListView.setAdapter(new PersonTopicAdapter(getActivity(), mModels));
                         mDataLoaded = true;
                     } catch (JSONException e) {
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();

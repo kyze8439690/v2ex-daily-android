@@ -4,6 +4,13 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#ccc"
+        android:layout_marginLeft="50dp"
+        />
+
     <ListView
         android:id="@+id/list_fragment_user"
         android:layout_width="match_parent"

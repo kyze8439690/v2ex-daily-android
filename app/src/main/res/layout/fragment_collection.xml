@@ -5,6 +5,10 @@
                                                                 android:layout_height="match_parent">
 
     <com.astuetz.PagerSlidingTabStrip
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:pstsIndicatorHeight="3dp"
+        app:pstsDividerPadding="16dp"
+        android:background="#FFF"
         android:id="@+id/tab_fragment_collection"
         android:layout_width="match_parent"
         android:layout_height="48dp" />

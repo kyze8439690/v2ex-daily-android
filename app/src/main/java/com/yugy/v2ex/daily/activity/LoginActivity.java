@@ -2,6 +2,7 @@ package com.yugy.v2ex.daily.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
@@ -49,14 +50,21 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        if(mUsername.getText().length() == 0){
-            mUsername.setError("Can not be empty");
-            mUsername.requestFocus();
-        }else if(mPassword.getText().length() == 0){
-            mPassword.setError("Can not be empty");
-            mPassword.requestFocus();
-        }else{
-            getOnceCode();
+        switch (v.getId()){
+            case R.id.btn_activity_login_login:
+                if(mUsername.getText().length() == 0){
+                    mUsername.setError("Can not be empty");
+                    mUsername.requestFocus();
+                }else if(mPassword.getText().length() == 0){
+                    mPassword.setError("Can not be empty");
+                    mPassword.requestFocus();
+                }else{
+                    getOnceCode();
+                }
+                break;
+            case R.id.txt_activity_login_sign_up:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.v2ex.com/signup")));
+                break;
         }
     }
 
