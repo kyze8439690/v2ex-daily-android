@@ -15,10 +15,12 @@ import com.yugy.v2ex.daily.widget.TopicView;
 public class NewestNodeAdapter extends CursorAdapter{
 
     private Context mContext;
+    private OnScrollToBottomListener mListener;
 
-    public NewestNodeAdapter(Context context) {
+    public NewestNodeAdapter(Context context, OnScrollToBottomListener listener) {
         super(context, null, false);
         mContext = context;
+        mListener = listener;
     }
 
     @Override
@@ -37,5 +39,19 @@ public class NewestNodeAdapter extends CursorAdapter{
         TopicView topicView = (TopicView) view;
         TopicModel topicModel = TopicModel.fromCursor(cursor, context);
         topicView.parse(topicModel);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(position == getCount() - 1){
+            if(mListener != null){
+                mListener.onScrollToBottom();
+            }
+        }
+        return super.getView(position, convertView, parent);
+    }
+
+    public static interface OnScrollToBottomListener{
+        public void onScrollToBottom();
     }
 }

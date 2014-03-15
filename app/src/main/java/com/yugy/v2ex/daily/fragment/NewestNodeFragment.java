@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -40,11 +39,12 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import static android.widget.AdapterView.OnItemClickListener;
+import static com.yugy.v2ex.daily.adapter.NewestNodeAdapter.OnScrollToBottomListener;
 
 /**
  * Created by yugy on 14-2-23.
  */
-public class NewestNodeFragment extends Fragment implements OnRefreshListener, OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener{
+public class NewestNodeFragment extends Fragment implements OnRefreshListener, OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnScrollToBottomListener{
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private ListView mListView;
@@ -53,7 +53,6 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     private NewestNodeAdapter mNewestNodeAdapter;
 
     private int mPage;
-    private boolean mLoading;
     private boolean mLoadFromCache;
 
     @Override
@@ -64,11 +63,8 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
         mListView.setOnItemClickListener(this);
         mAllNodesDataHelper = new AllNodesDataHelper(getActivity());
         mNewestNodeDataHelper = new NewestNodeDataHelper(getActivity());
-        mNewestNodeAdapter = new NewestNodeAdapter(getActivity());
-        mLoading = true;
-        mListView.setOnScrollListener(this);
+        mNewestNodeAdapter = new NewestNodeAdapter(getActivity(), this);
         mListView.setAdapter(mNewestNodeAdapter);
-        mLoading = false;
         getLoaderManager().initLoader(0, null, this);
         return mPullToRefreshLayout;
     }
@@ -81,6 +77,7 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
                 .listener(this)
                 .setup(mPullToRefreshLayout);
         if(mAllNodesDataHelper.query().length == 0){
+            mNewestNodeDataHelper.clear();
             getAllNodesData();
         }else{
             getNewestNodeData();
@@ -122,7 +119,6 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     }
 
     private void getData(){
-        mLoading = true;
         if(mPage == 1){
             mLoadFromCache = false;
         }
@@ -142,7 +138,6 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
                     e.printStackTrace();
                 }
                 mPullToRefreshLayout.setRefreshComplete();
-                mLoading = false;
                 super.onSuccess(response);
             }
 
@@ -206,13 +201,8 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if(!mLoadFromCache && !mLoading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleItemCount)){
+    public void onScrollToBottom() {
+        if(!mLoadFromCache) {
             getData();
         }
     }
