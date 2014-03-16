@@ -9,6 +9,7 @@ To know more infomation, please visit [**http://yanghui.name/v2ex-daily-android/
 <img src="https://raw.github.com/kyze8439690/v2ex-daily-android/master/screenshot/2.jpg" width="294" height="523"/>  
 <img src="https://raw.github.com/kyze8439690/v2ex-daily-android/master/screenshot/3.jpg" width="294" height="523"/>  
 <img src="https://raw.github.com/kyze8439690/v2ex-daily-android/master/screenshot/4.jpg" width="294" height="523"/>
+<img src="https://raw.github.com/kyze8439690/v2ex-daily-android/master/screenshot/5.jpg" width="294" height="523"/>
 
 ### To do:  
 - send topic
