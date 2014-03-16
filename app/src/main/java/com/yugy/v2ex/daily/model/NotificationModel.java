@@ -1,6 +1,7 @@
 package com.yugy.v2ex.daily.model;
 
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +23,9 @@ public class NotificationModel {
     private static final Pattern CONTENT_PATTERN = Pattern.compile("<!\\[CDATA\\[\\n\\t\\t\\n\\t([^\\t]+)");
 
     //2014-03-10T14:14:14Z
-    private static final SimpleDateFormat TIME_FORMATER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"){{
+        setTimeZone(TimeZone.getTimeZone("GMT"));
+    }};
 
 
     public void parse(String entry) throws Exception {
@@ -42,7 +45,7 @@ public class NotificationModel {
 
         Matcher timeMatcher = TIME_PATTERN.matcher(entry);
         if(timeMatcher.find()){
-            time = TIME_FORMATER.parse(timeMatcher.group(1)).getTime();
+            time = TIME_FORMATTER.parse(timeMatcher.group(1)).getTime();
         }else{
             throw new Exception("xml time no found");
         }

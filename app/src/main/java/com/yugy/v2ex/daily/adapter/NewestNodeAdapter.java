@@ -1,5 +1,6 @@
 package com.yugy.v2ex.daily.adapter;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.database.Cursor;
@@ -53,10 +54,12 @@ public class NewestNodeAdapter extends CursorAdapter{
         }
         View view = super.getView(position, convertView, parent);
         if((position > mLastPosition)){
-            ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 150, 0)
-                    .ofFloat(view, View.ROTATION_X, 8, 0)
-                    .setDuration(400)
-                    .start();
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.setDuration(400).playTogether(
+                    ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 150, 0),
+                    ObjectAnimator.ofFloat(view, View.ROTATION_X,    8,   0)
+                    );
+            animatorSet.start();
         }
         mLastPosition = position;
         return view;
