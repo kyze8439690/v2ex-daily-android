@@ -29,5 +29,7 @@
     <string name="title_notification">Notification Service</string>
     <string name="title_notification_action">Notification</string>
 
+    <string name="umeng_tag">apk</string>
+
 
 </resources>

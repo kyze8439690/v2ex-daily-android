@@ -15,3 +15,78 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-optimizationpasses 5
+
+-dontobfuscate
+
+# 混淆时不会产生形形色色的类名
+-dontusemixedcaseclassnames
+
+# 指定不去忽略非公共的类库
+-dontskipnonpubliclibraryclasses
+
+# 不预校验
+-dontpreverify
+
+-verbose
+
+# 优化
+#-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
+
+-libraryjars libs/umeng_sdk.jar
+-libraryjars libs/libGoogleAnalyticsServices.jar
+
+# Parcel
+-keep class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
+
+# 不进行混淆保持原样
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class com.android.vending.licensing.ILicensingService
+
+# ndk
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# custom View/ViewGroup
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+
+# implement OnClick and so on
+-keepclassmembers class * extends android.app.Activity {
+    public void *(android.view.View);
+}
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers class * {
+    public <init>(com.yugy.v2ex.daily);
+}
+
+-keep public class com.yugy.v2ex.daily.R$*{
+public static final int *;
+}
+
+-keep public class com.umeng.fb.ui.ThreadView {
+}
+
+-keep class com.umeng.** {*;}
+-keep public class * extends com.umeng.**

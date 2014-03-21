@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.yugy.v2ex.daily.R;
 import com.yugy.v2ex.daily.model.NodeModel;
 
-import java.util.ArrayList;
-
 /**
  * Created by yugy on 14-2-23.
  */

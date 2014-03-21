@@ -57,7 +57,8 @@ public class NewestNodeAdapter extends CursorAdapter{
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.setDuration(400).playTogether(
                     ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 150, 0),
-                    ObjectAnimator.ofFloat(view, View.ROTATION_X,    8,   0)
+                    ObjectAnimator.ofFloat(view, View.ROTATION_X,    8,   0),
+                    ObjectAnimator.ofFloat(view, View.ALPHA,         0, 1.0f)
                     );
             animatorSet.start();
         }
