@@ -102,7 +102,9 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
                 e.printStackTrace();
-                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                if(getActivity() != null) {
+                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                }
                 super.onFailure(statusCode, headers, responseBody, e);
             }
         });
@@ -144,8 +146,10 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
                 e.printStackTrace();
-                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
-                mPullToRefreshLayout.setRefreshComplete();
+                if(getActivity() != null) {
+                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                    mPullToRefreshLayout.setRefreshComplete();
+                }
                 super.onFailure(statusCode, headers, responseBody, e);
             }
         });

@@ -165,7 +165,9 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
-                AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                if(getActivity() != null) {
+                    AppMsg.makeText(getActivity(), "Network error", AppMsg.STYLE_ALERT).show();
+                }
                 e.printStackTrace();
                 super.onFailure(statusCode, headers, responseBody, e);
             }
