@@ -1,4 +1,4 @@
-v2ex-daily-android
+v2ex-daily-android([**Google Play**](https://play.google.com/store/apps/details?id=com.yugy.v2ex.daily))
 ==================  
 v2ex daily is a v2ex client on android platform.  
 It supports view topics, nodes search, user and so on.Its appearence follows the android design.  
