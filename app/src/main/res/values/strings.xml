@@ -2,6 +2,15 @@
 <resources>
 
     <string name="app_name">V2EX</string>
-    <string name="action_settings">Settings</string>
+    <string name="click_to_login">点击登录</string>
+    <string name="loading">Loading...</string>
+
+    <array name="menu_entries">
+        <item>今日热议</item>
+        <item>最新主题</item>
+        <item>所有节点</item>
+        <item>通知</item>
+        <item>设置</item>
+    </array>
 
 </resources>
