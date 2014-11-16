@@ -7,7 +7,7 @@
     <style name="MainActivity" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
     </style>
 
 </resources>

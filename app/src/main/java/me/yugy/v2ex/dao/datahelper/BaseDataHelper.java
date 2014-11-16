@@ -2,10 +2,10 @@ package me.yugy.v2ex.dao.datahelper;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.v4.content.CursorLoader;
 
 import me.yugy.v2ex.Application;
 import me.yugy.v2ex.dao.DBHelper;
@@ -24,7 +24,11 @@ public abstract class BaseDataHelper<T>{
         mUri = Uri.parse("content://" + DataProvider.AUTHORITY + "/" + getTableName());
     }
 
-    public void notifyChange(){
+    public Uri getContentUri() {
+        return mUri;
+    }
+
+    public void notifyChange() {
         Application.getInstance().getContentResolver().notifyChange(mUri, null);
     }
 

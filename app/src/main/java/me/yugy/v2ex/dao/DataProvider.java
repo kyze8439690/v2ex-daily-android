@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 
 import me.yugy.v2ex.BuildConfig;
 import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
+import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
+import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 
 /**
  * Created by yugy on 14/11/14.
@@ -21,12 +23,19 @@ import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
 public class DataProvider extends ContentProvider{
 
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID;
+
     private DBHelper mDBHelper;
 
     @Override
     public boolean onCreate() {
-        mDBHelper = new DBHelper();
         return true;
+    }
+
+    public DBHelper getDBHelper() {
+        if (mDBHelper == null) {
+            mDBHelper = new DBHelper();
+        }
+        return mDBHelper;
     }
 
     @Override
@@ -34,7 +43,7 @@ public class DataProvider extends ContentProvider{
         synchronized (DataProvider.class){
             SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
             queryBuilder.setTables(getTableName(uri));
-            SQLiteDatabase db = mDBHelper.getReadableDatabase();
+            SQLiteDatabase db = getDBHelper().getReadableDatabase();
             Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
             cursor.setNotificationUri(getContext().getContentResolver(), uri);
             return cursor;
@@ -43,12 +52,18 @@ public class DataProvider extends ContentProvider{
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH){{
         addURI(AUTHORITY, HotTopicsDBInfo.TABLE_NAME, HotTopicsDBInfo.ID);
+        addURI(AUTHORITY, MemberDBInfo.TABLE_NAME, MemberDBInfo.ID);
+        addURI(AUTHORITY, NodeDBInfo.TABLE_NAME, NodeDBInfo.ID);
     }};
 
     private String getTableName(Uri uri){
         switch (sUriMatcher.match(uri)) {
             case HotTopicsDBInfo.ID:
                 return HotTopicsDBInfo.TABLE_NAME;
+            case MemberDBInfo.ID:
+                return MemberDBInfo.TABLE_NAME;
+            case NodeDBInfo.ID:
+                return NodeDBInfo.TABLE_NAME;
             default:
                 return "";
         }
@@ -62,7 +77,7 @@ public class DataProvider extends ContentProvider{
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         synchronized (DataProvider.class){
-            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            SQLiteDatabase db = getDBHelper().getWritableDatabase();
             long rowId = 0;
             db.beginTransaction();
             try {
@@ -85,7 +100,7 @@ public class DataProvider extends ContentProvider{
     @Override
     public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         synchronized (DataProvider.class){
-            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            SQLiteDatabase db = getDBHelper().getWritableDatabase();
             db.beginTransaction();
             try {
                 for(ContentValues contentValues : values){
@@ -93,12 +108,12 @@ public class DataProvider extends ContentProvider{
                 }
                 db.setTransactionSuccessful();
                 getContext().getContentResolver().notifyChange(uri, null);
-                return values.length;
-            }catch (Exception e){
-                e.printStackTrace();
-            }finally {
                 db.endTransaction();
+                return values.length;
+            }catch (Exception e) {
+                e.printStackTrace();
             }
+            db.endTransaction();
             throw new SQLException("Failed to insert row into "+ uri);
         }
     }
@@ -106,7 +121,7 @@ public class DataProvider extends ContentProvider{
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         synchronized (DataProvider.class){
-            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            SQLiteDatabase db = getDBHelper().getWritableDatabase();
             int count = 0;
             db.beginTransaction();
             try {
@@ -123,7 +138,7 @@ public class DataProvider extends ContentProvider{
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         synchronized (DataProvider.class){
-            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            SQLiteDatabase db = getDBHelper().getWritableDatabase();
             int count;
             db.beginTransaction();
             try {

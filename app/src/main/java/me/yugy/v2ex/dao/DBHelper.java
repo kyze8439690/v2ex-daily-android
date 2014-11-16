@@ -1,11 +1,12 @@
 package me.yugy.v2ex.dao;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import me.yugy.v2ex.Application;
 import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
+import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
+import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 
 /**
  * Created by yugy on 14/11/14.
@@ -13,7 +14,7 @@ import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "v2ex.db";
-    private static final int DB_VERSION = 0;
+    private static final int DB_VERSION = 1;
 
 
     public DBHelper() {
@@ -23,11 +24,15 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         HotTopicsDBInfo.TABLE.create(db);
+        MemberDBInfo.TABLE.create(db);
+        NodeDBInfo.TABLE.create(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         HotTopicsDBInfo.TABLE.delete(db);
+        MemberDBInfo.TABLE.delete(db);
+        NodeDBInfo.TABLE.delete(db);
 
         onCreate(db);
     }

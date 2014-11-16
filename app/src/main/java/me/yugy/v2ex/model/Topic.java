@@ -1,10 +1,13 @@
 package me.yugy.v2ex.model;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.yugy.v2ex.dao.datahelper.MembersDataHelper;
+import me.yugy.v2ex.dao.datahelper.NodesDataHelper;
 import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
 
 /**
@@ -37,6 +40,27 @@ public class Topic {
         topic.created = json.getLong("created");
         topic.last_modified = json.getLong("last_modified");
         topic.last_touched = json.getLong("last_touched");
+        return topic;
+    }
+
+    public static Topic fromCursor(Cursor cursor){
+        Topic topic = new Topic();
+        topic.id = cursor.getInt(cursor.getColumnIndex(HotTopicsDBInfo.TID));
+        topic.title = cursor.getString(cursor.getColumnIndex(HotTopicsDBInfo.TITLE));
+        topic.url = cursor.getString(cursor.getColumnIndex(HotTopicsDBInfo.URL));
+        topic.content = cursor.getString(cursor.getColumnIndex(HotTopicsDBInfo.CONTENT));
+        topic.content_rendered = cursor.getString(cursor.getColumnIndex(HotTopicsDBInfo.CONTENT_RENDERED));
+        topic.replies = cursor.getInt(cursor.getColumnIndex(HotTopicsDBInfo.REPLIES));
+
+        int mid = cursor.getInt(cursor.getColumnIndex(HotTopicsDBInfo.MID));
+        topic.member = new MembersDataHelper().select(mid);
+
+        int nid = cursor.getInt(cursor.getColumnIndex(HotTopicsDBInfo.NID));
+        topic.node = new NodesDataHelper().select(nid);
+
+        topic.created = cursor.getLong(cursor.getColumnIndex(HotTopicsDBInfo.CREATED));
+        topic.last_modified = cursor.getLong(cursor.getColumnIndex(HotTopicsDBInfo.LAST_MODIFIED));
+        topic.last_touched = cursor.getLong(cursor.getColumnIndex(HotTopicsDBInfo.LAST_TOUCHED));
         return topic;
     }
 

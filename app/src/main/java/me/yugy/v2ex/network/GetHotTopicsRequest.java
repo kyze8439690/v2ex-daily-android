@@ -11,6 +11,7 @@ import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 
+import me.yugy.v2ex.dao.datahelper.HotTopicsDataHelper;
 import me.yugy.v2ex.model.Topic;
 
 /**
@@ -45,6 +46,9 @@ public class GetHotTopicsRequest extends Request<Topic[]> {
 
     @Override
     protected void deliverResponse(Topic[] response) {
+        HotTopicsDataHelper dataHelper = new HotTopicsDataHelper();
+        dataHelper.deleteAll();
+        dataHelper.bulkInsert(response);
         mListener.onResponse(response);
     }
 }

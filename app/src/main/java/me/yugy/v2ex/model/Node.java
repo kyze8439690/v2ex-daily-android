@@ -1,7 +1,12 @@
 package me.yugy.v2ex.model;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 
 /**
  * Created by yugy on 14/11/14.
@@ -25,6 +30,30 @@ public class Node {
         node.url = json.getString("url");
         node.topics = json.getInt("topics");
         node.avatar = "http:" + json.getString("avatar_large");
+        return node;
+    }
+
+    public ContentValues toContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(NodeDBInfo.NID, id);
+        values.put(NodeDBInfo.NAME, name);
+        values.put(NodeDBInfo.TITLE, title);
+        values.put(NodeDBInfo.TITLE_ALTERNATIVE, title_alternative);
+        values.put(NodeDBInfo.URL, url);
+        values.put(NodeDBInfo.TOPICS, topics);
+        values.put(NodeDBInfo.AVATAR, avatar);
+        return values;
+    }
+
+    public static Node fromCursor(Cursor cursor) {
+        Node node = new Node();
+        node.id = cursor.getInt(cursor.getColumnIndex(NodeDBInfo.NID));
+        node.name = cursor.getString(cursor.getColumnIndex(NodeDBInfo.NAME));
+        node.title = cursor.getString(cursor.getColumnIndex(NodeDBInfo.TITLE));
+        node.title_alternative = cursor.getString(cursor.getColumnIndex(NodeDBInfo.TITLE_ALTERNATIVE));
+        node.url = cursor.getString(cursor.getColumnIndex(NodeDBInfo.URL));
+        node.topics = cursor.getInt(cursor.getColumnIndex(NodeDBInfo.TOPICS));
+        node.avatar = cursor.getString(cursor.getColumnIndex(NodeDBInfo.AVATAR));
         return node;
     }
 }

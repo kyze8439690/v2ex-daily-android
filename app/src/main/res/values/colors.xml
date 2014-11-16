@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="color_primary">#FFFAFAFA</color>
+    <color name="color_primary">#FFFFFFFF</color>
     <color name="color_primary_dark">#21000000</color>
     <color name="text_color_primary">#FF4D4D4D</color>
     <color name="menu_item_color_active">#FFD35400</color>
+    <color name="windowBackground">#fff1f1f1</color>
 
 </resources>
