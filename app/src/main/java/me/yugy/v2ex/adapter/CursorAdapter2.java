@@ -24,26 +24,21 @@ public abstract class CursorAdapter2<T extends RecyclerView.ViewHolder> extends 
     protected DataSetObserver mDataSetObserver = new MyDataSetObserver();
 
     public CursorAdapter2(Context context, Cursor cursor) {
-        super();
-        init(context, cursor, true);
+        this(context, cursor, true);
     }
 
     public CursorAdapter2(Context context, Cursor cursor, boolean autoRequery) {
         super();
-        init(context, cursor, autoRequery);
-    }
-
-    protected void init(Context context, Cursor c, boolean autoRequery) {
-        boolean cursorPresent = c != null;
+        boolean cursorPresent = cursor != null;
         mAutoRequery = autoRequery;
-        mCursor = c;
+        mCursor = cursor;
         mDataValid = cursorPresent;
         mContext = context;
-        mRowIDColumn = cursorPresent ? c.getColumnIndexOrThrow("_id") : -1;
+        mRowIDColumn = cursorPresent ? cursor.getColumnIndexOrThrow("_id") : -1;
         mChangeObserver = new ChangeObserver();
         if (cursorPresent) {
-            c.registerContentObserver(mChangeObserver);
-            c.registerDataSetObserver(mDataSetObserver);
+            cursor.registerContentObserver(mChangeObserver);
+            cursor.registerDataSetObserver(mDataSetObserver);
         }
     }
 

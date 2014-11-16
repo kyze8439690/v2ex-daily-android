@@ -33,7 +33,12 @@ public class Topic {
         topic.title = json.getString("title");
         topic.url = json.getString("url");
         topic.content = json.getString("content");
-        topic.content_rendered = json.getString("content_rendered");
+        topic.content_rendered = json.getString("content_rendered")
+                .replace("<br />", "\n")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replaceAll("<img [^>]+>", "[图片]")
+                .replaceAll("<a [^>]+>[^<]+</a>", "[链接]");
         topic.replies = json.getInt("replies");
         topic.member = Member.fromJson(json.getJSONObject("member"));
         topic.node = Node.fromJson(json.getJSONObject("node"));

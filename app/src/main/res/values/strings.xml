@@ -4,6 +4,7 @@
     <string name="app_name">V2EX</string>
     <string name="click_to_login">点击登录</string>
     <string name="loading">Loading...</string>
+    <string name="just_now">刚刚</string>
 
     <array name="menu_entries">
         <item>今日热议</item>

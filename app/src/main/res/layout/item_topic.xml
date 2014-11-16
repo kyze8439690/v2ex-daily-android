@@ -25,7 +25,7 @@
             tools:text="移动的光纤为什么这么便宜"
             />
 
-        <TextView
+        <me.yugy.v2ex.widget.RelativeTimeTextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
