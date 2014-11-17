@@ -10,6 +10,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,6 +47,7 @@ public class HotTopicsFragment extends Fragment implements LoaderManager.LoaderC
         super.onCreate(savedInstanceState);
         mDataHelper = new HotTopicsDataHelper();
         mAdapter = new HotTopicsAdapter(getActivity());
+        setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(0, null, this);
     }
@@ -72,6 +76,24 @@ public class HotTopicsFragment extends Fragment implements LoaderManager.LoaderC
 
         if(mDataHelper.getCount() == 0) {
             getData();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.hot_topics, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            if (!mRefreshLayout.isRefreshing()) {
+                getData();
+            }
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

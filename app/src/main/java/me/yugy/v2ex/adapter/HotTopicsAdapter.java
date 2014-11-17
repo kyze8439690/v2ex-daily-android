@@ -1,10 +1,9 @@
 package me.yugy.v2ex.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Debug;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.v2ex.R;
+import me.yugy.v2ex.activity.UserCenterActivity;
+import me.yugy.v2ex.fragment.UserInfoFirstFragment;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.widget.RelativeTimeTextView;
 
@@ -39,12 +41,7 @@ public class HotTopicsAdapter extends CursorAdapter2<HotTopicsAdapter.TopicHolde
 //        Debug.startMethodTracing();
 
         Topic topic = Topic.fromCursor(cursor);
-        viewHolder.title.setText(topic.title);
-        viewHolder.time.setReferenceTime(topic.created * 1000);
-        viewHolder.content.setText(topic.content_rendered);
-        ImageLoader.getInstance().displayImage(topic.member.avatar, viewHolder.headIcon);
-        viewHolder.name.setText(topic.member.username);
-        viewHolder.commentCount.setText(String.format("%d 个回复", topic.replies));
+        viewHolder.parse(topic);
 
 //        Debug.stopMethodTracing();
     }
@@ -57,10 +54,34 @@ public class HotTopicsAdapter extends CursorAdapter2<HotTopicsAdapter.TopicHolde
         @InjectView(R.id.head_icon) CircleImageView headIcon;
         @InjectView(R.id.name) TextView name;
         @InjectView(R.id.comment_count) TextView commentCount;
+        private String mUsername;
 
         public TopicHolder(View itemView) {
             super(itemView);
             ButterKnife.inject(this, itemView);
+        }
+
+        public void parse (Topic topic) {
+            mUsername = topic.member.username;
+            title.setText(topic.title);
+            time.setReferenceTime(topic.created * 1000);
+            content.setText(topic.content_rendered);
+            ImageLoader.getInstance().displayImage(topic.member.avatar, headIcon);
+            name.setText(topic.member.username);
+            commentCount.setText(String.format("%d 个回复", topic.replies));
+        }
+
+        @OnClick(R.id.head_icon)
+        void onHeadIconClick(View view) {
+            UserInfoFirstFragment.HeadIconInfo headIconInfo = new UserInfoFirstFragment.HeadIconInfo();
+            int[] screenLocation = new int[2];
+            headIcon.getLocationOnScreen(screenLocation);
+            headIconInfo.left = screenLocation[0];
+            headIconInfo.top = screenLocation[1];
+            headIconInfo.width = view.getWidth();
+            headIconInfo.height = view.getHeight();
+            UserCenterActivity.launch(headIcon.getContext(), mUsername, headIconInfo);
+            ((Activity)headIcon.getContext()).overridePendingTransition(0, 0);
         }
     }
 }

@@ -30,6 +30,16 @@ public class MembersDataHelper extends BaseDataHelper<Member>{
         return member;
     }
 
+    public Member select(String username){
+        Cursor cursor = query(null, MemberDBInfo.USERNAME + "=?", new String[]{username}, null);
+        Member member = null;
+        if (cursor.moveToFirst()) {
+            member = Member.fromCursor(cursor);
+        }
+        cursor.close();
+        return member;
+    }
+
     public void insert(Member member) {
         ContentValues values = getContentValues(member);
         if (select(member.id) != null) {

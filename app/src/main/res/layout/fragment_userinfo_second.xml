@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             tools:background="#161616"
+             android:layout_height="200dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="32dp"
+        android:fadingEdge="vertical"
+        >
+
+        <TableLayout
+            android:id="@+id/table_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="48dp"
+            android:clipToPadding="false"
+            android:stretchColumns="1">
+
+        </TableLayout>
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="center"
+        android:text="Nothing more..."
+        android:textColor="#FFF"
+        android:visibility="gone"
+        />
+
+</FrameLayout>
