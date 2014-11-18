@@ -18,6 +18,7 @@ public class RequestManager {
     private static final String API_HOST = "http://www.v2ex.com/api";
     public static final String API_HOT_TOPICS = API_HOST + "/topics/hot.json";
     public static final String API_USER_INFO = API_HOST + "/members/show.json";
+    public static final String API_TOPICS = API_HOST + "/topics/show.json";
 
     private static RequestManager sInstance;
 
@@ -46,6 +47,12 @@ public class RequestManager {
 
     public void getUserInfo(Object tag, String username, Response.Listener<Member> listener, Response.ErrorListener errorListener) {
         GetUserInfoRequest request = new GetUserInfoRequest(username, listener, errorListener);
+        request.setTag(tag);
+        mRequestQueue.add(request);
+    }
+
+    public void getUserTopics(Object tag, String username, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
+        GetUserTopicsRequest request = new GetUserTopicsRequest(username, listener, errorListener);
         request.setTag(tag);
         mRequestQueue.add(request);
     }

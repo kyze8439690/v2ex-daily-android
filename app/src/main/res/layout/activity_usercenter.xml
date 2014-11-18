@@ -5,24 +5,19 @@
     android:layout_height="match_parent"
     android:clipChildren="false">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:layout_height="match_parent"
+        android:paddingTop="200dp"
+        android:clipToPadding="false"
+        android:background="@color/windowBackground"
+        />
 
     <FrameLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="#FF161616"
         android:clipChildren="false"
         >
 

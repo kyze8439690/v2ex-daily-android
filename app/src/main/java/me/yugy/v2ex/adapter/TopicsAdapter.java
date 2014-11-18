@@ -24,9 +24,9 @@ import me.yugy.v2ex.widget.RelativeTimeTextView;
 /**
  * Created by yugy on 14/11/16.
  */
-public class HotTopicsAdapter extends CursorAdapter2<HotTopicsAdapter.TopicHolder>{
+public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
 
-    public HotTopicsAdapter(Context context) {
+    public TopicsAdapter(Context context) {
         super(context, null);
     }
 

@@ -16,6 +16,7 @@ import me.yugy.v2ex.BuildConfig;
 import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
+import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
 
 /**
  * Created by yugy on 14/11/14.
@@ -54,6 +55,7 @@ public class DataProvider extends ContentProvider{
         addURI(AUTHORITY, HotTopicsDBInfo.TABLE_NAME, HotTopicsDBInfo.ID);
         addURI(AUTHORITY, MemberDBInfo.TABLE_NAME, MemberDBInfo.ID);
         addURI(AUTHORITY, NodeDBInfo.TABLE_NAME, NodeDBInfo.ID);
+        addURI(AUTHORITY, UserTopicsDBInfo.TABLE_NAME, UserTopicsDBInfo.ID);
     }};
 
     private String getTableName(Uri uri){
@@ -64,6 +66,8 @@ public class DataProvider extends ContentProvider{
                 return MemberDBInfo.TABLE_NAME;
             case NodeDBInfo.ID:
                 return NodeDBInfo.TABLE_NAME;
+            case UserTopicsDBInfo.ID:
+                return UserTopicsDBInfo.TABLE_NAME;
             default:
                 return "";
         }

@@ -54,7 +54,7 @@ public class UserInfoSecondFragment extends Fragment{
             mUsername = getArguments().getString("username");
         }
         Member member = new MembersDataHelper().select(mUsername);
-        if (member != null) {
+        if (member != null && mTableLayout != null) {
             mTableLayout.removeAllViews();
             if (!TextUtils.isEmpty(member.website)) {
                 View view = newRowView("Website", member.website, null);

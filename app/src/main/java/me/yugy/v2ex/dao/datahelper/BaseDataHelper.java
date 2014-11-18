@@ -80,8 +80,8 @@ public abstract class BaseDataHelper<T>{
         return new CursorLoader(Application.getInstance(), mUri, null, null, null, sortOrder);
     }
 
-    public CursorLoader getCursorLoader(String selection, String sortOrder){
-        return new CursorLoader(Application.getInstance(), mUri, null, selection, null, sortOrder);
+    public CursorLoader getCursorLoader(String selection, String[] selectionArgs){
+        return new CursorLoader(Application.getInstance(), mUri, null, selection, selectionArgs, null);
     }
 
     protected abstract ContentValues getContentValues(T T);

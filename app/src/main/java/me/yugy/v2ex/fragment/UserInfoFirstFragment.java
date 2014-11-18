@@ -83,15 +83,10 @@ public class UserInfoFirstFragment extends Fragment{
         refreshData();
     }
 
-    private static final DisplayImageOptions OPTIONS = new DisplayImageOptions.Builder()
-            .cacheInMemory(true)
-            .cacheOnDisk(true)
-            .build();
-
     public void refreshData() {
         Member member = new MembersDataHelper().select(mUsername);
         if (member != null) {
-            ImageLoader.getInstance().displayImage(member.avatar, mHeadIcon, OPTIONS, new SimpleImageLoadingListener() {
+            ImageLoader.getInstance().displayImage(member.avatar, mHeadIcon, new SimpleImageLoadingListener() {
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                     if (mHeadIconInfo != null) {
@@ -161,7 +156,9 @@ public class UserInfoFirstFragment extends Fragment{
     public void playExitAnimation(Animator.AnimatorListener listener) {
         int[] screenLocation = new int[2];
         mHeadIcon.getLocationOnScreen(screenLocation);
-        if (mAnimatorSet != null && screenLocation[0] >= 0) {
+        if (mAnimatorSet != null && screenLocation[1] >= 0) {
+            mLeftDelta = mHeadIconInfo.left - screenLocation[0];
+            mTopDelta = mHeadIconInfo.top - screenLocation[1];
             ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0, mTopDelta);
             yAnimator.setInterpolator(new ReversePathInterpolator());
             mAnimatorSet.playTogether(

@@ -23,7 +23,7 @@
         </activity>
         <activity
             android:name=".activity.UserCenterActivity"
-            android:theme="@style/MainActivity"
+            android:theme="@style/UserCenterActivity"
             />
         
         

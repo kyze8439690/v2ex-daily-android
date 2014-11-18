@@ -6,6 +6,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+import me.yugy.github.myutils.DebugUtils;
+
 /**
  * Created by yugy on 14/11/13.
  */
@@ -18,11 +20,12 @@ public class Application extends android.app.Application{
         super.onCreate();
         sInstance = this;
 
+        DebugUtils.setLogEnable(BuildConfig.DEBUG);
+
         //init imageLoader
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
-                .displayer(new FadeInBitmapDisplayer(600))
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .tasksProcessingOrder(QueueProcessingType.LIFO)

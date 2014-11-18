@@ -18,7 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import me.yugy.github.myutils.ScreenUtils;
+import me.yugy.github.myutils.UIUtils;
 import me.yugy.v2ex.R;
 
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
@@ -69,7 +69,7 @@ public class CirclePageIndicator extends View implements ViewPager.OnPageChangeL
         mPaintPageFill.setColor(Color.parseColor("#FF999999"));
         mPaintFill.setStyle(Style.FILL);
         mPaintFill.setColor(Color.parseColor("#FFFFFFFF"));
-        mRadius = ScreenUtils.dp(context, 3);
+        mRadius = UIUtils.dp(context, 3);
         mSnap = true;
 
         final ViewConfiguration configuration = ViewConfiguration.get(context);

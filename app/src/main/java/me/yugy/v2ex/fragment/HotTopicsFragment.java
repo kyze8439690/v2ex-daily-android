@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.yugy.github.myutils.MessageUtils;
 import me.yugy.v2ex.R;
-import me.yugy.v2ex.adapter.HotTopicsAdapter;
+import me.yugy.v2ex.adapter.TopicsAdapter;
 import me.yugy.v2ex.dao.datahelper.HotTopicsDataHelper;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.network.RequestManager;
@@ -40,13 +40,13 @@ public class HotTopicsFragment extends Fragment implements LoaderManager.LoaderC
     @InjectView(R.id.recycler_view) RecyclerView mRecyclerView;
 
     private HotTopicsDataHelper mDataHelper;
-    private HotTopicsAdapter mAdapter;
+    private TopicsAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataHelper = new HotTopicsDataHelper();
-        mAdapter = new HotTopicsAdapter(getActivity());
+        mAdapter = new TopicsAdapter(getActivity());
         setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(0, null, this);
