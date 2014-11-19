@@ -25,6 +25,10 @@
             android:name=".activity.UserCenterActivity"
             android:theme="@style/UserCenterActivity"
             />
+        <activity
+            android:name=".activity.NodeActivity"
+            android:theme="@style/NodeActivity"
+            />
         
         
         

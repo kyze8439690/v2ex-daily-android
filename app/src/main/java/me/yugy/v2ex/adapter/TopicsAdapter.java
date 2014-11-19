@@ -16,8 +16,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.v2ex.R;
+import me.yugy.v2ex.activity.NodeActivity;
 import me.yugy.v2ex.activity.UserCenterActivity;
-import me.yugy.v2ex.fragment.UserInfoFirstFragment;
+import me.yugy.v2ex.model.HeadIconInfo;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.widget.RelativeTimeTextView;
 
@@ -38,12 +39,7 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
 
     @Override
     public void bindViewHolder(TopicHolder viewHolder, Cursor cursor) {
-//        Debug.startMethodTracing();
-
-        Topic topic = Topic.fromCursor(cursor);
-        viewHolder.parse(topic);
-
-//        Debug.stopMethodTracing();
+        viewHolder.parse(Topic.fromCursor(cursor));
     }
 
     public class TopicHolder extends RecyclerView.ViewHolder{
@@ -54,7 +50,9 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
         @InjectView(R.id.head_icon) CircleImageView headIcon;
         @InjectView(R.id.name) TextView name;
         @InjectView(R.id.comment_count) TextView commentCount;
+        @InjectView(R.id.node) TextView node;
         private String mUsername;
+        private int mNodeId;
 
         public TopicHolder(View itemView) {
             super(itemView);
@@ -63,17 +61,19 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
 
         public void parse (Topic topic) {
             mUsername = topic.member.username;
+            mNodeId = topic.node.id;
             title.setText(topic.title);
             time.setReferenceTime(topic.created * 1000);
             content.setText(topic.content_rendered);
             ImageLoader.getInstance().displayImage(topic.member.avatar, headIcon);
             name.setText(topic.member.username);
             commentCount.setText(String.format("%d 个回复", topic.replies));
+            node.setText(topic.node.title);
         }
 
         @OnClick(R.id.head_icon)
         void onHeadIconClick(View view) {
-            UserInfoFirstFragment.HeadIconInfo headIconInfo = new UserInfoFirstFragment.HeadIconInfo();
+            HeadIconInfo headIconInfo = new HeadIconInfo();
             int[] screenLocation = new int[2];
             headIcon.getLocationOnScreen(screenLocation);
             headIconInfo.left = screenLocation[0];
@@ -82,6 +82,11 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
             headIconInfo.height = view.getHeight();
             UserCenterActivity.launch(headIcon.getContext(), mUsername, headIconInfo);
             ((Activity)headIcon.getContext()).overridePendingTransition(0, 0);
+        }
+
+        @OnClick(R.id.node)
+        void onNodeClick(View view) {
+            NodeActivity.launch(view.getContext(), mNodeId);
         }
     }
 }

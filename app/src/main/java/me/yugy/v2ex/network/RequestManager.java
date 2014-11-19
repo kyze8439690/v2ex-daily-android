@@ -4,8 +4,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 
-import java.util.Objects;
-
 import me.yugy.v2ex.Application;
 import me.yugy.v2ex.model.Member;
 import me.yugy.v2ex.model.Topic;
@@ -53,6 +51,12 @@ public class RequestManager {
 
     public void getUserTopics(Object tag, String username, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
         GetUserTopicsRequest request = new GetUserTopicsRequest(username, listener, errorListener);
+        request.setTag(tag);
+        mRequestQueue.add(request);
+    }
+
+    public void getNodeTopics(Object tag, int nodeId, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
+        GetNodeTopicsRequest request = new GetNodeTopicsRequest(nodeId, listener, errorListener);
         request.setTag(tag);
         mRequestQueue.add(request);
     }

@@ -17,7 +17,6 @@ public class GetUserTopicsRequest extends BaseTopicsRequest {
     @Override
     protected void deliverResponse(Topic[] response) {
         UserTopicsDataHelper dataHelper = new UserTopicsDataHelper();
-        dataHelper.deleteAll();
         dataHelper.bulkInsert(response);
         super.deliverResponse(response);
     }

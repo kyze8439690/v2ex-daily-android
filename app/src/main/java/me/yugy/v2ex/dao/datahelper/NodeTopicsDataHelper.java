@@ -11,7 +11,7 @@ import me.yugy.v2ex.dao.DBHelper;
 import me.yugy.v2ex.dao.DataProvider;
 import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
-import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
+import me.yugy.v2ex.dao.dbinfo.NodeTopicsDBInfo;
 import me.yugy.v2ex.model.Member;
 import me.yugy.v2ex.model.Node;
 import me.yugy.v2ex.model.Topic;
@@ -19,10 +19,10 @@ import me.yugy.v2ex.model.Topic;
 /**
  * Created by yugy on 14/11/14.
  */
-public class UserTopicsDataHelper extends BaseDataHelper<Topic>{
+public class NodeTopicsDataHelper extends BaseDataHelper<Topic>{
     @Override
     protected String getTableName() {
-        return UserTopicsDBInfo.TABLE_NAME;
+        return NodeTopicsDBInfo.TABLE_NAME;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class UserTopicsDataHelper extends BaseDataHelper<Topic>{
     }
 
     public Topic select(int tid) {
-        Cursor cursor = query(null, UserTopicsDBInfo.TID + "=?", new String[]{String.valueOf(tid)}, null);
+        Cursor cursor = query(null, NodeTopicsDBInfo.TID + "=?", new String[]{String.valueOf(tid)}, null);
         Topic topic = null;
         if (cursor.moveToFirst()){
             topic = Topic.fromCursor(cursor);
@@ -40,11 +40,11 @@ public class UserTopicsDataHelper extends BaseDataHelper<Topic>{
         return topic;
     }
 
-    public int getCount(int uid){
+    public int getCount(int nodeId){
         synchronized (DataProvider.class){
             SQLiteDatabase db = new DBHelper().getReadableDatabase();
             Cursor cursor = db.query(getTableName(), new String[] {"count(*)"},
-                    UserTopicsDBInfo.MID + "=?", new String[]{String.valueOf(uid)}, null, null, null);
+                    NodeTopicsDBInfo.NID + "=?", new String[]{String.valueOf(nodeId)}, null, null, null);
             int count;
             if(cursor.moveToFirst()){
                 count = cursor.getInt(0);
@@ -67,14 +67,14 @@ public class UserTopicsDataHelper extends BaseDataHelper<Topic>{
                 for (Topic topic : topics) {
                     members.add(topic.member);
                     nodes.add(topic.node);
-                    if (db.query(UserTopicsDBInfo.TABLE_NAME, new String[]{UserTopicsDBInfo.TID},
-                            UserTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)},
+                    if (db.query(NodeTopicsDBInfo.TABLE_NAME, new String[]{NodeTopicsDBInfo.TID},
+                            NodeTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)},
                             null, null, null).moveToFirst()) {
-                        db.update(UserTopicsDBInfo.TABLE_NAME, topic.toContentValues(),
-                                UserTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)});
+                        db.update(NodeTopicsDBInfo.TABLE_NAME, topic.toContentValues(),
+                                NodeTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)});
                         changeCount++;
                     } else {
-                        db.insert(UserTopicsDBInfo.TABLE_NAME, null, topic.toContentValues());
+                        db.insert(NodeTopicsDBInfo.TABLE_NAME, null, topic.toContentValues());
                         changeCount++;
                     }
                 }

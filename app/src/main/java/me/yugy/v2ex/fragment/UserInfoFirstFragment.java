@@ -7,14 +7,7 @@ import android.animation.TimeInterpolator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
@@ -23,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -32,6 +24,8 @@ import butterknife.InjectView;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.v2ex.R;
 import me.yugy.v2ex.dao.datahelper.MembersDataHelper;
+import me.yugy.v2ex.listener.OnPaletteColorGenerateListener;
+import me.yugy.v2ex.model.HeadIconInfo;
 import me.yugy.v2ex.model.Member;
 
 /**
@@ -149,29 +143,21 @@ public class UserInfoFirstFragment extends Fragment{
         mOnPaletteColorGenerateListener = null;
     }
 
-    public interface OnPaletteColorGenerateListener {
-        public void onGenerated(Palette palette);
-    }
-
     public void playExitAnimation(Animator.AnimatorListener listener) {
         int[] screenLocation = new int[2];
         mHeadIcon.getLocationOnScreen(screenLocation);
-        if (mAnimatorSet != null && screenLocation[1] >= 0) {
-            mLeftDelta = mHeadIconInfo.left - screenLocation[0];
-            mTopDelta = mHeadIconInfo.top - screenLocation[1];
-            ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0, mTopDelta);
-            yAnimator.setInterpolator(new ReversePathInterpolator());
-            mAnimatorSet.playTogether(
-                    ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, 1, mWidthScale),
-                    ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, 1, mHeightScale),
-                    ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, 0, mLeftDelta),
-                    yAnimator
-            );
-            mAnimatorSet.addListener(listener);
-            mAnimatorSet.start();
-        } else {
-            listener.onAnimationEnd(null);
-        }
+        mLeftDelta = mHeadIconInfo.left - screenLocation[0];
+        mTopDelta = mHeadIconInfo.top - screenLocation[1];
+        ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0, mTopDelta);
+        yAnimator.setInterpolator(new ReversePathInterpolator());
+        mAnimatorSet.playTogether(
+                ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, 1, mWidthScale),
+                ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, 1, mHeightScale),
+                ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, 0, mLeftDelta),
+                yAnimator
+        );
+        mAnimatorSet.addListener(listener);
+        mAnimatorSet.start();
     }
 
     private static class PathInterpolator implements TimeInterpolator{
@@ -188,43 +174,4 @@ public class UserInfoFirstFragment extends Fragment{
         }
     }
 
-    public static class HeadIconInfo implements Parcelable {
-        public int left;
-        public int top;
-        public int width;
-        public int height;
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(this.left);
-            dest.writeInt(this.top);
-            dest.writeInt(this.width);
-            dest.writeInt(this.height);
-        }
-
-        public HeadIconInfo() {
-        }
-
-        private HeadIconInfo(Parcel in) {
-            this.left = in.readInt();
-            this.top = in.readInt();
-            this.width = in.readInt();
-            this.height = in.readInt();
-        }
-
-        public static final Parcelable.Creator<HeadIconInfo> CREATOR = new Parcelable.Creator<HeadIconInfo>() {
-            public HeadIconInfo createFromParcel(Parcel source) {
-                return new HeadIconInfo(source);
-            }
-
-            public HeadIconInfo[] newArray(int size) {
-                return new HeadIconInfo[size];
-            }
-        };
-    }
 }

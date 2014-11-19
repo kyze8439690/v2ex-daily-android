@@ -9,12 +9,16 @@
     android:layout_marginLeft="9dp"
     android:layout_marginRight="9dp"
     android:layout_marginTop="4dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:paddingBottom="12dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <TextView
             android:id="@+id/title"
@@ -23,6 +27,9 @@
             android:textSize="20sp"
             android:textColor="#FF4D4D4D"
             tools:text="移动的光纤为什么这么便宜"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
             />
 
         <me.yugy.v2ex.widget.RelativeTimeTextView
@@ -34,6 +41,7 @@
             tools:text="42 分钟前"
             android:layout_below="@id/title"
             android:layout_marginTop="12dp"
+            android:layout_marginLeft="12dp"
             />
 
         <TextView
@@ -47,6 +55,8 @@
 问问v友们这么便宜的靠谱嘛..."
             android:layout_below="@id/time"
             android:layout_marginTop="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
             android:maxLines="4"
             android:ellipsize="end"
             />
@@ -57,6 +67,7 @@
             android:layout_height="36dp"
             android:layout_below="@id/content"
             android:layout_marginTop="12dp"
+            android:layout_marginLeft="12dp"
             tools:src="@drawable/ic_launcher"
             />
 
@@ -81,6 +92,21 @@
             tools:text="76 个回复"
             android:layout_alignLeft="@id/name"
             android:layout_alignBottom="@id/head_icon"
+            />
+
+        <TextView
+            android:id="@+id/node"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="程序员"
+            android:textSize="14sp"
+            android:textColor="#4D4D4D"
+            android:layout_alignBottom="@id/comment_count"
+            android:layout_alignParentRight="true"
+            android:textStyle="bold"
+            android:padding="8dp"
+            android:background="@drawable/bg_node"
+            android:layout_marginRight="-2.5dp"
             />
 
     </RelativeLayout>

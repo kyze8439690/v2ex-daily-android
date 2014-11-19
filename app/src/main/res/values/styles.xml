@@ -18,4 +18,10 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="NodeActivity" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+    </style>
+
 </resources>

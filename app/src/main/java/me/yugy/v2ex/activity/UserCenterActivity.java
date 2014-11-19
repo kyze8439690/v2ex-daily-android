@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -16,6 +17,10 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -31,21 +36,23 @@ import me.yugy.v2ex.adapter.UserCenterHeaderPagerAdapter;
 import me.yugy.v2ex.dao.datahelper.MembersDataHelper;
 import me.yugy.v2ex.dao.datahelper.UserTopicsDataHelper;
 import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
-import me.yugy.v2ex.fragment.UserInfoFirstFragment;
+import me.yugy.v2ex.listener.OnPaletteColorGenerateListener;
+import me.yugy.v2ex.model.HeadIconInfo;
 import me.yugy.v2ex.model.Member;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.network.RequestManager;
 import me.yugy.v2ex.network.SimpleErrorListener;
 import me.yugy.v2ex.utils.UIUtils;
+import me.yugy.v2ex.widget.AlphaForegroundColorSpan;
 import me.yugy.v2ex.widget.CirclePageIndicator;
 import me.yugy.v2ex.widget.PauseOnScrollListener2;
 
 /**
  * Created by yugy on 14/11/16.
  */
-public class UserCenterActivity extends ActionBarActivity implements UserInfoFirstFragment.OnPaletteColorGenerateListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class UserCenterActivity extends ActionBarActivity implements OnPaletteColorGenerateListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static void launch(Context context, String username, UserInfoFirstFragment.HeadIconInfo headIconInfo) {
+    public static void launch(Context context, String username, HeadIconInfo headIconInfo) {
         Intent intent = new Intent(context, UserCenterActivity.class);
         intent.putExtra("username", username);
         if (headIconInfo != null) {
@@ -68,6 +75,8 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
     private TopicsAdapter mAdapter;
     private int mActionBarSize;
     private ColorDrawable mActionBarBackground;
+    private SpannableString mActionBarTitle;
+    private AlphaForegroundColorSpan mActionBarTitleColorSpan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +85,14 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
         ButterKnife.inject(this);
 
         setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(R.drawable.ic_back_white);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setOnScrollListener(new PauseOnScrollListener2(
                 ImageLoader.getInstance(), true, true, new RecyclerView.OnScrollListener() {
@@ -88,6 +105,7 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
                 if (mActionBarBackground != null) {
                     mActionBarBackground.setAlpha((int) (alpha * 255));
                 }
+                setActionBarTitleAlpha(alpha);
                 mHeader.setTranslationY(translationY);
             }
         }));
@@ -100,17 +118,12 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
             }
         }).start();
 
-        getSupportActionBar().setTitle("");
-        mToolbar.setNavigationIcon(R.drawable.ic_back_white);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
 
         mUsername = getIntent().getStringExtra("username");
-        UserInfoFirstFragment.HeadIconInfo headIconInfo = null;
+        mActionBarTitle = new SpannableString(mUsername);
+        mActionBarTitleColorSpan = new AlphaForegroundColorSpan(Color.WHITE);
+        setActionBarTitleAlpha(0);
+        HeadIconInfo headIconInfo = null;
         if (getIntent().hasExtra("headIconInfo")) {
             headIconInfo = getIntent().getParcelableExtra("headIconInfo");
         }
@@ -133,6 +146,29 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
         }
 
         mActionBarSize = UIUtils.getActionBarHeight(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.usercenter, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            getUserInfoData();
+            getUserTopicsData();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setActionBarTitleAlpha(float alpha){
+        mActionBarTitleColorSpan.setAlpha(alpha);
+        mActionBarTitle.setSpan(mActionBarTitleColorSpan, 0, mActionBarTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        getSupportActionBar().setTitle(mActionBarTitle);
     }
 
     private int getHeaderMaxTranslationY() {
@@ -201,11 +237,11 @@ public class UserCenterActivity extends ActionBarActivity implements UserInfoFir
     @SuppressWarnings("deprecation")
     @Override
     public void onGenerated(Palette palette) {
-        mActionBarBackground = new ColorDrawable(palette.getMutedColor(0));
+        mActionBarBackground = new ColorDrawable(palette.getMutedColor(0xFF161616));
         mActionBarBackground.setAlpha(0);
         mToolbar.setBackgroundDrawable(mActionBarBackground);
 
-        ColorDrawable headerBackground = new ColorDrawable(palette.getMutedColor(0));
+        ColorDrawable headerBackground = new ColorDrawable(palette.getMutedColor(0xFF161616));
         headerBackground.setAlpha(0);
         mHeader.setBackgroundDrawable(headerBackground);
 

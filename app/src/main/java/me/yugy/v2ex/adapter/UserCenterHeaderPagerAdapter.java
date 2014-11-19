@@ -7,6 +7,7 @@ import android.support.v13.app.FragmentPagerAdapter;
 
 import me.yugy.v2ex.fragment.UserInfoFirstFragment;
 import me.yugy.v2ex.fragment.UserInfoSecondFragment;
+import me.yugy.v2ex.model.HeadIconInfo;
 
 /**
  * Created by yugy on 14/11/17.
@@ -16,7 +17,7 @@ public class UserCenterHeaderPagerAdapter extends FragmentPagerAdapter {
     private UserInfoFirstFragment mUserInfoFirstFragment;
     private UserInfoSecondFragment mUserInfoSecondFragment;
 
-    public UserCenterHeaderPagerAdapter(FragmentManager fm, String username, UserInfoFirstFragment.HeadIconInfo headIconInfo) {
+    public UserCenterHeaderPagerAdapter(FragmentManager fm, String username, HeadIconInfo headIconInfo) {
         super(fm);
         mUserInfoFirstFragment = UserInfoFirstFragment.newInstance(username, headIconInfo);
         mUserInfoSecondFragment = UserInfoSecondFragment.newInstance(username);
