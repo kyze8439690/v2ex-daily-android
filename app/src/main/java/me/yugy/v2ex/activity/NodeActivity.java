@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,10 +21,12 @@ import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -42,6 +45,8 @@ import me.yugy.v2ex.network.RequestManager;
 import me.yugy.v2ex.network.SimpleErrorListener;
 import me.yugy.v2ex.utils.UIUtils;
 import me.yugy.v2ex.widget.AlphaForegroundColorSpan;
+import me.yugy.v2ex.widget.CircularProgressBar;
+import me.yugy.v2ex.widget.CircularProgressDrawable;
 import me.yugy.v2ex.widget.PauseOnScrollListener2;
 
 /**
@@ -69,6 +74,8 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
     private AlphaForegroundColorSpan mActionBarTitleColorSpan;
     private TopicsAdapter mAdapter;
     private NodeTopicsDataHelper mDataHelper;
+    private boolean mIsLoading = false;
+    private CircularProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,17 +151,48 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
     }
 
     private void getNodeTopicsData() {
+        mIsLoading = true;
+        invalidateOptionsMenu();
         RequestManager.getInstance().getNodeTopics(this, mNodeId, new Response.Listener<Topic[]>() {
             @Override
             public void onResponse(Topic[] response) {
-
+                stopLoadingAnimation();
             }
-        }, new SimpleErrorListener(this));
+        }, new SimpleErrorListener(this){
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                super.onErrorResponse(error);
+                stopLoadingAnimation();
+            }
+        });
+    }
+
+    private void stopLoadingAnimation() {
+        mIsLoading = false;
+        if (mProgressBar != null) {
+            mProgressBar.progressiveStop(new CircularProgressDrawable.OnEndListener() {
+                @Override
+                public void onEnd(CircularProgressDrawable drawable) {
+                    invalidateOptionsMenu();
+                }
+            });
+        } else {
+            invalidateOptionsMenu();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.usercenter, menu);
+        if (mIsLoading) {
+            MenuItem item = menu.findItem(R.id.refresh);
+            View actionView = getLayoutInflater().inflate(R.layout.view_menu_loading, null);
+            mProgressBar = (CircularProgressBar) actionView.findViewById(R.id.progress);
+            int size = me.yugy.github.myutils.UIUtils.dp(this, 48);
+            actionView.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+            MenuItemCompat.setActionView(item, actionView);
+            mProgressBar.setIndeterminate(true);
+        }
         return true;
     }
 

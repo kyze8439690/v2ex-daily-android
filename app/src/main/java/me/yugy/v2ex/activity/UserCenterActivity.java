@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
@@ -22,9 +23,11 @@ import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import butterknife.ButterKnife;
@@ -45,6 +48,8 @@ import me.yugy.v2ex.network.SimpleErrorListener;
 import me.yugy.v2ex.utils.UIUtils;
 import me.yugy.v2ex.widget.AlphaForegroundColorSpan;
 import me.yugy.v2ex.widget.CirclePageIndicator;
+import me.yugy.v2ex.widget.CircularProgressBar;
+import me.yugy.v2ex.widget.CircularProgressDrawable;
 import me.yugy.v2ex.widget.PauseOnScrollListener2;
 
 /**
@@ -52,21 +57,11 @@ import me.yugy.v2ex.widget.PauseOnScrollListener2;
  */
 public class UserCenterActivity extends ActionBarActivity implements OnPaletteColorGenerateListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static void launch(Context context, String username, HeadIconInfo headIconInfo) {
-        Intent intent = new Intent(context, UserCenterActivity.class);
-        intent.putExtra("username", username);
-        if (headIconInfo != null) {
-            intent.putExtra("headIconInfo", headIconInfo);
-        }
-        context.startActivity(intent);
-    }
-
     @InjectView(R.id.recycler_view) RecyclerView mRecyclerView;
     @InjectView(R.id.toolbar) Toolbar mToolbar;
     @InjectView(R.id.header) FrameLayout mHeader;
     @InjectView(R.id.viewpager) ViewPager mViewPager;
     @InjectView(R.id.pager_indicator) CirclePageIndicator mPageIndicator;
-
     private UserCenterHeaderPagerAdapter mHeaderAdapter;
     private String mUsername;
     private int mUid = -1;
@@ -77,6 +72,17 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
     private ColorDrawable mActionBarBackground;
     private SpannableString mActionBarTitle;
     private AlphaForegroundColorSpan mActionBarTitleColorSpan;
+    private boolean mIsLoading = false;
+    private CircularProgressBar mProgressBar;
+
+    public static void launch(Context context, String username, HeadIconInfo headIconInfo) {
+        Intent intent = new Intent(context, UserCenterActivity.class);
+        intent.putExtra("username", username);
+        if (headIconInfo != null) {
+            intent.putExtra("headIconInfo", headIconInfo);
+        }
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +147,7 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
             getLoaderManager().initLoader(1, null, this);
         }
 
-        if(mUid != -1 && mDataHelper.getCount(mUid) == 0) {
+        if (mUid != -1 && mDataHelper.getCount(mUid) == 0) {
             getUserTopicsData();
         }
 
@@ -151,6 +157,15 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.usercenter, menu);
+        if (mIsLoading) {
+            MenuItem item = menu.findItem(R.id.refresh);
+            View actionView = getLayoutInflater().inflate(R.layout.view_menu_loading, null);
+            mProgressBar = (CircularProgressBar) actionView.findViewById(R.id.progress);
+            int size = me.yugy.github.myutils.UIUtils.dp(this, 48);
+            actionView.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+            MenuItemCompat.setActionView(item, actionView);
+            mProgressBar.setIndeterminate(true);
+        }
         return true;
     }
 
@@ -165,7 +180,7 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
         }
     }
 
-    private void setActionBarTitleAlpha(float alpha){
+    private void setActionBarTitleAlpha(float alpha) {
         mActionBarTitleColorSpan.setAlpha(alpha);
         mActionBarTitle.setSpan(mActionBarTitleColorSpan, 0, mActionBarTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         getSupportActionBar().setTitle(mActionBarTitle);
@@ -190,7 +205,7 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
                         mUid = member.id;
                         getLoaderManager().initLoader(1, null, UserCenterActivity.this);
                     }
-                    if(mUid != -1 && mDataHelper.getCount(mUid) == 0) {
+                    if (mUid != -1 && mDataHelper.getCount(mUid) == 0) {
                         getUserTopicsData();
                     }
                 }
@@ -199,12 +214,34 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
     }
 
     private void getUserTopicsData() {
+        mIsLoading = true;
+        invalidateOptionsMenu();
         RequestManager.getInstance().getUserTopics(this, mUsername, new Response.Listener<Topic[]>() {
             @Override
             public void onResponse(Topic[] response) {
-
+                stopLoadingAnimation();
             }
-        }, new SimpleErrorListener(this));
+        }, new SimpleErrorListener(this) {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                super.onErrorResponse(error);
+                stopLoadingAnimation();
+            }
+        });
+    }
+
+    private void stopLoadingAnimation() {
+        mIsLoading = false;
+        if (mProgressBar != null) {
+            mProgressBar.progressiveStop(new CircularProgressDrawable.OnEndListener() {
+                @Override
+                public void onEnd(CircularProgressDrawable drawable) {
+                    invalidateOptionsMenu();
+                }
+            });
+        } else {
+            invalidateOptionsMenu();
+        }
     }
 
     @Override

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12dp"
+    >
+
+    <me.yugy.v2ex.widget.CircularProgressBar
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:id="@+id/progress"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cpb_color="@android:color/white"
+        app:cpb_stroke_width="3dp"
+        />
+
+</FrameLayout>
