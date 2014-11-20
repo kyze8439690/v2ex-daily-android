@@ -17,6 +17,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.v2ex.R;
 import me.yugy.v2ex.activity.NodeActivity;
+import me.yugy.v2ex.activity.TopicActivity;
 import me.yugy.v2ex.activity.UserCenterActivity;
 import me.yugy.v2ex.model.HeadIconInfo;
 import me.yugy.v2ex.model.Topic;
@@ -27,8 +28,11 @@ import me.yugy.v2ex.widget.RelativeTimeTextView;
  */
 public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
 
-    public TopicsAdapter(Context context) {
+    private int mType;
+
+    public TopicsAdapter(Context context, @TopicActivity.Type int type) {
         super(context, null);
+        mType = type;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
             ButterKnife.inject(this, itemView);
         }
 
-        public void parse (Topic topic) {
+        public void parse (final Topic topic) {
             mUsername = topic.member.username;
             mNodeId = topic.node.id;
             title.setText(topic.title);
@@ -69,10 +73,18 @@ public class TopicsAdapter extends CursorAdapter2<TopicsAdapter.TopicHolder>{
             name.setText(topic.member.username);
             commentCount.setText(String.format("%d 个回复", topic.replies));
             node.setText(topic.node.title);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TopicActivity.launch(v.getContext(), mType, topic.id);
+                }
+            });
         }
 
         @OnClick(R.id.head_icon)
         void onHeadIconClick(View view) {
+            view.setVisibility(View.INVISIBLE);
             HeadIconInfo headIconInfo = new HeadIconInfo();
             int[] screenLocation = new int[2];
             headIcon.getLocationOnScreen(screenLocation);

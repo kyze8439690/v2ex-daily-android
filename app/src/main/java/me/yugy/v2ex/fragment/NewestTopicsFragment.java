@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.yugy.github.myutils.MessageUtils;
 import me.yugy.v2ex.R;
+import me.yugy.v2ex.activity.TopicActivity;
 import me.yugy.v2ex.adapter.TopicsAdapter;
 import me.yugy.v2ex.dao.datahelper.NewestTopicsDataHelper;
 import me.yugy.v2ex.model.Topic;
@@ -46,7 +47,7 @@ public class NewestTopicsFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataHelper = new NewestTopicsDataHelper();
-        mAdapter = new TopicsAdapter(getActivity());
+        mAdapter = new TopicsAdapter(getActivity(), TopicActivity.TYPE_NEWEST);
         setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(3, null, this);
@@ -76,6 +77,18 @@ public class NewestTopicsFragment extends Fragment implements LoaderManager.Load
 
         if(mDataHelper.getCount() == 0) {
             getData();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int count = mRecyclerView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = mRecyclerView.getChildAt(i).findViewById(R.id.head_icon);
+            if (view != null && !view.isShown()) {
+                view.setVisibility(View.VISIBLE);
+            }
         }
     }
 

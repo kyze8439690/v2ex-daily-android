@@ -1,6 +1,6 @@
 package me.yugy.v2ex.activity;
 
-import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +9,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.github.myutils.MathUtils;
+import me.yugy.github.myutils.UIUtils;
 import me.yugy.v2ex.R;
 import me.yugy.v2ex.adapter.TopicsAdapter;
 import me.yugy.v2ex.dao.datahelper.NodeTopicsDataHelper;
@@ -43,11 +44,12 @@ import me.yugy.v2ex.model.Node;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.network.RequestManager;
 import me.yugy.v2ex.network.SimpleErrorListener;
-import me.yugy.v2ex.utils.UIUtils;
+import me.yugy.v2ex.utils.UIUtils2;
 import me.yugy.v2ex.widget.AlphaForegroundColorSpan;
 import me.yugy.v2ex.widget.CircularProgressBar;
 import me.yugy.v2ex.widget.CircularProgressDrawable;
 import me.yugy.v2ex.widget.PauseOnScrollListener2;
+import me.yugy.v2ex.widget.RevealColorView;
 
 /**
  * Created by yugy on 14/11/19.
@@ -58,17 +60,18 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
         Intent intent = new Intent(context, NodeActivity.class);
         intent.putExtra("node_id", nodeId);
         context.startActivity(intent);
+        ((Activity)context).overridePendingTransition(0, 0);
     }
 
     @InjectView(R.id.recycler_view) RecyclerView mRecyclerView;
     @InjectView(R.id.toolbar) Toolbar mToolbar;
     @InjectView(R.id.header) RelativeLayout mHeader;
+    @InjectView(R.id.reveal) RevealColorView mRevealColorView;
     @InjectView(R.id.head_icon) CircleImageView mHeadIcon;
     @InjectView(R.id.name) TextView mName;
     @InjectView(R.id.tagline) TextView mTagline;
     private int mNodeId;
     private int mActionBarSize;
-    private ObjectAnimator mHeaderBackgroundAnimator;
     private ColorDrawable mActionBarBackground;
     private SpannableString mActionBarTitle;
     private AlphaForegroundColorSpan mActionBarTitleColorSpan;
@@ -101,9 +104,9 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
         setSupportActionBar(mToolbar);
         mToolbar.setNavigationIcon(R.drawable.ic_back_white);
         mNodeId = getIntent().getIntExtra("node_id", 0);
-        mActionBarSize = UIUtils.getActionBarHeight(this);
+        mActionBarSize = UIUtils2.getActionBarHeight(this);
 
-        mAdapter = new TopicsAdapter(this);
+        mAdapter = new TopicsAdapter(this, TopicActivity.TYPE_NODE);
         mDataHelper = new NodeTopicsDataHelper();
         mRecyclerView.setAdapter(mAdapter);
 
@@ -126,20 +129,18 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
                     Palette.generateAsync(loadedImage, new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int color = palette.getMutedColor(0xFF161616);
+                            int color = palette.getVibrantColor(0xFF161616);
                             if (color == Color.TRANSPARENT) { color = 0xFF161616; }
                             mActionBarBackground = new ColorDrawable(color);
                             mActionBarBackground.setAlpha(0);
                             mToolbar.setBackgroundDrawable(mActionBarBackground);
 
-                            ColorDrawable headerBackground = new ColorDrawable(color);
-                            headerBackground.setAlpha(0);
-                            mHeader.setBackgroundDrawable(headerBackground);
-
-                            mHeaderBackgroundAnimator = ObjectAnimator.ofInt(headerBackground, "alpha",
-                                    255);
-                            mHeaderBackgroundAnimator.setDuration(600);
-                            mHeaderBackgroundAnimator.start();
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                getWindow().setStatusBarColor(palette.getDarkMutedColor(Color.BLACK));
+                                getWindow().setNavigationBarColor(palette.getDarkMutedColor(Color.BLACK));
+                            }
+                            mRevealColorView.reveal(mRevealColorView.getWidth() / 2, UIUtils.dp(NodeActivity.this, 64),
+                                    palette.getMutedColor(0xFF161616), null);
                         }
                     });
                 }
@@ -169,6 +170,18 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        int count = mRecyclerView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = mRecyclerView.getChildAt(i).findViewById(R.id.head_icon);
+            if (view != null && !view.isShown()) {
+                view.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     private void stopLoadingAnimation() {
         mIsLoading = false;
         if (mProgressBar != null) {
@@ -190,7 +203,7 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
             MenuItem item = menu.findItem(R.id.refresh);
             View actionView = getLayoutInflater().inflate(R.layout.view_menu_loading, null);
             mProgressBar = (CircularProgressBar) actionView.findViewById(R.id.progress);
-            int size = me.yugy.github.myutils.UIUtils.dp(this, 48);
+            int size = UIUtils.dp(this, 48);
             actionView.setLayoutParams(new ViewGroup.LayoutParams(size, size));
             MenuItemCompat.setActionView(item, actionView);
             mProgressBar.setIndeterminate(true);

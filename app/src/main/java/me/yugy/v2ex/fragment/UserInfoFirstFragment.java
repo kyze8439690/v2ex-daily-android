@@ -74,10 +74,10 @@ public class UserInfoFirstFragment extends Fragment{
 
         mName.setText(mUsername);
 
-        refreshData();
+        initData();
     }
 
-    public void refreshData() {
+    public void initData() {
         Member member = new MembersDataHelper().select(mUsername);
         if (member != null) {
             ImageLoader.getInstance().displayImage(member.avatar, mHeadIcon, new SimpleImageLoadingListener() {
@@ -95,16 +95,20 @@ public class UserInfoFirstFragment extends Fragment{
                                 mWidthScale = (float) mHeadIconInfo.width / mHeadIcon.getWidth();
                                 mHeightScale = (float) mHeadIconInfo.height / mHeadIcon.getHeight();
 
+                                mHeadIcon.setTranslationX(mLeftDelta);
+                                mHeadIcon.setTranslationY(mTopDelta);
+                                mHeadIcon.setScaleX(mWidthScale);
+                                mHeadIcon.setScaleY(mHeightScale);
                                 mHeadIcon.setPivotX(0);
                                 mHeadIcon.setPivotY(0);
 
                                 mAnimatorSet = new AnimatorSet();
-                                ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, mTopDelta, 0f);
+                                ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0f);
                                 yAnimator.setInterpolator(new PathInterpolator());
                                 mAnimatorSet.playTogether(
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, mWidthScale, 1f),
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, mHeightScale, 1f),
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, mLeftDelta, 0f),
+                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, 1f),
+                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, 1f),
+                                        ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, 0f),
                                         yAnimator
                                 );
                                 mAnimatorSet.setDuration(600);
@@ -144,10 +148,14 @@ public class UserInfoFirstFragment extends Fragment{
     }
 
     public void playExitAnimation(Animator.AnimatorListener listener) {
+        mName.setAlpha(0);
+        mTagline.setAlpha(0);
+
         int[] screenLocation = new int[2];
         mHeadIcon.getLocationOnScreen(screenLocation);
         mLeftDelta = mHeadIconInfo.left - screenLocation[0];
         mTopDelta = mHeadIconInfo.top - screenLocation[1];
+
         ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0, mTopDelta);
         yAnimator.setInterpolator(new ReversePathInterpolator());
         mAnimatorSet.playTogether(

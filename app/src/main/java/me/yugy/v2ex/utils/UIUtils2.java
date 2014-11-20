@@ -8,7 +8,7 @@ import me.yugy.v2ex.R;
 /**
  * Created by yugy on 14/11/18.
  */
-public class UIUtils {
+public class UIUtils2 {
 
     public static int getActionBarHeight(Context context){
         int[] attrs = new int[] { R.attr.actionBarSize };

@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:paddingTop="200dp"
         android:clipToPadding="false"
+        android:paddingBottom="8dp"
         />
 
     <RelativeLayout
@@ -20,6 +21,11 @@
         android:layout_height="200dp"
         android:clipChildren="false"
         >
+
+        <me.yugy.v2ex.widget.RevealColorView
+            android:id="@+id/reveal"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/head_icon"

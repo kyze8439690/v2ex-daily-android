@@ -29,6 +29,9 @@
             android:name=".activity.NodeActivity"
             android:theme="@style/NodeActivity"
             />
+        <activity
+            android:name=".activity.TopicActivity"
+            />
         
         
         

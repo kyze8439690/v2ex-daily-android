@@ -8,7 +8,7 @@
     app:cardBackgroundColor="@android:color/white"
     android:layout_marginLeft="9dp"
     android:layout_marginRight="9dp"
-    android:layout_marginTop="4dp"
+    android:layout_marginTop="9dp"
     android:clipChildren="false"
     android:clipToPadding="false"
     >
@@ -105,8 +105,7 @@
             android:layout_alignParentRight="true"
             android:textStyle="bold"
             android:padding="8dp"
-            android:background="@drawable/bg_node"
-            android:layout_marginRight="-2.5dp"
+            android:layout_marginRight="8dp"
             />
 
     </RelativeLayout>

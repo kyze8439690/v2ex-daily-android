@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.yugy.github.myutils.MessageUtils;
 import me.yugy.v2ex.R;
+import me.yugy.v2ex.activity.TopicActivity;
 import me.yugy.v2ex.adapter.TopicsAdapter;
 import me.yugy.v2ex.dao.datahelper.HotTopicsDataHelper;
 import me.yugy.v2ex.model.Topic;
@@ -46,7 +47,7 @@ public class HotTopicsFragment extends Fragment implements LoaderManager.LoaderC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataHelper = new HotTopicsDataHelper();
-        mAdapter = new TopicsAdapter(getActivity());
+        mAdapter = new TopicsAdapter(getActivity(), TopicActivity.TYPE_HOT);
         setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(0, null, this);
@@ -76,6 +77,18 @@ public class HotTopicsFragment extends Fragment implements LoaderManager.LoaderC
 
         if(mDataHelper.getCount() == 0) {
             getData();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int count = mRecyclerView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = mRecyclerView.getChildAt(i).findViewById(R.id.head_icon);
+            if (view != null && !view.isShown()) {
+                view.setVisibility(View.VISIBLE);
+            }
         }
     }
 

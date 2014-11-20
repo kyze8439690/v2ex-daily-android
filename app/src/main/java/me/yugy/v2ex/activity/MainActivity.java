@@ -12,6 +12,7 @@ import android.view.View;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import me.yugy.github.myutils.UIUtils;
 import me.yugy.v2ex.R;
 import me.yugy.v2ex.fragment.HotTopicsFragment;
 import me.yugy.v2ex.fragment.MenuFragment;
@@ -36,6 +37,7 @@ public class MainActivity extends BaseActivity implements MenuFragment.OnMenuIte
             setSupportActionBar(mToolbar);
             mToolbar.setTitle(R.string.app_name);
             mToolbar.setNavigationIcon(R.drawable.ic_menu);
+            getSupportActionBar().setElevation(UIUtils.dp(this, 2));
             mToolbar.setTitleTextColor(getResources().getColor(R.color.text_color_primary));
         }
 
