@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:requiresFadingEdge="vertical"
-        android:fadingEdgeLength="32dp"
+        android:fadingEdgeLength="64dp"
         android:fadingEdge="vertical"
         >
 

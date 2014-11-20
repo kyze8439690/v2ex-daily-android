@@ -1,5 +1,8 @@
 package me.yugy.v2ex.activity;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +15,7 @@ import butterknife.InjectView;
 import me.yugy.v2ex.R;
 import me.yugy.v2ex.fragment.HotTopicsFragment;
 import me.yugy.v2ex.fragment.MenuFragment;
+import me.yugy.v2ex.fragment.NewestTopicsFragment;
 
 
 public class MainActivity extends BaseActivity implements MenuFragment.OnMenuItemSelectListener{
@@ -63,14 +67,30 @@ public class MainActivity extends BaseActivity implements MenuFragment.OnMenuIte
     }
 
     @Override
-    public void onSelect(int index, String title) {
+    public void onSelect(final int index, String title) {
         mToolbar.setTitle(title);
+        final Fragment fragment;
+        switch (index) {
+            case 0:
+                fragment = new HotTopicsFragment();
+                break;
+            case 1:
+                fragment = new NewestTopicsFragment();
+                break;
+            default:
+                fragment = new ListFragment();
+                break;
+        }
+
         mDrawerLayout.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 mDrawerLayout.setDrawerListener(null);
-
+                getFragmentManager().beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .replace(R.id.container, fragment)
+                        .commit();
             }
         });
         mDrawerLayout.closeDrawer(GravityCompat.START);

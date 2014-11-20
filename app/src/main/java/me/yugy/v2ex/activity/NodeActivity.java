@@ -126,11 +126,13 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
                     Palette.generateAsync(loadedImage, new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            mActionBarBackground = new ColorDrawable(palette.getMutedColor(0xFF161616));
+                            int color = palette.getMutedColor(0xFF161616);
+                            if (color == Color.TRANSPARENT) { color = 0xFF161616; }
+                            mActionBarBackground = new ColorDrawable(color);
                             mActionBarBackground.setAlpha(0);
                             mToolbar.setBackgroundDrawable(mActionBarBackground);
 
-                            ColorDrawable headerBackground = new ColorDrawable(palette.getMutedColor(0xFF161616));
+                            ColorDrawable headerBackground = new ColorDrawable(color);
                             headerBackground.setAlpha(0);
                             mHeader.setBackgroundDrawable(headerBackground);
 
@@ -231,4 +233,9 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
         mAdapter.changeCursor(null);
     }
 
+    @Override
+    protected void onDestroy() {
+        RequestManager.getInstance().cancel(this);
+        super.onDestroy();
+    }
 }

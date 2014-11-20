@@ -24,6 +24,7 @@ public class SimpleErrorListener implements Response.ErrorListener {
         if (error.getCause() instanceof TimeoutError) {
             MessageUtils.toast(mContext, "网络超时");
         } else {
+            error.printStackTrace();
             MessageUtils.toast(mContext, error.toString());
         }
     }

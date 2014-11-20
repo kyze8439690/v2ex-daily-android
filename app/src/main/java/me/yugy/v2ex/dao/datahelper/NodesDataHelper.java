@@ -9,7 +9,7 @@ import me.yugy.v2ex.model.Node;
 /**
  * Created by yugy on 14/11/15.
  */
-public class NodesDataHelper extends BaseDataHelper<Node>{
+public class NodesDataHelper extends BaseDataHelper<Node> {
     @Override
     protected String getTableName() {
         return NodeDBInfo.TABLE_NAME;
@@ -34,7 +34,7 @@ public class NodesDataHelper extends BaseDataHelper<Node>{
         ContentValues values = getContentValues(node);
         if (select(node.id) != null) {
             update(values, NodeDBInfo.NID + "=?", new String[]{String.valueOf(node.id)});
-        }else{
+        } else {
             insert(values);
         }
     }

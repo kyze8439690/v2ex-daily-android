@@ -17,6 +17,7 @@ public class RequestManager {
     public static final String API_HOT_TOPICS = API_HOST + "/topics/hot.json";
     public static final String API_USER_INFO = API_HOST + "/members/show.json";
     public static final String API_TOPICS = API_HOST + "/topics/show.json";
+    public static final String API_LATEST_TOPICS = API_HOST + "/topics/latest.json";
 
     private static RequestManager sInstance;
 
@@ -57,6 +58,12 @@ public class RequestManager {
 
     public void getNodeTopics(Object tag, int nodeId, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
         GetNodeTopicsRequest request = new GetNodeTopicsRequest(nodeId, listener, errorListener);
+        request.setTag(tag);
+        mRequestQueue.add(request);
+    }
+
+    public void getNewestTopics(Object tag, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
+        GetNewestTopicsRequest request = new GetNewestTopicsRequest(listener, errorListener);
         request.setTag(tag);
         mRequestQueue.add(request);
     }

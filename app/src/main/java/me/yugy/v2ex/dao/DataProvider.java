@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import me.yugy.v2ex.BuildConfig;
 import me.yugy.v2ex.dao.dbinfo.HotTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
+import me.yugy.v2ex.dao.dbinfo.NewestTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
@@ -58,6 +59,7 @@ public class DataProvider extends ContentProvider{
         addURI(AUTHORITY, NodeDBInfo.TABLE_NAME, NodeDBInfo.ID);
         addURI(AUTHORITY, UserTopicsDBInfo.TABLE_NAME, UserTopicsDBInfo.ID);
         addURI(AUTHORITY, NodeTopicsDBInfo.TABLE_NAME, NodeTopicsDBInfo.ID);
+        addURI(AUTHORITY, NewestTopicsDBInfo.TABLE_NAME, NewestTopicsDBInfo.ID);
     }};
 
     private String getTableName(Uri uri){
@@ -72,6 +74,8 @@ public class DataProvider extends ContentProvider{
                 return UserTopicsDBInfo.TABLE_NAME;
             case NodeTopicsDBInfo.ID:
                 return NodeTopicsDBInfo.TABLE_NAME;
+            case NewestTopicsDBInfo.ID:
+                return NewestTopicsDBInfo.TABLE_NAME;
             default:
                 return "";
         }

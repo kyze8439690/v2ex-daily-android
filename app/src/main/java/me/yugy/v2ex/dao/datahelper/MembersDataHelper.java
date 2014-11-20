@@ -9,7 +9,7 @@ import me.yugy.v2ex.model.Member;
 /**
  * Created by yugy on 14/11/15.
  */
-public class MembersDataHelper extends BaseDataHelper<Member>{
+public class MembersDataHelper extends BaseDataHelper<Member> {
     @Override
     protected String getTableName() {
         return MemberDBInfo.TABLE_NAME;
@@ -20,7 +20,7 @@ public class MembersDataHelper extends BaseDataHelper<Member>{
         return member.toContentValues();
     }
 
-    public Member select(int mid){
+    public Member select(int mid) {
         Cursor cursor = query(null, MemberDBInfo.MID + "=?", new String[]{String.valueOf(mid)}, null);
         Member member = null;
         if (cursor.moveToFirst()) {
@@ -30,7 +30,7 @@ public class MembersDataHelper extends BaseDataHelper<Member>{
         return member;
     }
 
-    public Member select(String username){
+    public Member select(String username) {
         Cursor cursor = query(null, MemberDBInfo.USERNAME + "=?", new String[]{username}, null);
         Member member = null;
         if (cursor.moveToFirst()) {

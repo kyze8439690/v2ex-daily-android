@@ -26,7 +26,7 @@ public class Node {
         node.id = json.getInt("id");
         node.name = json.getString("name");
         node.title = json.getString("title");
-        node.title_alternative = json.getString("title_alternative");
+        node.title_alternative = json.optString("title_alternative");
         node.url = json.getString("url");
         node.topics = json.getInt("topics");
         node.avatar = "http:" + json.getString("avatar_large");
