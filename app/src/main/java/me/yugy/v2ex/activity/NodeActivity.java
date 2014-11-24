@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -129,7 +130,7 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
                     Palette.generateAsync(loadedImage, new Palette.PaletteAsyncListener() {
                         @Override
                         public void onGenerated(Palette palette) {
-                            int color = palette.getVibrantColor(0xFF161616);
+                            int color = palette.getMutedColor(0xFF161616);
                             if (color == Color.TRANSPARENT) { color = 0xFF161616; }
                             mActionBarBackground = new ColorDrawable(color);
                             mActionBarBackground.setAlpha(0);
@@ -139,8 +140,17 @@ public class NodeActivity extends BaseActivity implements LoaderManager.LoaderCa
                                 getWindow().setStatusBarColor(palette.getDarkMutedColor(Color.BLACK));
                                 getWindow().setNavigationBarColor(palette.getDarkMutedColor(Color.BLACK));
                             }
-                            mRevealColorView.reveal(mRevealColorView.getWidth() / 2, UIUtils.dp(NodeActivity.this, 64),
-                                    palette.getMutedColor(0xFF161616), null);
+                            final int finalColor = color;
+                            mRevealColorView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                                @Override
+                                public boolean onPreDraw() {
+                                    mRevealColorView.getViewTreeObserver().removeOnPreDrawListener(this);
+                                    mRevealColorView.reveal(mRevealColorView.getWidth() / 2,
+                                            UIUtils.dp(NodeActivity.this, 64),
+                                            finalColor, null);
+                                    return true;
+                                }
+                            });
                         }
                     });
                 }

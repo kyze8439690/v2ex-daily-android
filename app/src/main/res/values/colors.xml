@@ -7,4 +7,7 @@
     <color name="menu_item_color_active">#FFD35400</color>
     <color name="windowBackground">#fff1f1f1</color>
 
+    <color name="color_primary_topic">#ff1eaef9</color>
+    <color name="color_primary_dark_topic">#ff178dee</color>
+
 </resources>

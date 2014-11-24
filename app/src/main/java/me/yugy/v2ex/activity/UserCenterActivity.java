@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
 import com.android.volley.Response;
@@ -41,6 +43,7 @@ import me.yugy.v2ex.dao.datahelper.MembersDataHelper;
 import me.yugy.v2ex.dao.datahelper.UserTopicsDataHelper;
 import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
 import me.yugy.v2ex.listener.OnPaletteColorGenerateListener;
+import me.yugy.v2ex.listener.SimpleAnimationListener;
 import me.yugy.v2ex.model.HeadIconInfo;
 import me.yugy.v2ex.model.Member;
 import me.yugy.v2ex.model.Topic;
@@ -117,15 +120,9 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
                 mHeader.setTranslationY(translationY);
             }
         }));
-        mRecyclerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        mRecyclerView.setAlpha(0f);
-        mRecyclerView.animate().alpha(1f).setDuration(600).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mRecyclerView.setLayerType(View.LAYER_TYPE_NONE, null);
-            }
-        }).start();
-
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+        alphaAnimation.setDuration(600);
+        mRecyclerView.startAnimation(alphaAnimation);
 
         mUsername = getIntent().getStringExtra("username");
         mActionBarTitle = new SpannableString(mUsername);
@@ -260,17 +257,17 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
 
     @Override
     public void onBackPressed() {
-        mHeaderAdapter.playExitAnimation(new AnimatorListenerAdapter() {
+        mHeaderAdapter.playExitAnimation(new SimpleAnimationListener() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
+            public void onAnimationEnd(Animation animation) {
                 UserCenterActivity.super.onBackPressed();
             }
         });
         mPageIndicator.setAlpha(0);
         mRevealColorView.hide(mRevealColorView.getWidth() / 2, UIUtils.dp(this, 64), Color.TRANSPARENT, null);
-        mRecyclerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        mRecyclerView.animate().alpha(0f).setDuration(600).start();
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
+        alphaAnimation.setDuration(600);
+        mRecyclerView.startAnimation(alphaAnimation);
     }
 
     @Override
@@ -287,7 +284,7 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
 
     @Override
     public void onGenerated(Palette palette) {
-        int color = palette.getVibrantColor(0xFF161616);
+        int color = palette.getMutedColor(0xFF161616);
         if (color == Color.TRANSPARENT) { color = 0xFF161616; }
         mActionBarBackground = new ColorDrawable(color);
         mActionBarBackground.setAlpha(0);
@@ -298,7 +295,7 @@ public class UserCenterActivity extends ActionBarActivity implements OnPaletteCo
             getWindow().setNavigationBarColor(palette.getDarkMutedColor(Color.BLACK));
         }
         mRevealColorView.reveal(mRevealColorView.getWidth() / 2, UIUtils.dp(this, 64),
-                palette.getMutedColor(0xFF161616), null);
+                color, null);
 
     }
 

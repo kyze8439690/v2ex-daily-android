@@ -5,6 +5,7 @@
     <string name="click_to_login">点击登录</string>
     <string name="just_now">刚刚</string>
     <string name="refresh">刷新</string>
+    <string name="topic_title">查看主题</string>
 
     <array name="menu_entries">
         <item>今日热议</item>

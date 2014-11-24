@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.view.animation.Animation;
 
 import me.yugy.v2ex.fragment.UserInfoFirstFragment;
 import me.yugy.v2ex.fragment.UserInfoSecondFragment;
@@ -42,7 +43,7 @@ public class UserCenterHeaderPagerAdapter extends FragmentPagerAdapter {
         mUserInfoSecondFragment.refreshData();
     }
 
-    public void playExitAnimation(Animator.AnimatorListener listener) {
+    public void playExitAnimation(Animation.AnimationListener listener) {
         mUserInfoFirstFragment.playExitAnimation(listener);
     }
 }

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="16dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#FF4D4D4D"
+        tools:text="移动的光纤为什么这么便宜"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        />
+
+    <me.yugy.v2ex.widget.RelativeTimeTextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#FF999999"
+        tools:text="42 分钟前"
+        android:layout_below="@id/title"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="16dp"
+        />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#FF999999"
+        tools:text="广东汕头，移动的光纤12m六百块一年，每月送你二十块话费。
+这样才三百六元，还有12m。感觉便宜得不太对劲，不过有个亲戚也在用，没发现有啥问题。
+问问v友们这么便宜的靠谱嘛..."
+        android:layout_below="@id/time"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:maxLines="4"
+        android:ellipsize="end"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/head_icon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_below="@id/content"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="16dp"
+        tools:src="@drawable/ic_launcher"
+        />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#FF4D4D4D"
+        tools:text="Pete"
+        android:layout_alignTop="@id/head_icon"
+        android:layout_toRightOf="@id/head_icon"
+        android:layout_marginLeft="12dp"
+        />
+
+    <TextView
+        android:id="@+id/node"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="程序员"
+        android:textSize="14sp"
+        android:textColor="#4D4D4D"
+        android:layout_alignBottom="@id/head_icon"
+        android:layout_alignParentRight="true"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginRight="16dp"
+        />
+
+    <View
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffe0e0e0"
+        android:layout_below="@id/head_icon"
+        android:layout_marginTop="12dp"
+        />
+
+    <TextView
+        android:id="@+id/comment_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#ff767676"
+        tools:text="76 个回复"
+        android:background="#ffebebeb"
+        android:layout_below="@id/line1"
+        android:padding="16dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffe0e0e0"
+        android:layout_below="@id/comment_count"
+        />
+
+</RelativeLayout>

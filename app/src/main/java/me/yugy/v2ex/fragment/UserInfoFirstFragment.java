@@ -14,6 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -50,6 +57,7 @@ public class UserInfoFirstFragment extends Fragment{
     private String mUsername;
     private HeadIconInfo mHeadIconInfo;
     private AnimatorSet mAnimatorSet;
+    private AnimationSet mAnimationSet;
     private int mLeftDelta;
     private int mTopDelta;
     private float mWidthScale;
@@ -95,24 +103,17 @@ public class UserInfoFirstFragment extends Fragment{
                                 mWidthScale = (float) mHeadIconInfo.width / mHeadIcon.getWidth();
                                 mHeightScale = (float) mHeadIconInfo.height / mHeadIcon.getHeight();
 
-                                mHeadIcon.setTranslationX(mLeftDelta);
-                                mHeadIcon.setTranslationY(mTopDelta);
-                                mHeadIcon.setScaleX(mWidthScale);
-                                mHeadIcon.setScaleY(mHeightScale);
-                                mHeadIcon.setPivotX(0);
-                                mHeadIcon.setPivotY(0);
+                                mAnimationSet = new AnimationSet(false);
+                                ScaleAnimation scaleAnimation = new ScaleAnimation(mWidthScale, 1f, mHeightScale, 1f, 0f, 0f);
+                                mAnimationSet.addAnimation(scaleAnimation);
+                                TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, mTopDelta, 0f);
+                                yTranslateAnimation.setInterpolator(new DecelerateInterpolator());
+                                mAnimationSet.addAnimation(yTranslateAnimation);
+                                TranslateAnimation xTranslateAnimation = new TranslateAnimation(mLeftDelta, 0f, 0f, 0f);
+                                mAnimationSet.addAnimation(xTranslateAnimation);
+                                mAnimationSet.setDuration(600);
+                                mHeadIcon.startAnimation(mAnimationSet);
 
-                                mAnimatorSet = new AnimatorSet();
-                                ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0f);
-                                yAnimator.setInterpolator(new PathInterpolator());
-                                mAnimatorSet.playTogether(
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, 1f),
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, 1f),
-                                        ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, 0f),
-                                        yAnimator
-                                );
-                                mAnimatorSet.setDuration(600);
-                                mAnimatorSet.start();
                                 return true;
                             }
                         });
@@ -147,7 +148,7 @@ public class UserInfoFirstFragment extends Fragment{
         mOnPaletteColorGenerateListener = null;
     }
 
-    public void playExitAnimation(Animator.AnimatorListener listener) {
+    public void playExitAnimation(Animation.AnimationListener listener) {
         mName.setAlpha(0);
         mTagline.setAlpha(0);
 
@@ -156,30 +157,18 @@ public class UserInfoFirstFragment extends Fragment{
         mLeftDelta = mHeadIconInfo.left - screenLocation[0];
         mTopDelta = mHeadIconInfo.top - screenLocation[1];
 
-        ObjectAnimator yAnimator = ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_Y, 0, mTopDelta);
-        yAnimator.setInterpolator(new ReversePathInterpolator());
-        mAnimatorSet.playTogether(
-                ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_X, 1, mWidthScale),
-                ObjectAnimator.ofFloat(mHeadIcon, View.SCALE_Y, 1, mHeightScale),
-                ObjectAnimator.ofFloat(mHeadIcon, View.TRANSLATION_X, 0, mLeftDelta),
-                yAnimator
-        );
-        mAnimatorSet.addListener(listener);
-        mAnimatorSet.start();
-    }
-
-    private static class PathInterpolator implements TimeInterpolator{
-        @Override
-        public float getInterpolation(float input) {
-            return (float) Math.pow(1 - Math.pow(input - 1, 2), 0.5f);
-        }
-    }
-
-    private static class ReversePathInterpolator implements TimeInterpolator{
-        @Override
-        public float getInterpolation(float input) {
-            return (float) (1 - Math.pow(1 - Math.pow(input, 2), 0.5f));
-        }
+        mAnimationSet = new AnimationSet(false);
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1f, mWidthScale, 1f, mHeightScale, 0f, 0f);
+        mAnimationSet.addAnimation(scaleAnimation);
+        TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, 0f, mTopDelta);
+        yTranslateAnimation.setInterpolator(new AccelerateInterpolator());
+        mAnimationSet.addAnimation(yTranslateAnimation);
+        TranslateAnimation xTranslateAnimation = new TranslateAnimation(0f, mLeftDelta, 0f, 0f);
+        mAnimationSet.addAnimation(xTranslateAnimation);
+        mAnimationSet.setDuration(600);
+        mAnimationSet.setFillAfter(true);
+        mAnimationSet.setAnimationListener(listener);
+        mHeadIcon.startAnimation(mAnimationSet);
     }
 
 }

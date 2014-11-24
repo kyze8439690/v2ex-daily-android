@@ -31,6 +31,8 @@
             />
         <activity
             android:name=".activity.TopicActivity"
+            android:theme="@style/TopicActivity"
+            android:label="@string/topic_title"
             />
         
         
