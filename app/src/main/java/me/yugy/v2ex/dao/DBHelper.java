@@ -9,6 +9,7 @@ import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NewestTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 import me.yugy.v2ex.dao.dbinfo.NodeTopicsDBInfo;
+import me.yugy.v2ex.dao.dbinfo.ReplyDBInfo;
 import me.yugy.v2ex.dao.dbinfo.UserTopicsDBInfo;
 
 /**
@@ -32,6 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
         UserTopicsDBInfo.TABLE.create(db);
         NodeTopicsDBInfo.TABLE.create(db);
         NewestTopicsDBInfo.TABLE.create(db);
+        ReplyDBInfo.TABLE.create(db);
     }
 
     @Override
@@ -42,6 +44,7 @@ public class DBHelper extends SQLiteOpenHelper {
         UserTopicsDBInfo.TABLE.delete(db);
         NodeTopicsDBInfo.TABLE.delete(db);
         NewestTopicsDBInfo.TABLE.delete(db);
+        ReplyDBInfo.TABLE.delete(db);
 
         onCreate(db);
     }

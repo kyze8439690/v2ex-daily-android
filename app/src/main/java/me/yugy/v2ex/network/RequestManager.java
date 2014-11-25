@@ -6,6 +6,7 @@ import com.android.volley.toolbox.Volley;
 
 import me.yugy.v2ex.Application;
 import me.yugy.v2ex.model.Member;
+import me.yugy.v2ex.model.Reply;
 import me.yugy.v2ex.model.Topic;
 
 /**
@@ -18,6 +19,7 @@ public class RequestManager {
     public static final String API_USER_INFO = API_HOST + "/members/show.json";
     public static final String API_TOPICS = API_HOST + "/topics/show.json";
     public static final String API_LATEST_TOPICS = API_HOST + "/topics/latest.json";
+    public static final String API_REPLIES = API_HOST + "/replies/show.json";
 
     private static RequestManager sInstance;
 
@@ -64,6 +66,12 @@ public class RequestManager {
 
     public void getNewestTopics(Object tag, Response.Listener<Topic[]> listener, Response.ErrorListener errorListener) {
         GetNewestTopicsRequest request = new GetNewestTopicsRequest(listener, errorListener);
+        request.setTag(tag);
+        mRequestQueue.add(request);
+    }
+
+    public void getReplies(Object tag, int topicId, Response.Listener<Reply[]> listener, Response.ErrorListener errorListener) {
+        GetRepliesRequest request = new GetRepliesRequest(topicId, listener, errorListener);
         request.setTag(tag);
         mRequestQueue.add(request);
     }

@@ -1,8 +1,11 @@
 package me.yugy.v2ex.activity;
 
-import android.app.Activity;
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.v4.view.MenuItemCompat;
@@ -10,34 +13,41 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import me.yugy.github.myutils.UIUtils;
 import me.yugy.v2ex.R;
-import me.yugy.v2ex.adapter.EmptyAdapter;
+import me.yugy.v2ex.adapter.RepliesAdapter;
 import me.yugy.v2ex.dao.datahelper.HotTopicsDataHelper;
 import me.yugy.v2ex.dao.datahelper.NewestTopicsDataHelper;
 import me.yugy.v2ex.dao.datahelper.NodeTopicsDataHelper;
+import me.yugy.v2ex.dao.datahelper.RepliesDataHelper;
 import me.yugy.v2ex.dao.datahelper.UserTopicsDataHelper;
-import me.yugy.v2ex.model.HeadIconInfo;
+import me.yugy.v2ex.dao.dbinfo.ReplyDBInfo;
+import me.yugy.v2ex.model.Reply;
 import me.yugy.v2ex.model.Topic;
+import me.yugy.v2ex.network.RequestManager;
+import me.yugy.v2ex.network.SimpleErrorListener;
 import me.yugy.v2ex.widget.CircularProgressBar;
-import me.yugy.v2ex.widget.RelativeTimeTextView;
+import me.yugy.v2ex.widget.CircularProgressDrawable;
+import me.yugy.v2ex.widget.RevealLayout;
+import me.yugy.v2ex.widget.container.TopicHeaderContainer;
 
 /**
  * Created by yugy on 14/11/20.
  */
-public class TopicActivity extends BaseActivity{
+public class TopicActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({TYPE_HOT, TYPE_NEWEST, TYPE_NODE, TYPE_USER})
@@ -59,7 +69,9 @@ public class TopicActivity extends BaseActivity{
     private Topic mTopic;
     private boolean mIsLoading = false;
     private CircularProgressBar mProgressBar;
-    private HeaderContainer mHeaderContainer;
+    private TopicHeaderContainer mHeaderContainer;
+    private RepliesDataHelper mDataHelper;
+    private RepliesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +79,17 @@ public class TopicActivity extends BaseActivity{
         setContentView(R.layout.activity_topic);
         ButterKnife.inject(this);
 
+        getSupportActionBar().setElevation(UIUtils.dp(this, 2));
+        mDataHelper = new RepliesDataHelper();
+        mAdapter = new RepliesAdapter(this);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+
         getTopicData();
         initTopicData();
+        getLoaderManager().initLoader(4, null, this);
 
+        getRepliesData();
     }
 
     private void getTopicData() {
@@ -94,61 +114,44 @@ public class TopicActivity extends BaseActivity{
 
     private void initTopicData() {
         View headerView = getLayoutInflater().inflate(R.layout.header_topic, mListView, false);
-        mHeaderContainer = new HeaderContainer(headerView);
+        mHeaderContainer = new TopicHeaderContainer(headerView);
         if (mTopic != null) {
             mHeaderContainer.parse(mTopic);
-        }
-        mListView.addHeaderView(headerView, null, false);
-        mListView.setAdapter(new EmptyAdapter());
-
-    }
-
-    public class HeaderContainer {
-
-        @InjectView(R.id.title) TextView title;
-        @InjectView(R.id.time) RelativeTimeTextView time;
-        @InjectView(R.id.content) TextView content;
-        @InjectView(R.id.head_icon) CircleImageView headIcon;
-        @InjectView(R.id.name) TextView name;
-        @InjectView(R.id.comment_count) TextView commentCount;
-        @InjectView(R.id.node) TextView node;
-        private String mUsername;
-        private int mNodeId;
-
-        public HeaderContainer(View itemView) {
-            ButterKnife.inject(this, itemView);
-        }
-
-        public void parse (final Topic topic) {
-            mUsername = topic.member.username;
-            mNodeId = topic.node.id;
-            title.setText(topic.title);
-            time.setReferenceTime(topic.created * 1000);
-            content.setText(topic.content_rendered);
-            ImageLoader.getInstance().displayImage(topic.member.avatar, headIcon);
-            name.setText(topic.member.username);
-            commentCount.setText(String.format("%d 个回复", topic.replies));
-            node.setText(topic.node.title);
-        }
-
-        @OnClick(R.id.head_icon)
-        void onHeadIconClick(View view) {
-            view.setVisibility(View.INVISIBLE);
-            HeadIconInfo headIconInfo = new HeadIconInfo();
-            int[] screenLocation = new int[2];
-            headIcon.getLocationOnScreen(screenLocation);
-            headIconInfo.left = screenLocation[0];
-            headIconInfo.top = screenLocation[1];
-            headIconInfo.width = view.getWidth();
-            headIconInfo.height = view.getHeight();
-            UserCenterActivity.launch(headIcon.getContext(), mUsername, headIconInfo);
-        }
-
-        @OnClick(R.id.node)
-        void onNodeClick(View view) {
-            NodeActivity.launch(view.getContext(), mNodeId);
+            mListView.addHeaderView(headerView, null, false);
         }
     }
+
+    private void getRepliesData() {
+        mIsLoading = true;
+        invalidateOptionsMenu();
+        RequestManager.getInstance().getReplies(this, mTopic.id, new Response.Listener<Reply[]>() {
+            @Override
+            public void onResponse(Reply[] response) {
+                stopLoadingAnimation();
+            }
+        }, new SimpleErrorListener(this) {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                super.onErrorResponse(error);
+                stopLoadingAnimation();
+            }
+        });
+    }
+
+    private void stopLoadingAnimation() {
+        mIsLoading = false;
+        if (mProgressBar != null) {
+            mProgressBar.progressiveStop(new CircularProgressDrawable.OnEndListener() {
+                @Override
+                public void onEnd(CircularProgressDrawable drawable) {
+                    invalidateOptionsMenu();
+                }
+            });
+        } else {
+            invalidateOptionsMenu();
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -166,11 +169,50 @@ public class TopicActivity extends BaseActivity{
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            getRepliesData();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (!mHeaderContainer.headIcon.isShown()) {
             mHeaderContainer.headIcon.setVisibility(View.VISIBLE);
         }
+        int childCount = mListView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = mListView.getChildAt(i);
+            View headIcon = view.findViewById(R.id.head_icon);
+            if (headIcon != null && !headIcon.isShown()) {
+                headIcon.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        RequestManager.getInstance().cancel(this);
+        super.onDestroy();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return mDataHelper.getCursorLoader(ReplyDBInfo.TID + "=?", new String[]{String.valueOf(mTopic.id)});
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mAdapter.changeCursor(null);
     }
 }
 

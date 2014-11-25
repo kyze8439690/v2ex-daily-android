@@ -107,7 +107,7 @@ public class UserInfoFirstFragment extends Fragment{
                                 ScaleAnimation scaleAnimation = new ScaleAnimation(mWidthScale, 1f, mHeightScale, 1f, 0f, 0f);
                                 mAnimationSet.addAnimation(scaleAnimation);
                                 TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, mTopDelta, 0f);
-                                yTranslateAnimation.setInterpolator(new DecelerateInterpolator());
+                                yTranslateAnimation.setInterpolator(new PathInterpolator());
                                 mAnimationSet.addAnimation(yTranslateAnimation);
                                 TranslateAnimation xTranslateAnimation = new TranslateAnimation(mLeftDelta, 0f, 0f, 0f);
                                 mAnimationSet.addAnimation(xTranslateAnimation);
@@ -161,7 +161,7 @@ public class UserInfoFirstFragment extends Fragment{
         ScaleAnimation scaleAnimation = new ScaleAnimation(1f, mWidthScale, 1f, mHeightScale, 0f, 0f);
         mAnimationSet.addAnimation(scaleAnimation);
         TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, 0f, mTopDelta);
-        yTranslateAnimation.setInterpolator(new AccelerateInterpolator());
+        yTranslateAnimation.setInterpolator(new ReversePathInterpolator());
         mAnimationSet.addAnimation(yTranslateAnimation);
         TranslateAnimation xTranslateAnimation = new TranslateAnimation(0f, mLeftDelta, 0f, 0f);
         mAnimationSet.addAnimation(xTranslateAnimation);
@@ -171,4 +171,17 @@ public class UserInfoFirstFragment extends Fragment{
         mHeadIcon.startAnimation(mAnimationSet);
     }
 
+    private static class PathInterpolator implements Interpolator{
+        @Override
+        public float getInterpolation(float input) {
+            return (float) Math.pow(1 - Math.pow(input - 1, 2), 0.5f);
+        }
+    }
+
+    private static class ReversePathInterpolator implements Interpolator{
+        @Override
+        public float getInterpolation(float input) {
+            return (float) (1 - Math.pow(1 - Math.pow(input, 2), 0.5f));
+        }
+    }
 }

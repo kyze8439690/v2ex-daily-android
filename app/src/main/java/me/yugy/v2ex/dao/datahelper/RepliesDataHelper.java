@@ -9,14 +9,10 @@ import java.util.ArrayList;
 import me.yugy.v2ex.Application;
 import me.yugy.v2ex.dao.DBHelper;
 import me.yugy.v2ex.dao.DataProvider;
-import me.yugy.v2ex.dao.dbinfo.BaseTopicsDBInfo;
 import me.yugy.v2ex.dao.dbinfo.MemberDBInfo;
-import me.yugy.v2ex.dao.dbinfo.NodeDBInfo;
 import me.yugy.v2ex.dao.dbinfo.ReplyDBInfo;
 import me.yugy.v2ex.model.Member;
-import me.yugy.v2ex.model.Node;
 import me.yugy.v2ex.model.Reply;
-import me.yugy.v2ex.model.Topic;
 
 /**
  * Created by yugy on 14/11/19.
@@ -36,25 +32,23 @@ public class RepliesDataHelper extends BaseDataHelper<Reply> {
         return new Reply[0];
     }
 
-    public void bulkInsert(Topic[] topics) {
+    public void bulkInsert(Reply[] replies) {
         synchronized (DataProvider.class) {
             SQLiteDatabase db = new DBHelper().getWritableDatabase();
             int changeCount = 0;
             db.beginTransaction();
             try {
                 ArrayList<Member> members = new ArrayList<Member>();
-                ArrayList<Node> nodes = new ArrayList<Node>();
-                for (Topic topic : topics) {
-                    members.add(topic.member);
-                    nodes.add(topic.node);
-                    if (db.query(getTableName(), new String[]{BaseTopicsDBInfo.TID},
-                            BaseTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)},
+                for (Reply reply : replies) {
+                    members.add(reply.member);
+                    if (db.query(getTableName(), new String[]{ReplyDBInfo.RID},
+                            ReplyDBInfo.RID + "=?", new String[]{String.valueOf(reply.id)},
                             null, null, null).moveToFirst()) {
-                        db.update(getTableName(), topic.toContentValues(),
-                                BaseTopicsDBInfo.TID + "=?", new String[]{String.valueOf(topic.id)});
+                        db.update(getTableName(), reply.toContentValues(),
+                                ReplyDBInfo.RID + "=?", new String[]{String.valueOf(reply.id)});
                         changeCount++;
                     } else {
-                        db.insert(getTableName(), null, topic.toContentValues());
+                        db.insert(getTableName(), null, reply.toContentValues());
                         changeCount++;
                     }
                 }
@@ -66,16 +60,6 @@ public class RepliesDataHelper extends BaseDataHelper<Reply> {
                                 MemberDBInfo.MID + "=?", new String[]{String.valueOf(member.id)});
                     } else {
                         db.insert(MemberDBInfo.TABLE_NAME, null, member.toContentValues());
-                    }
-                }
-                for (Node node : nodes) {
-                    if (db.query(NodeDBInfo.TABLE_NAME, new String[]{NodeDBInfo.NID},
-                            NodeDBInfo.NID + "=?", new String[]{String.valueOf(node.id)},
-                            null, null, null).moveToFirst()) {
-                        db.update(NodeDBInfo.TABLE_NAME, node.toContentValues(),
-                                NodeDBInfo.NID + "=?", new String[]{String.valueOf(node.id)});
-                    } else {
-                        db.insert(NodeDBInfo.TABLE_NAME, null, node.toContentValues());
                     }
                 }
                 db.setTransactionSuccessful();

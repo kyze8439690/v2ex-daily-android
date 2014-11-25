@@ -1,5 +1,8 @@
 package me.yugy.v2ex;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -24,8 +27,11 @@ public class Application extends android.app.Application{
 
         //init imageLoader
         DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_launcher)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
+                .displayer(new FadeInBitmapDisplayer(600))
+//                .showImageOnLoading(new ColorDrawable(Color.rgb(0, 165, 154)))
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .tasksProcessingOrder(QueueProcessingType.LIFO)

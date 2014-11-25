@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+    >
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@id/head_icon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        tools:src="@drawable/ic_launcher"
+        />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="name"
+        android:layout_toRightOf="@id/head_icon"
+        android:layout_marginLeft="16dp"
+        android:textSize="16sp"
+        />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="fjkladhsfdjkshfjkadhsjklfhadsjklfhffjkdshfjkdhsfjkdhsjkfdhsjkfhadsjkfhs"
+        android:layout_alignLeft="@id/name"
+        android:layout_below="@id/name"
+        android:layout_marginTop="8dp"
+        />
+
+    <me.yugy.v2ex.widget.RelativeTimeTextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        tools:text="12 minutes ago"
+        android:layout_alignLeft="@id/content"
+        android:layout_below="@id/content"
+        android:layout_marginTop="8dp"
+        />
+
+</RelativeLayout>

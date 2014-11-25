@@ -32,7 +32,7 @@ public class Topic {
         topic.id = json.getInt("id");
         topic.title = json.getString("title");
         topic.url = json.getString("url");
-        topic.content = json.getString("content");
+        topic.content = json.getString("content_rendered");
         topic.content_rendered = json.getString("content_rendered")
                 .replace("<br />", "\n")
                 .replace("&lt;", "<")
