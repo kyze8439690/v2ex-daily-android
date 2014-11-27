@@ -60,7 +60,7 @@ import me.yugy.v2ex.widget.RevealColorView;
 /**
  * Created by yugy on 14/11/16.
  */
-public class UserCenterActivity extends ActionBarActivity implements OnPaletteColorGenerateListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class UserCenterActivity extends BaseActivity implements OnPaletteColorGenerateListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     @InjectView(R.id.recycler_view) RecyclerView mRecyclerView;
     @InjectView(R.id.toolbar) Toolbar mToolbar;

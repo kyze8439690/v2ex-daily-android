@@ -6,11 +6,13 @@
     <string name="just_now">刚刚</string>
     <string name="refresh">刷新</string>
     <string name="topic_title">查看主题</string>
+    <string name="login_title">用户登陆</string>
+    <string name="login_success">登陆成功</string>
+    <string name="login_fail">登陆失败</string>
 
     <array name="menu_entries">
         <item>今日热议</item>
         <item>最新主题</item>
-        <item>所有节点</item>
         <item>通知</item>
         <item>设置</item>
     </array>

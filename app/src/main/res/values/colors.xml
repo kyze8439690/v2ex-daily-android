@@ -10,4 +10,6 @@
     <color name="color_primary_topic">#ff1eaef9</color>
     <color name="color_primary_dark_topic">#ff178dee</color>
 
+    <color name="color_primary_login_webview">#FF3D00</color>
+    <color name="color_primary_dark_login_webview">#DD2C00</color>
 </resources>

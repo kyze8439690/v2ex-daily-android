@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="304.5dp"
-                android:layout_height="190.5dp"
-                android:background="@drawable/bg_menu_header"
-    >
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/darker_gray"
+                android:id="@+id/root_layout"
+                android:paddingLeft="16dp"
+                android:paddingTop="32dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="16dp"
+                >
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/head_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/ic_launcher"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginBottom="16dp"
         />
 
     <TextView
@@ -24,9 +26,9 @@
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:layout_toRightOf="@id/head_icon"
-        android:layout_alignParentBottom="true"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_alignBottom="@id/head_icon"
+        android:layout_marginBottom="8dp"
         />
 
 

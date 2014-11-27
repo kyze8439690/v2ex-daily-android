@@ -50,13 +50,14 @@ import me.yugy.v2ex.widget.container.TopicHeaderContainer;
 public class TopicActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TYPE_HOT, TYPE_NEWEST, TYPE_NODE, TYPE_USER})
+    @IntDef({TYPE_HOT, TYPE_NEWEST, TYPE_NODE, TYPE_USER, TYPE_OUTSIDE})
     public @interface Type {}
 
     public static final int TYPE_HOT = 0;
     public static final int TYPE_NEWEST = 1;
     public static final int TYPE_NODE = 2;
     public static final int TYPE_USER = 3;
+    public static final int TYPE_OUTSIDE = 4;
 
     public static void launch(Context context, @Type int type, int topicId) {
         Intent intent = new Intent(context, TopicActivity.class);
@@ -85,30 +86,35 @@ public class TopicActivity extends BaseActivity implements LoaderManager.LoaderC
         mListView.setAdapter(mAdapter);
         mListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
 
-        getTopicData();
-        initTopicData();
-        getLoaderManager().initLoader(4, null, this);
+        if (getTopicData()) {
+            initTopicData();
+            getLoaderManager().initLoader(4, null, this);
+            getRepliesData();
+        } else {
 
-        getRepliesData();
+        }
     }
 
-    private void getTopicData() {
+    private boolean getTopicData() {
         int type = getIntent().getIntExtra("type", -1);
         int topicId = getIntent().getIntExtra("topicId", 0);
 
         switch (type) {
             case TYPE_HOT:
                 mTopic = new HotTopicsDataHelper().select(topicId);
-                break;
+                return true;
             case TYPE_NEWEST:
                 mTopic = new NewestTopicsDataHelper().select(topicId);
-                break;
+                return true;
             case TYPE_NODE:
                 mTopic = new NodeTopicsDataHelper().select(topicId);
-                break;
+                return true;
             case TYPE_USER:
                 mTopic = new UserTopicsDataHelper().select(topicId);
-                break;
+                return true;
+            case TYPE_OUTSIDE:
+            default:
+                return false;
         }
     }
 

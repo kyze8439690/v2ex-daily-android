@@ -2,6 +2,7 @@ package me.yugy.v2ex.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +30,12 @@ public class Node {
         node.title_alternative = json.optString("title_alternative");
         node.url = json.getString("url");
         node.topics = json.getInt("topics");
-        node.avatar = "http:" + json.getString("avatar_large");
+        String avatar = json.optString("avatar_large");
+        if (TextUtils.isEmpty(avatar)) {
+            node.avatar = "";
+        } else {
+            node.avatar = "http:" + avatar;
+        }
         return node;
     }
 

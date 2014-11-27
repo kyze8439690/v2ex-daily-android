@@ -28,6 +28,7 @@ import me.yugy.v2ex.R;
 import me.yugy.v2ex.activity.TopicActivity;
 import me.yugy.v2ex.adapter.TopicsAdapter;
 import me.yugy.v2ex.dao.datahelper.NewestTopicsDataHelper;
+import me.yugy.v2ex.dao.dbinfo.NewestTopicsDBInfo;
 import me.yugy.v2ex.model.Topic;
 import me.yugy.v2ex.network.RequestManager;
 import me.yugy.v2ex.widget.PauseOnScrollListener2;
@@ -140,7 +141,7 @@ public class NewestTopicsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return mDataHelper.getCursorLoader();
+        return mDataHelper.getCursorLoader(NewestTopicsDBInfo.CREATED + " DESC");
     }
 
     @Override

@@ -32,4 +32,9 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="LoginWebViewActivity" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/color_primary_login_webview</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark_login_webview</item>
+    </style>
+
 </resources>

@@ -33,10 +33,10 @@
     <fragment
         android:name="me.yugy.v2ex.fragment.MenuFragment"
         android:id="@+id/menu_fragment"
-        android:layout_width="304.5dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:background="@android:color/white"
         android:layout_gravity="start"
-        />
+        tools:layout="@layout/header_menu"/>
 
 </android.support.v4.widget.DrawerLayout>
