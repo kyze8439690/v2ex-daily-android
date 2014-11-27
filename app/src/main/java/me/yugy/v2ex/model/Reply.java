@@ -28,7 +28,7 @@ public class Reply {
         reply.id = json.getInt("id");
         reply.thanks = json.getInt("thanks");
         reply.content = json.getString("content");
-        reply.content_rendered = json.getString("content_rendered");
+        reply.content_rendered = json.getString("content_rendered").replace("@<a target=\"_blank\" href=\"/member/", "@<a target=\"_blank\" href=\"http://www.v2ex.com/member/");
         reply.member = Member.fromJson(json.getJSONObject("member"));
         reply.created = json.getLong("created");
         reply.last_modified = json.getLong("last_modified");

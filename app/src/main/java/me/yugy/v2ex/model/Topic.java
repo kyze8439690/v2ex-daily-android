@@ -32,7 +32,8 @@ public class Topic {
         topic.id = json.getInt("id");
         topic.title = json.getString("title");
         topic.url = json.getString("url");
-        topic.content = json.getString("content_rendered");
+        topic.content = json.getString("content_rendered")
+                .replaceAll("<a target=\"_blank\" href=\"/t/([0-9]+)\">", "<a target=\"_blank\" href=\"http://www.v2ex.com/t/$1\">");
         topic.content_rendered = json.getString("content_rendered")
                 .replace("<br />", "\n")
                 .replace("&lt;", "<")

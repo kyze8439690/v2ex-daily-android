@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.view.View;
@@ -43,6 +44,7 @@ public class RepliesAdapterHolder {
 
     public RepliesAdapterHolder(View view) {
         ButterKnife.inject(this, view);
+        content.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     public void parse(Reply reply) {

@@ -45,7 +45,6 @@
         android:layout_marginTop="12dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:linksClickable="true"
         android:autoLink="web|email"
         android:textIsSelectable="true"
         />

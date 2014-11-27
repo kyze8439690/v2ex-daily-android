@@ -67,6 +67,7 @@ public class TopicActivity extends BaseActivity implements LoaderManager.LoaderC
     }
 
     @InjectView(R.id.list) ListView mListView;
+    private int mTopicId;
     private Topic mTopic;
     private boolean mIsLoading = false;
     private CircularProgressBar mProgressBar;
@@ -91,26 +92,33 @@ public class TopicActivity extends BaseActivity implements LoaderManager.LoaderC
             getLoaderManager().initLoader(4, null, this);
             getRepliesData();
         } else {
-
+            RequestManager.getInstance().getTopic(this, mTopicId, new Response.Listener<Topic>() {
+                @Override
+                public void onResponse(Topic response) {
+                    initTopicData();
+                    getLoaderManager().initLoader(4, null, TopicActivity.this);
+                    getRepliesData();
+                }
+            }, new SimpleErrorListener(this));
         }
     }
 
     private boolean getTopicData() {
         int type = getIntent().getIntExtra("type", -1);
-        int topicId = getIntent().getIntExtra("topicId", 0);
+        mTopicId = getIntent().getIntExtra("topicId", 0);
 
         switch (type) {
             case TYPE_HOT:
-                mTopic = new HotTopicsDataHelper().select(topicId);
+                mTopic = new HotTopicsDataHelper().select(mTopicId);
                 return true;
             case TYPE_NEWEST:
-                mTopic = new NewestTopicsDataHelper().select(topicId);
+                mTopic = new NewestTopicsDataHelper().select(mTopicId);
                 return true;
             case TYPE_NODE:
-                mTopic = new NodeTopicsDataHelper().select(topicId);
+                mTopic = new NodeTopicsDataHelper().select(mTopicId);
                 return true;
             case TYPE_USER:
-                mTopic = new UserTopicsDataHelper().select(topicId);
+                mTopic = new UserTopicsDataHelper().select(mTopicId);
                 return true;
             case TYPE_OUTSIDE:
             default:
@@ -177,6 +185,28 @@ public class TopicActivity extends BaseActivity implements LoaderManager.LoaderC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
+            RequestManager.getInstance().getTopic(this, mTopicId, new Response.Listener<Topic>() {
+                @Override
+                public void onResponse(Topic response) {
+                    int type = getIntent().getIntExtra("type", -1);
+                    switch (type) {
+                        case TYPE_HOT:
+                            new HotTopicsDataHelper().bulkInsert(new Topic[]{response});
+                            break;
+                        case TYPE_NEWEST:
+                            new NewestTopicsDataHelper().bulkInsert(new Topic[]{response});
+                            break;
+                        case TYPE_NODE:
+                            new NodeTopicsDataHelper().bulkInsert(new Topic[]{response});
+                            break;
+                        case TYPE_USER:
+                            new UserTopicsDataHelper().bulkInsert(new Topic[]{response});
+                            break;
+                    }
+                    mTopic = response;
+                    mHeaderContainer.parse(mTopic);
+                }
+            }, new SimpleErrorListener(this));
             getRepliesData();
             return true;
         } else {

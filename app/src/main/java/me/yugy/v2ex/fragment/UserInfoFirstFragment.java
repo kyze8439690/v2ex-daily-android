@@ -149,26 +149,30 @@ public class UserInfoFirstFragment extends Fragment{
     }
 
     public void playExitAnimation(Animation.AnimationListener listener) {
-        mName.setAlpha(0);
-        mTagline.setAlpha(0);
+        if (mHeadIconInfo != null) {
+            mName.setAlpha(0);
+            mTagline.setAlpha(0);
 
-        int[] screenLocation = new int[2];
-        mHeadIcon.getLocationOnScreen(screenLocation);
-        mLeftDelta = mHeadIconInfo.left - screenLocation[0];
-        mTopDelta = mHeadIconInfo.top - screenLocation[1];
+            int[] screenLocation = new int[2];
+            mHeadIcon.getLocationOnScreen(screenLocation);
+            mLeftDelta = mHeadIconInfo.left - screenLocation[0];
+            mTopDelta = mHeadIconInfo.top - screenLocation[1];
 
-        mAnimationSet = new AnimationSet(false);
-        ScaleAnimation scaleAnimation = new ScaleAnimation(1f, mWidthScale, 1f, mHeightScale, 0f, 0f);
-        mAnimationSet.addAnimation(scaleAnimation);
-        TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, 0f, mTopDelta);
-        yTranslateAnimation.setInterpolator(new ReversePathInterpolator());
-        mAnimationSet.addAnimation(yTranslateAnimation);
-        TranslateAnimation xTranslateAnimation = new TranslateAnimation(0f, mLeftDelta, 0f, 0f);
-        mAnimationSet.addAnimation(xTranslateAnimation);
-        mAnimationSet.setDuration(600);
-        mAnimationSet.setFillAfter(true);
-        mAnimationSet.setAnimationListener(listener);
-        mHeadIcon.startAnimation(mAnimationSet);
+            mAnimationSet = new AnimationSet(false);
+            ScaleAnimation scaleAnimation = new ScaleAnimation(1f, mWidthScale, 1f, mHeightScale, 0f, 0f);
+            mAnimationSet.addAnimation(scaleAnimation);
+            TranslateAnimation yTranslateAnimation = new TranslateAnimation(0f, 0f, 0f, mTopDelta);
+            yTranslateAnimation.setInterpolator(new ReversePathInterpolator());
+            mAnimationSet.addAnimation(yTranslateAnimation);
+            TranslateAnimation xTranslateAnimation = new TranslateAnimation(0f, mLeftDelta, 0f, 0f);
+            mAnimationSet.addAnimation(xTranslateAnimation);
+            mAnimationSet.setDuration(600);
+            mAnimationSet.setFillAfter(true);
+            mAnimationSet.setAnimationListener(listener);
+            mHeadIcon.startAnimation(mAnimationSet);
+        } else {
+            listener.onAnimationEnd(null);
+        }
     }
 
     private static class PathInterpolator implements Interpolator{

@@ -124,7 +124,12 @@ public class UserCenterActivity extends BaseActivity implements OnPaletteColorGe
         alphaAnimation.setDuration(600);
         mRecyclerView.startAnimation(alphaAnimation);
 
-        mUsername = getIntent().getStringExtra("username");
+        if (getIntent().hasExtra("username")) {
+            mUsername = getIntent().getStringExtra("username");
+        } else {
+            mUsername = getIntent().getData().getLastPathSegment();
+        }
+
         mActionBarTitle = new SpannableString(mUsername);
         mActionBarTitleColorSpan = new AlphaForegroundColorSpan(Color.WHITE);
         setActionBarTitleAlpha(0);
@@ -301,7 +306,7 @@ public class UserCenterActivity extends BaseActivity implements OnPaletteColorGe
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return mDataHelper.getCursorLoader(UserTopicsDBInfo.MID + "=?", new String[]{String.valueOf(mUid)});
+        return mDataHelper.getCursorLoader(UserTopicsDBInfo.MID + "=?", new String[]{String.valueOf(mUid)}, UserTopicsDBInfo.CREATED + " DESC");
     }
 
     @Override

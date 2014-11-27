@@ -24,7 +24,18 @@
         <activity
             android:name=".activity.UserCenterActivity"
             android:theme="@style/UserCenterActivity"
-            />
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
+                <data
+                    android:host="www.v2ex.com"
+                    android:pathPrefix="/member/"
+                    android:scheme="http"
+                    />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.NodeActivity"
             android:theme="@style/NodeActivity"

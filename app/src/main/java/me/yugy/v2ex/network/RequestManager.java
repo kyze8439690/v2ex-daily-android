@@ -76,6 +76,12 @@ public class RequestManager {
         mRequestQueue.add(request);
     }
 
+    public void getTopic(Object tag, int topicId, Response.Listener<Topic> listener, Response.ErrorListener errorListener) {
+        GetTopicRequest request = new GetTopicRequest(topicId, listener, errorListener);
+        request.setTag(tag);
+        mRequestQueue.add(request);
+    }
+
     public void cancel(Object tag){
         mRequestQueue.cancelAll(tag);
     }

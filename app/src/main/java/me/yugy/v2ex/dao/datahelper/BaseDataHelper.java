@@ -76,12 +76,15 @@ public abstract class BaseDataHelper<T> {
     }
 
     public CursorLoader getCursorLoader(String sortOrder) {
-        CursorLoader loader = new CursorLoader(Application.getInstance(), mUri, null, null, null, sortOrder);
         return new CursorLoader(Application.getInstance(), mUri, null, null, null, sortOrder);
     }
 
     public CursorLoader getCursorLoader(String selection, String[] selectionArgs) {
         return new CursorLoader(Application.getInstance(), mUri, null, selection, selectionArgs, null);
+    }
+
+    public CursorLoader getCursorLoader(String selection, String[] selectionArgs, String sortOrder) {
+        return new CursorLoader(Application.getInstance(), mUri, null, selection, selectionArgs, sortOrder);
     }
 
     protected abstract ContentValues getContentValues(T T);
