@@ -14,6 +14,13 @@ import me.yugy.v2ex.R;
 public class MenuAdapter extends BaseAdapter {
 
     private String[] mEntries;
+    private int[] mEntriesIconResource = new int[]{
+            R.drawable.ic_hot,
+            R.drawable.ic_time,
+            R.drawable.ic_nodes,
+            R.drawable.ic_notification,
+            R.drawable.ic_setting
+    };
     private int mActiveColor;
     private int mNormalColor;
     private int mCurrentIndex = 0;
@@ -55,6 +62,7 @@ public class MenuAdapter extends BaseAdapter {
             view = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu, parent, false);
         }
         view.setText(getItem(position));
+        view.setCompoundDrawablesWithIntrinsicBounds(mEntriesIconResource[position], 0, 0, 0);
         if(position == mCurrentIndex){
             view.setTextColor(mActiveColor);
         }else{

@@ -13,6 +13,7 @@
     <array name="menu_entries">
         <item>今日热议</item>
         <item>最新主题</item>
+        <item>所有节点</item>
         <item>通知</item>
         <item>设置</item>
     </array>

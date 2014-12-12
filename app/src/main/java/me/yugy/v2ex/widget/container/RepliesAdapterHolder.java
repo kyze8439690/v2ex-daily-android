@@ -37,6 +37,7 @@ public class RepliesAdapterHolder {
 
     @InjectView(R.id.head_icon) CircleImageView headIcon;
     @InjectView(R.id.name) TextView name;
+    @InjectView(R.id.thanks) TextView thanks;
     @InjectView(R.id.content) TextView content;
     @InjectView(R.id.time) RelativeTimeTextView time;
 
@@ -52,6 +53,12 @@ public class RepliesAdapterHolder {
         ImageLoader.getInstance().displayImage(reply.member.avatar, headIcon);
         name.setText(reply.member.username);
         time.setReferenceTime(reply.created * 1000);
+        if (reply.thanks > 0) {
+            thanks.setVisibility(View.VISIBLE);
+            thanks.setText("+" + reply.thanks);
+        } else {
+            thanks.setVisibility(View.INVISIBLE);
+        }
 
         Spanned spanned = Html.fromHtml(reply.content_rendered, new AsyncImageGetter(content), null);
         SpannableStringBuilder spannableStringBuilder;

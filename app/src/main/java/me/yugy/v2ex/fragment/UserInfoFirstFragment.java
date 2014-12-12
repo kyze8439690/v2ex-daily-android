@@ -56,7 +56,6 @@ public class UserInfoFirstFragment extends Fragment{
     @InjectView(R.id.tagline) TextView mTagline;
     private String mUsername;
     private HeadIconInfo mHeadIconInfo;
-    private AnimatorSet mAnimatorSet;
     private AnimationSet mAnimationSet;
     private int mLeftDelta;
     private int mTopDelta;

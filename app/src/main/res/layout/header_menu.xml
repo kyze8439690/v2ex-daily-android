@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:background="@android:color/darker_gray"
-                android:id="@+id/root_layout"
-                android:paddingLeft="16dp"
-                android:paddingTop="32dp"
-                android:paddingRight="16dp"
-                android:paddingBottom="16dp"
-                >
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/head_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_launcher"
-        />
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="150dp"
+        android:background="@android:color/darker_gray"
+        android:id="@+id/root_layout"
+        android:padding="16dp"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/head_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"
+            android:layout_alignParentBottom="true"
+            />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_to_login"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/head_icon"
+            android:layout_marginLeft="16dp"
+            android:layout_alignBottom="@id/head_icon"
+            android:layout_marginBottom="8dp"
+            />
+
+
+    </RelativeLayout>
 
     <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:text="@string/click_to_login"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:layout_toRightOf="@id/head_icon"
-        android:layout_marginLeft="16dp"
-        android:layout_alignBottom="@id/head_icon"
-        android:layout_marginBottom="8dp"
+        android:padding="16dp"
+        android:text="所有标签"
+        android:textColor="#888888"
         />
 
-
-</RelativeLayout>
+</LinearLayout>

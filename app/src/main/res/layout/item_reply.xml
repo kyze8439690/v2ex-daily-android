@@ -24,6 +24,19 @@
         />
 
     <TextView
+        android:id="@+id/thanks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="+10"
+        android:textSize="12sp"
+        android:layout_toRightOf="@id/name"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="8dp"
+        android:textStyle="italic"
+        android:textColor="#404040"
+        />
+
+    <TextView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
