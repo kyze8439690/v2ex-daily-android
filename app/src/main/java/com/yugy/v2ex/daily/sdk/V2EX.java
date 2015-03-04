@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class V2EX {
 
-    private static final String API_URL = "http://www.v2ex.com/api";
+    private static final String API_URL = "https://www.v2ex.com/api";
     private static final String API_LATEST = "/topics/latest.json";
     private static final String API_ALL_NODE = "/nodes/all.json";
     private static final String API_REPLIES = "/replies/show.json";
@@ -171,8 +171,8 @@ public class V2EX {
      */
     public static void getOnceCode(final Context context, int topicId, final JsonHttpResponseHandler responseHandler){
         AsyncHttpClient client = getClient(context);
-        client.addHeader("Referer", "http://www.v2ex.com");
-        client.get("http://www.v2ex.com/t/" + topicId, new AsyncHttpResponseHandler(){
+        client.addHeader("Referer", "https://www.v2ex.com");
+        client.get("https://www.v2ex.com/t/" + topicId, new AsyncHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String content = new String(responseBody);
@@ -260,15 +260,15 @@ public class V2EX {
      */
     public static void login(final Context context, String username, String password, int onceCode, final JsonHttpResponseHandler responseHandler){
         AsyncHttpClient client = getClient(context);
-        client.addHeader("Origin", "http://www.v2ex.com");
-        client.addHeader("Referer", "http://www.v2ex.com/signin");
+        client.addHeader("Origin", "https://www.v2ex.com");
+        client.addHeader("Referer", "https://www.v2ex.com/signin");
         client.addHeader("Content-Type", "application/x-www-form-urlencoded");
         RequestParams params = new RequestParams();
         params.put("next", "/");
         params.put("u", username);
         params.put("once", String.valueOf(onceCode));
         params.put("p", password);
-        client.post("http://www.v2ex.com/signin", params, new TextHttpResponseHandler() {
+        client.post("https://www.v2ex.com/signin", params, new TextHttpResponseHandler() {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -330,7 +330,7 @@ public class V2EX {
      * }
      */
     public static void getUserInfo(final Context context, final JsonHttpResponseHandler responseHandler){
-        getClient(context).get("http://www.v2ex.com/my/nodes", new TextHttpResponseHandler() {
+        getClient(context).get("https://www.v2ex.com/my/nodes", new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 responseHandler.onFailure(statusCode, headers, responseString, throwable);
@@ -371,13 +371,13 @@ public class V2EX {
 
     public static void postComment(final Context context, int onceCode, int topicId, final String commentContent, final JsonHttpResponseHandler responseHandler){
         AsyncHttpClient client = getClient(context);
-        client.addHeader("Origin", "http://www.v2ex.com");
-        client.addHeader("Referer", "http://www.v2ex.com/t/" + topicId);
+        client.addHeader("Origin", "https://www.v2ex.com");
+        client.addHeader("Referer", "https://www.v2ex.com/t/" + topicId);
         client.addHeader("Content-Type", "application/x-www-form-urlencoded");
         RequestParams params = new RequestParams();
         params.put("content", commentContent);
         params.put("once", String.valueOf(onceCode));
-        client.post("http://www.v2ex.com/t/" + topicId, params, new AsyncHttpResponseHandler() {
+        client.post("https://www.v2ex.com/t/" + topicId, params, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -429,7 +429,7 @@ public class V2EX {
      * }
      */
     public static void getRegTime(final Context context, final JsonHttpResponseHandler responseHandler){
-        getClient(context).get("http://www.v2ex.com/go/nds", new TextHttpResponseHandler() {
+        getClient(context).get("https://www.v2ex.com/go/nds", new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 responseHandler.onFailure(statusCode, headers, responseString, throwable);
@@ -459,9 +459,9 @@ public class V2EX {
     public static void syncCollection(final Context context, int nodeId, String regTime, boolean add, final JsonHttpResponseHandler responseHandler){
         String url;
         if(add){
-            url = "http://www.v2ex.com/favorite/node/" + nodeId + "?t=" + regTime;
+            url = "https://www.v2ex.com/favorite/node/" + nodeId + "?t=" + regTime;
         }else{
-            url = "http://www.v2ex.com/unfavorite/node/" + nodeId + "?t=" + regTime;
+            url = "https://www.v2ex.com/unfavorite/node/" + nodeId + "?t=" + regTime;
         }
         getClient(context).get(url, new TextHttpResponseHandler(){
 
@@ -503,7 +503,7 @@ public class V2EX {
     public static void getNotificationToken(final Context context, final JsonHttpResponseHandler responseHandler){
         AsyncHttpClient client = getClient(context);
         client.setUserAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.146 Safari/537.36");
-        client.get("http://www.v2ex.com/notifications", new TextHttpResponseHandler(){
+        client.get("https://www.v2ex.com/notifications", new TextHttpResponseHandler(){
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 responseHandler.onFailure(statusCode, headers, responseString, throwable);
@@ -511,7 +511,7 @@ public class V2EX {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                Pattern tokenPattern = Pattern.compile("<input type=\"text\" value=\"http://www\\.v2ex\\.com/n/([^\\.]+)\\.xml\" class=\"sll\" onclick=\"this\\.select\\(\\);\" readonly=\"readonly\" />");
+                Pattern tokenPattern = Pattern.compile("<input type=\"text\" value=\"https://www\\.v2ex\\.com/n/([^\\.]+)\\.xml\" class=\"sll\" onclick=\"this\\.select\\(\\);\" readonly=\"readonly\" />");
                 Matcher tokenMatcher = tokenPattern.matcher(responseBody);
                 try {
                     JSONObject result = new JSONObject();
@@ -530,7 +530,7 @@ public class V2EX {
     }
 
     public static void getNotification(final Context context, String token, TextHttpResponseHandler responseHandler){
-        getClient(context).get("http://www.v2ex.com/n/" + token + ".xml", responseHandler);
+        getClient(context).get("https://www.v2ex.com/n/" + token + ".xml", responseHandler);
     }
 
     public static void logout(Context context){

@@ -64,14 +64,14 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
                 }
                 break;
             case R.id.txt_activity_login_sign_up:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.v2ex.com/signup")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.v2ex.com/signup")));
                 break;
         }
     }
 
     private void getOnceCode(){
         mProgressDialog = ProgressDialog.show(LoginActivity.this, null, "Get Once Code...", true, true);
-        V2EX.getOnceCode(this, "http://www.v2ex.com/signin", new JsonHttpResponseHandler(){
+        V2EX.getOnceCode(this, "https://www.v2ex.com/signin", new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if(LoginActivity.this != null){

@@ -114,7 +114,7 @@ public class AllNodesDataHelper extends BaseDataHelper{
 
     public void importCollections(String[] collections){
         for(String collectionName : collections){
-            Cursor cursor = query(null, BaseNodesDBInfo.URL + "=\"http://www.v2ex.com/go/" + collectionName + "\"", null, null);
+            Cursor cursor = query(null, BaseNodesDBInfo.URL + "=\"https://www.v2ex.com/go/" + collectionName + "\"", null, null);
             if(cursor.moveToFirst()){
                 NodeModel node = NodeModel.fromCursor(cursor);
                 node.isCollected = true;
