@@ -119,7 +119,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
             mDescription.setText("Loading...");
             V2EX.showUser(getActivity(), username, new JsonHttpResponseHandler(){
                 @Override
-                public void onSuccess(JSONObject response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     mMemberModel = new MemberModel();
                     try {
                         mMemberModel.parse(response);
@@ -128,7 +128,6 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                         AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                         e.printStackTrace();
                     }
-                    super.onSuccess(response);
                 }
 
                 @Override
@@ -173,7 +172,7 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
         V2EX.showTopicByUsername(getActivity(), forceRefresh, mMemberModel.username,
             new JsonHttpResponseHandler(){
                 @Override
-                public void onSuccess(JSONArray response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                     DebugUtils.log(response);
                     try {
                         mModels = getModels(response);
@@ -184,7 +183,6 @@ public class UserFragment extends Fragment implements OnRefreshListener, Adapter
                         e.printStackTrace();
                     }
                     mPullToRefreshLayout.setRefreshComplete();
-                    super.onSuccess(response);
                 }
 
                 @Override

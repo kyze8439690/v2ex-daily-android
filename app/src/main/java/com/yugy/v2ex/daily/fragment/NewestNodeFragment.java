@@ -87,7 +87,7 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
     private void getAllNodesData(){
         V2EX.getAllNode(getActivity(), new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 new AllNodesParseTask(getActivity()){
                     @Override
@@ -96,7 +96,6 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
                         getNewestNodeData();
                     }
                 }.execute(response);
-                super.onSuccess(response);
             }
 
             @Override
@@ -127,7 +126,7 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
         mPullToRefreshLayout.setRefreshing(true);
         V2EX.getLatestTopics(getActivity(), mPage, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 try {
                     if(mPage == 1){
@@ -140,7 +139,6 @@ public class NewestNodeFragment extends Fragment implements OnRefreshListener, O
                     e.printStackTrace();
                 }
                 mPullToRefreshLayout.setRefreshComplete();
-                super.onSuccess(response);
             }
 
             @Override

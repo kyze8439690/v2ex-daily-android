@@ -133,7 +133,7 @@ public class AllNodeFragment extends Fragment implements
     private void getData(){
         V2EX.getAllNode(getActivity(), new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 new AllNodesParseTask(getActivity()) {
                     @Override
@@ -143,7 +143,6 @@ public class AllNodeFragment extends Fragment implements
                         mGridView.setEmptyView(null);
                     }
                 }.execute(response);
-                super.onSuccess(response);
             }
 
             @Override

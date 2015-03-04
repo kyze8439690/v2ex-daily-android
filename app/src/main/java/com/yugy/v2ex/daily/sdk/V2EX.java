@@ -38,9 +38,8 @@ public class V2EX {
         params.put("p", String.valueOf(page));
         new AsyncHttpClient().get(context, API_URL + API_LATEST, params, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(JSONArray response) {
-                responseHandler.onSuccess(response);
-                super.onSuccess(response);
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                responseHandler.onSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -56,9 +55,8 @@ public class V2EX {
         new AsyncHttpClient().get(context, API_URL + API_ALL_NODE, new JsonHttpResponseHandler() {
 
             @Override
-            public void onSuccess(JSONArray response) {
-                responseHandler.onSuccess(response);
-                super.onSuccess(response);
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                responseHandler.onSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -87,7 +85,7 @@ public class V2EX {
             if(sharedPreferences.contains("topics_" + nodeId + "_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("topics_" + nodeId + "_cache", null));
-                    responseHandler.onSuccess(jsonArray);
+                    responseHandler.onSuccess(200, new Header[0], jsonArray);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -96,10 +94,9 @@ public class V2EX {
         }
         new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?node_id=" + nodeId, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 sharedPreferences.edit().putString("topics_" + nodeId + "_cache", response.toString()).commit();
-                responseHandler.onSuccess(response);
-                super.onSuccess(response);
+                responseHandler.onSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -118,7 +115,7 @@ public class V2EX {
             if(sharedPreferences.contains("topics_" + username + "_cache")){
                 try {
                     JSONArray jsonArray = new JSONArray(sharedPreferences.getString("topics_" + username + "_cache", null));
-                    responseHandler.onSuccess(jsonArray);
+                    responseHandler.onSuccess(200, new Header[0], jsonArray);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -127,10 +124,9 @@ public class V2EX {
         }
         new AsyncHttpClient().get(context, API_URL + API_TOPIC + "?username=" + username, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 sharedPreferences.edit().putString("topics_" + username + "_cache", response.toString()).commit();
-                responseHandler.onSuccess(response);
-                super.onSuccess(response);
+                responseHandler.onSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -208,8 +204,12 @@ public class V2EX {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                responseHandler.onSuccess(result);
-                super.onSuccess(statusCode, headers, responseBody);
+                responseHandler.onSuccess(statusCode, headers, result);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                responseHandler.onFailure(statusCode, headers, responseBody, error);
             }
         });
     }
@@ -217,6 +217,11 @@ public class V2EX {
     public static void getOnceCode(Context context, String url, final JsonHttpResponseHandler responseHandler){
         AsyncHttpClient client = getClient(context);
         client.get(url, new TextHttpResponseHandler(){
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                responseHandler.onFailure(statusCode, headers, responseString, throwable);
+            }
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
 //                DebugUtils.log(responseBody);
@@ -238,8 +243,7 @@ public class V2EX {
                     e.printStackTrace();
                 }
                 DebugUtils.log(result);
-                responseHandler.onSuccess(result);
-                super.onSuccess(statusCode, headers, responseBody);
+                responseHandler.onSuccess(statusCode, headers, result);
             }
         });
     }
@@ -267,6 +271,23 @@ public class V2EX {
         client.post("http://www.v2ex.com/signin", params, new TextHttpResponseHandler() {
 
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                DebugUtils.log(statusCode);
+                JSONObject result = new JSONObject();
+                try {
+                    if(statusCode == 302){
+                        result.put("result", "ok");
+                    }else{
+                        result.put("result", "fail");
+                    }
+                    DebugUtils.log(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
 //                DebugUtils.log(responseBody);
                 JSONObject result = new JSONObject();
@@ -284,30 +305,13 @@ public class V2EX {
                         put("error_msg", errorContent);
                     }});
                     DebugUtils.log(result);
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
             }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                DebugUtils.log(statusCode);
-                JSONObject result = new JSONObject();
-                try {
-                    if(statusCode == 302){
-                        result.put("result", "ok");
-                    }else{
-                        result.put("result", "fail");
-                    }
-                    DebugUtils.log(result);
-                    responseHandler.onSuccess(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                super.onFailure(statusCode, headers, responseBody, error);
-            }
         });
     }
 
@@ -328,8 +332,12 @@ public class V2EX {
     public static void getUserInfo(final Context context, final JsonHttpResponseHandler responseHandler){
         getClient(context).get("http://www.v2ex.com/my/nodes", new TextHttpResponseHandler() {
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                responseHandler.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                super.onSuccess(statusCode, headers, responseBody);
                 JSONObject result = new JSONObject();
                 try {
                     Pattern userPattern = Pattern.compile("<a href=\"/member/([^\"]+)\" class=\"top\">");
@@ -349,10 +357,10 @@ public class V2EX {
                         content.put("collections", collections);
                         result.put("content", content);
                         result.put("result", "ok");
-                        responseHandler.onSuccess(result);
+                        responseHandler.onSuccess(statusCode, headers, result);
                     } else {
                         result.put("result", "fail");
-                        responseHandler.onSuccess(result);
+                        responseHandler.onSuccess(statusCode, headers, result);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -387,11 +395,10 @@ public class V2EX {
                     result.put("content", new JSONObject(){{
                         put("error_msg", errorContent);
                     }});
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                super.onSuccess(statusCode, headers, responseBody);
             }
 
             @Override
@@ -406,11 +413,10 @@ public class V2EX {
                         result.put("result", "fail");
                     }
                     DebugUtils.log(result);
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                super.onFailure(statusCode, headers, responseBody, error);
             }
         });
     }
@@ -425,8 +431,12 @@ public class V2EX {
     public static void getRegTime(final Context context, final JsonHttpResponseHandler responseHandler){
         getClient(context).get("http://www.v2ex.com/go/nds", new TextHttpResponseHandler() {
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                responseHandler.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                super.onSuccess(statusCode, headers, responseBody);
                 try {
                     JSONObject result = new JSONObject();
                     Pattern regTimePattern = Pattern.compile("favorite/node/32\\?t=([^\"]+)\">");
@@ -438,7 +448,7 @@ public class V2EX {
                         result.put("result", "fail");
                     }
                     DebugUtils.log(result);
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -456,20 +466,7 @@ public class V2EX {
         getClient(context).get(url, new TextHttpResponseHandler(){
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                super.onSuccess(statusCode, headers, responseBody);
-                try {
-                    JSONObject result = new JSONObject();
-                    result.put("result", "fail");
-                    responseHandler.onSuccess(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                super.onFailure(statusCode, headers, responseBody, error);
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 JSONObject result = new JSONObject();
                 try {
                     if(statusCode == 302){
@@ -477,7 +474,18 @@ public class V2EX {
                     }else{
                         result.put("result", "fail");
                     }
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                try {
+                    JSONObject result = new JSONObject();
+                    result.put("result", "fail");
+                    responseHandler.onSuccess(statusCode, headers, result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -497,8 +505,12 @@ public class V2EX {
         client.setUserAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.146 Safari/537.36");
         client.get("http://www.v2ex.com/notifications", new TextHttpResponseHandler(){
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                responseHandler.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                super.onSuccess(statusCode, headers, responseBody);
                 Pattern tokenPattern = Pattern.compile("<input type=\"text\" value=\"http://www\\.v2ex\\.com/n/([^\\.]+)\\.xml\" class=\"sll\" onclick=\"this\\.select\\(\\);\" readonly=\"readonly\" />");
                 Matcher tokenMatcher = tokenPattern.matcher(responseBody);
                 try {
@@ -509,7 +521,7 @@ public class V2EX {
                     }else{
                         result.put("result", "fail");
                     }
-                    responseHandler.onSuccess(result);
+                    responseHandler.onSuccess(statusCode, headers, result);
                 }catch (JSONException e){
                     e.printStackTrace();
                 }

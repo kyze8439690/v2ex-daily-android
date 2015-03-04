@@ -74,8 +74,7 @@ public class NotificationFragment extends Fragment implements OnRefreshListener,
                 final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), null, "Getting notification token...", true, false);
                 V2EX.getNotificationToken(getActivity(), new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(JSONObject response) {
-                    super.onSuccess(response);
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     DebugUtils.log(response);
                     if (getActivity() != null) {
                         try {
@@ -106,15 +105,19 @@ public class NotificationFragment extends Fragment implements OnRefreshListener,
         mPullToRefreshLayout.setRefreshing(true);
         V2EX.getNotification(getActivity(), mToken, new TextHttpResponseHandler(){
             @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
+
+            @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                super.onSuccess(statusCode, headers, responseBody);
                 Pattern entryPattern = Pattern.compile("<entry>[\\d\\D]+?</entry>");
                 Matcher entryMatcher = entryPattern.matcher(responseBody);
                 ArrayList<String> entries = new ArrayList<String>();
                 while(entryMatcher.find()){
                     entries.add(entryMatcher.group());
                 }
-                mModels = new ArrayList<NotificationModel>();
+                mModels = new ArrayList<>();
                 for(String entry : entries){
                     NotificationModel model = new NotificationModel();
                     try {

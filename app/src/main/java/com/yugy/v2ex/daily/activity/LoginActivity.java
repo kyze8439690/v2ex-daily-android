@@ -20,6 +20,7 @@ import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.MessageUtils;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,7 +73,7 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
         mProgressDialog = ProgressDialog.show(LoginActivity.this, null, "Get Once Code...", true, true);
         V2EX.getOnceCode(this, "http://www.v2ex.com/signin", new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONObject response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if(LoginActivity.this != null){
                     try {
                         if(response.getString("result").equals("ok")){
@@ -82,7 +83,6 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
                         }else{
                             MessageUtils.toast(LoginActivity.this, "get once code fail");
                         }
-                        super.onSuccess(response);
                     } catch (JSONException e) {
                         MessageUtils.toast(LoginActivity.this, "json error");
                         e.printStackTrace();
@@ -95,7 +95,7 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
     private void login(int onceCode){
         V2EX.login(LoginActivity.this, mUsername.getText().toString(), mPassword.getText().toString(), onceCode, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONObject response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if(LoginActivity.this != null){
                     try {
                         if(response.getString("result").equals("ok")){
@@ -109,7 +109,6 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    super.onSuccess(response);
                 }
             }
         });
@@ -118,8 +117,7 @@ public class LoginActivity extends SwipeBackActivity implements View.OnClickList
     private void getUserInfo(){
         V2EX.getUserInfo(LoginActivity.this, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONObject response) {
-                super.onSuccess(response);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 DebugUtils.log(response);
                 try{
                     String username = response.getJSONObject("content").getString("username");

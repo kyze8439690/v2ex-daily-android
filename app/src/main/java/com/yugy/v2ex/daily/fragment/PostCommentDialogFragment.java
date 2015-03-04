@@ -12,6 +12,7 @@ import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.MessageUtils;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,7 +64,7 @@ public class PostCommentDialogFragment extends DialogFragment{
         }else{
             V2EX.getOnceCode(getActivity(), mTopicId, new JsonHttpResponseHandler(){
                 @Override
-                public void onSuccess(JSONObject response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     DebugUtils.log(response);
                     if(getDialog() != null){
                         try {
@@ -71,12 +72,11 @@ public class PostCommentDialogFragment extends DialogFragment{
                                 int onceCode = response.getJSONObject("content").getInt("once");
                                 V2EX.postComment(getActivity(), onceCode, mTopicId, mCommentContent, new JsonHttpResponseHandler(){
                                     @Override
-                                    public void onSuccess(JSONObject response) {
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         if(mOnCommentFinishListener != null){
                                             mOnCommentFinishListener.onCommentFinished(response);
                                         }
                                         dismiss();
-                                        super.onSuccess(response);
                                     }
                                 });
                             }else if(response.getString("result").equals("fail")){
@@ -86,7 +86,6 @@ public class PostCommentDialogFragment extends DialogFragment{
                             e.printStackTrace();
                         }
                     }
-                    super.onSuccess(response);
                 }
             });
         }
