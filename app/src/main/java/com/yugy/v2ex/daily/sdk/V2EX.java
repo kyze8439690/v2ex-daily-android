@@ -345,7 +345,7 @@ public class V2EX {
                     if (userMatcher.find()) {
                         JSONObject content = new JSONObject();
                         content.put("username", userMatcher.group(1));
-                        Pattern collectionPattern = Pattern.compile("</a>&nbsp; <a href=\"/go/([^\"]+)\">");
+                        Pattern collectionPattern = Pattern.compile("<a class=\"grid_item\" href=\"/go/([^\"]+)\"");
                         Matcher collectionMatcher = collectionPattern.matcher(responseBody);
                         JSONArray collections = new JSONArray();
                         if (collectionMatcher.find()) {

@@ -76,9 +76,9 @@ public class SwipeBackActivityHelper {
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void convertActivityFromTranslucent() {
         try {
-            Method method = Activity.class.getDeclaredMethod("convertFromTranslucent", null);
+            Method method = Activity.class.getDeclaredMethod("convertFromTranslucent", Void.class);
             method.setAccessible(true);
-            method.invoke(mActivity, null);
+            method.invoke(mActivity);
         } catch (Throwable ignored) {
         }
     }
