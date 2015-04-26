@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
@@ -45,6 +46,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     public static final String PREF_LOGIN = "pref_login";
     public static final String PREF_CONTACT = "pref_contact";
+    public static final String PREF_HTTPS = "pref_https";
     public static final String PREF_UPDATE = "pref_check_update";
     public static final String PREF_SYNC = "pref_sync";
 
@@ -76,6 +78,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         findPreference(PREF_CONTACT).setOnPreferenceClickListener(this);
         findPreference(PREF_UPDATE).setOnPreferenceClickListener(this);
         findPreference(PREF_SYNC).setOnPreferenceClickListener(this);
+        findPreference(PREF_HTTPS).setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -129,6 +132,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }else{
                 startActivityForResult(new Intent(getActivity(), LoginActivity.class), REQUEST_CODE_LOGIN);
             }
+            return true;
+        }else if(preference.getKey().equals(PREF_HTTPS)){
+            boolean checked = ((CheckBoxPreference)findPreference(PREF_HTTPS)).isChecked();
+            V2EX.setHttps(checked);
             return true;
         }else if(preference.getKey().equals(PREF_SYNC)){
             final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), null, "Syncing...", true, true);
