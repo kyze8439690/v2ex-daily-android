@@ -10,6 +10,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.yugy.v2ex.daily.Application;
 import com.yugy.v2ex.daily.utils.DebugUtils;
 
 import org.apache.http.Header;
@@ -24,13 +25,19 @@ import java.util.regex.Pattern;
  * Created by yugy on 14-2-22.
  */
 public class V2EX {
-
-    private static final String API_URL = "https://www.v2ex.com/api";
+    private static Context cxt = Application.getInstance().getBaseContext();
+    private static boolean USE_HTTPS = PreferenceManager.getDefaultSharedPreferences(cxt).getBoolean("pref_https", false);
+    private static String API_URL = USE_HTTPS ? "https://www.v2ex.com/api" : "http://www.v2ex.com/api";
     private static final String API_LATEST = "/topics/latest.json";
     private static final String API_ALL_NODE = "/nodes/all.json";
     private static final String API_REPLIES = "/replies/show.json";
     private static final String API_TOPIC = "/topics/show.json";
     private static final String API_USER = "/members/show.json";
+
+    public static void setHttps(boolean checked){
+        USE_HTTPS = checked;
+        API_URL = USE_HTTPS ? "https://www.v2ex.com/api" : "http://www.v2ex.com/api";
+    }
 
     public static void getLatestTopics(Context context, int page, final JsonHttpResponseHandler responseHandler){
         DebugUtils.log("getLatestTopics");

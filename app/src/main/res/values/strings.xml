@@ -24,7 +24,9 @@
     <string name="title_more">More</string>
     <string name="title_about">About V2EX Daily</string>
     <string name="title_contact">Contact me</string>
+    <string name="title_https">Use http</string>
     <string name="title_contact_summary">I am looking for a job...</string>
+    <string name="title_https_summary">Use https instead of http</string>
     <string name="title_update">Check update</string>
     <string name="title_notification">Notification Service</string>
     <string name="title_notification_action">Notification</string>

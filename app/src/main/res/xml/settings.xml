@@ -35,6 +35,14 @@
             android:summary="@string/title_contact_summary"
             />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_https"
+            android:title="@string/title_https"
+            android:summary="@string/title_https_summary">
+        </CheckBoxPreference>
+
+
         <Preference
             android:key="pref_check_update"
             android:title="@string/title_update"
