@@ -15,6 +15,7 @@ import com.yugy.v2ex.daily.sdk.V2EX;
 import com.yugy.v2ex.daily.utils.MessageUtils;
 import com.yugy.v2ex.daily.widget.NodeView;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,8 +83,7 @@ public class SearchAllNodeAdapter extends BaseAdapter implements NodeView.OnAddB
             if(mRegTime == null){
                 V2EX.getRegTime(mContext, new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(JSONObject response) {
-                        super.onSuccess(response);
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
                             if (response.getString("result").equals("ok")) {
                                 mRegTime = response.getString("reg_time");
@@ -109,8 +109,7 @@ public class SearchAllNodeAdapter extends BaseAdapter implements NodeView.OnAddB
     private void syncCollection(final int nodeId, final boolean added, String regTime){
         V2EX.syncCollection(mContext, nodeId, regTime, added, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONObject response) {
-                super.onSuccess(response);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
                     if(response.getString("result").equals("ok")){
                         mProgressDialog.setMessage("OK");

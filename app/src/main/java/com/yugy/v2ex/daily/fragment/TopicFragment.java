@@ -97,7 +97,7 @@ public class TopicFragment extends Fragment implements OnRefreshListener{
     private void getTopicData(){
         V2EX.showTopicByTopicId(getActivity(), mTopicId, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 try {
                     if(mTopicModel == null){
@@ -115,7 +115,6 @@ public class TopicFragment extends Fragment implements OnRefreshListener{
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                     e.printStackTrace();
                 }
-                super.onSuccess(response);
             }
 
             @Override
@@ -147,7 +146,7 @@ public class TopicFragment extends Fragment implements OnRefreshListener{
         mPullToRefreshLayout.setRefreshing(true);
         V2EX.getReplies(getActivity(), mTopicModel.id, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 if(response.length() == 0){
                     mListView.setAdapter(new NoReplyAdapter());
@@ -162,7 +161,6 @@ public class TopicFragment extends Fragment implements OnRefreshListener{
                     AppMsg.makeText(getActivity(), "Json decode error", AppMsg.STYLE_ALERT).show();
                     e.printStackTrace();
                 }
-                super.onSuccess(response);
             }
 
             @Override

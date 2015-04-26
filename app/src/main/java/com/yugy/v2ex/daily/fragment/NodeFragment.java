@@ -109,8 +109,7 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                     if(mRegTime == null){
                         V2EX.getRegTime(getActivity(), new JsonHttpResponseHandler(){
                             @Override
-                            public void onSuccess(JSONObject response) {
-                                super.onSuccess(response);
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 if(getActivity() != null){
                                     try {
                                         if(response.getString("result").equals("ok")){
@@ -143,7 +142,7 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     private void getData(boolean forceRefresh){
         V2EX.showTopicByNodeId(getActivity(), forceRefresh, mNodeId, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DebugUtils.log(response);
                 if(getActivity() != null){
                     try {
@@ -160,7 +159,6 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
                     }
                     mPullToRefreshLayout.setRefreshComplete();
                 }
-                super.onSuccess(response);
             }
 
             @Override
@@ -201,8 +199,7 @@ public class NodeFragment extends Fragment implements OnRefreshListener, Adapter
     private void syncCollection(final int nodeId, final boolean added, String regTime){
         V2EX.syncCollection(getActivity(), nodeId, regTime, added, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(JSONObject response) {
-                super.onSuccess(response);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if(getActivity() != null){
                     try {
                         if(response.getString("result").equals("ok")){

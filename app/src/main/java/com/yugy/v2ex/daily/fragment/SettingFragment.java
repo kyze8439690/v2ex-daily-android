@@ -25,6 +25,7 @@ import com.yugy.v2ex.daily.utils.DebugUtils;
 import com.yugy.v2ex.daily.utils.TextUtils;
 import com.yugy.v2ex.daily.widget.AppMsg;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,8 +134,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), null, "Syncing...", true, true);
             V2EX.getUserInfo(getActivity(), new JsonHttpResponseHandler(){
                 @Override
-                public void onSuccess(JSONObject response) {
-                    super.onSuccess(response);
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     DebugUtils.log(response);
                     try{
                         progressDialog.setMessage("Import Node Collections...");

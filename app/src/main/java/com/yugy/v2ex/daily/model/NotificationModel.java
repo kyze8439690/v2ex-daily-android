@@ -17,7 +17,7 @@ public class NotificationModel {
     public String content;
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("<title>([^<]+)</title>");
-    private static final Pattern TOPIC_ID_PATTERN = Pattern.compile("http://www\\.v2ex\\.com/t/([0-9]+)");
+    private static final Pattern TOPIC_ID_PATTERN = Pattern.compile("https://www\\.v2ex\\.com/t/([0-9]+)");
     private static final Pattern TIME_PATTERN = Pattern.compile("<published>([^<]+)</published>");
     private static final Pattern AUTHOR_PATTERN = Pattern.compile("<name>([^<]+)</name>");
     private static final Pattern CONTENT_PATTERN = Pattern.compile("<!\\[CDATA\\[\\n\\t\\t\\n\\t([^\\t]+)");
